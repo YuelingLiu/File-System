@@ -42,8 +42,12 @@ typedef struct VCB {
 long MAGICNUM = 133713371337;
 
 
-void set(uint8_t **freeSpaceMap, int i){
+void setBit(uint8_t **freeSpaceMap, int i){
     *freeSpaceMap[i >> 3] |= (1 << (i & 0x7));    
+}
+
+int getBit(uint8_t **freeSpaceMap, int i){
+    return *freeSpaceMap[i >> 3] & (1 << (i & 0x7));
 }
 
 int initFreespace(int numberOfBlocks, int blockSize) {
@@ -54,8 +58,13 @@ int initFreespace(int numberOfBlocks, int blockSize) {
 
     printf("freepsace is working\n");
     printf("freeSpaceMap[0]: %d\n", freeSpaceMap[0]);
-    set(&freeSpaceMap, 0);
-        printf("freeSpaceMap[0]: %d\n", freeSpaceMap[0]);
+    int testing = getBit(&freeSpaceMap, 0);
+    printf("testing: %d\n", testing);
+    setBit(&freeSpaceMap, 0);
+    testing = getBit(&freeSpaceMap,0);
+        printf("testing: %d\n", testing);
+
+    printf("freeSpaceMap[0]: %d\n", freeSpaceMap[0]);
 
 
     //ToDo: Set remaining bits as 0 (free)
