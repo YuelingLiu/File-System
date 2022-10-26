@@ -42,10 +42,15 @@ typedef struct VCB {
 long MAGICNUM = 133713371337;
 
 
-void setBit(uint8_t **freeSpaceMap, int i){
+void setBitOne(uint8_t **freeSpaceMap, int i){
     *freeSpaceMap[i >> 3] |= (1 << (i & 0x7));    
 }
 
+void setBitZero(uint8_t **freeSpaceMap, int i){
+    *freeSpaceMap[i >> 3] &= (0 << (i & 0x7));    
+}
+
+// why do we need a get function ?
 int getBit(uint8_t **freeSpaceMap, int i){
     return *freeSpaceMap[i >> 3] & (1 << (i & 0x7));
 }
@@ -58,14 +63,23 @@ int initFreespace(int numberOfBlocks, int blockSize) {
 
     printf("freepsace is working\n");
     printf("freeSpaceMap[0]: %d\n", freeSpaceMap[0]);
-    int testing = getBit(&freeSpaceMap, 0);
-    printf("testing: %d\n", testing);
-    setBit(&freeSpaceMap, 0);
-    testing = getBit(&freeSpaceMap,0);
-        printf("testing: %d\n", testing);
+    
+    setBitOne(&freeSpaceMap, 0);
 
     printf("freeSpaceMap[0]: %d\n", freeSpaceMap[0]);
 
+    setBitZero(&freeSpaceMap, 0);
+    printf("freeSpaceMap[0]: %d\n", freeSpaceMap[0]);
+    setBitOne(&freeSpaceMap, 0);
+    printf("freeSpaceMap[0]: %d\n", freeSpaceMap[0]);
+
+    for (size_t i = 1; i <= 6; i++)
+    {
+        printf("freeSpaceMap[%d]= %d\n",i,freeSpaceMap[i]); 
+
+    }
+    
+    
 
     //ToDo: Set remaining bits as 0 (free)
 
