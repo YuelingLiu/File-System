@@ -1,7 +1,7 @@
 /**************************************************************
 * Class: CSC-415-03 Fall 2022
 * Names: Tommy Truong, Yueling Liu, Steve Betts, Nicholas Hamada
-* Student IDs: 918602131 (Nicholas)
+* Student IDs: 913660519, 922272361, 921898143, 918602131 
 * GitHub Name: kpcrocks
 * Group Name: dev/null
 * Project: Basic File System
@@ -22,6 +22,7 @@
 #include <string.h>
 #include <time.h>
 #include <stdint.h> 
+#include <stdbool.h>
 
 #include "fsLow.h"
 #include "mfs.h"
@@ -50,8 +51,7 @@ void setBitZero(uint8_t **freeSpaceMap, int i){
     *freeSpaceMap[i >> 3] &= (0 << (i & 0x7));    
 }
 
-// why do we need a get function ?
-int getBit(uint8_t **freeSpaceMap, int i){
+bool getBit(uint8_t **freeSpaceMap, int i){
     return *freeSpaceMap[i >> 3] & (1 << (i & 0x7));
 }
 
@@ -59,29 +59,38 @@ int initFreespace(int numberOfBlocks, int blockSize) {
     int bytesNeeded = (numberOfBlocks + 7) / 8;
     int blocksNeeded = (bytesNeeded + (blockSize - 1)) / blockSize;
     uint8_t* freeSpaceMap = malloc(blocksNeeded * blockSize);
-    //ToDo: Set first six bits as 1 (used)
-
-    printf("freepsace is working\n");
-    printf("freeSpaceMap[0]: %d\n", freeSpaceMap[0]);
     
-    setBitOne(&freeSpaceMap, 0);
 
-    printf("freeSpaceMap[0]: %d\n", freeSpaceMap[0]);
-
-    setBitZero(&freeSpaceMap, 0);
-    printf("freeSpaceMap[0]: %d\n", freeSpaceMap[0]);
-    setBitOne(&freeSpaceMap, 0);
-    printf("freeSpaceMap[0]: %d\n", freeSpaceMap[0]);
-
-    for (size_t i = 1; i <= 6; i++)
+    // set the first 6 bits to 1 for the VCB and the bitmap
+    for (size_t i = 0; i <= 7; i++)
     {
-        printf("freeSpaceMap[%d]= %d\n",i,freeSpaceMap[i]); 
+        setBitOne(&freeSpaceMap, i);
+    }
 
+    
+    // for (size_t i = 0; i <=7   ; i++)
+    // {
+    //    printf("getBit: %d\n", getBit(&freeSpaceMap, i));
+    // }
+
+    printf("sizeof(freeSpaceMap): %d\n", strlen(freeSpaceMap));
+    //ToDo: Set remaining bits as 0 (free)
+    
+    for (size_t i = 0; i <= 5; i++)
+    {
+        setBitZero(&freeSpaceMap, i);
     }
     
-    
 
-    //ToDo: Set remaining bits as 0 (free)
+
+    // for (size_t i = 0; i <=5 ; i++)
+    // {
+    //    printf("getBit: %d\n", getBit(&freeSpaceMap, i));
+    // }
+    
+    printf("getBit(&freeSpaceMap, ): %d\n", getBit(&freeSpaceMap, 7));
+
+    //printf("freeSpaceMap[1]: %d\n", freeSpaceMap[1]);
 
     //Block 1 is where freespace will be written
     LBAwrite(freeSpaceMap, 5, 1); 
