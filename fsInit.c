@@ -43,16 +43,16 @@ typedef struct VCB {
 long MAGICNUM = 133713371337;
 
 
-void setBitOne(uint8_t **freeSpaceMap, int i){
-    *freeSpaceMap[i >> 3] |= (1 << (i & 0x7));    
+void setBitOne(uint8_t *freeSpaceMap, int i){
+    freeSpaceMap[i >> 3] |= (1 << (i & 0x7));    
 }
 
-void setBitZero(uint8_t **freeSpaceMap, int i){
-    *freeSpaceMap[i >> 3] &= (0 << (i & 0x7));    
+void setBitZero(uint8_t *freeSpaceMap, int i){
+    freeSpaceMap[i >> 3] &= (0 << (i & 0x7));    
 }
 
-bool getBit(uint8_t **freeSpaceMap, int i){
-    return *freeSpaceMap[i >> 3] & (1 << (i & 0x7));
+bool getBit(uint8_t *freeSpaceMap, int i){
+    return freeSpaceMap[i >> 3] & (1 << (i & 0x7));
 }
 
 int initFreespace(int numberOfBlocks, int blockSize) {
@@ -64,22 +64,22 @@ int initFreespace(int numberOfBlocks, int blockSize) {
     // set the first 6 bits to 1 for the VCB and the bitmap
     for (size_t i = 0; i <= 7; i++)
     {
-        setBitOne(&freeSpaceMap, i);
+        setBitOne(freeSpaceMap, i);
     }
 
     
-    // for (size_t i = 0; i <=7   ; i++)
-    // {
-    //    printf("getBit: %d\n", getBit(&freeSpaceMap, i));
-    // }
-
-    printf("sizeof(freeSpaceMap): %d\n", strlen(freeSpaceMap));
-    //ToDo: Set remaining bits as 0 (free)
-    
-    for (size_t i = 0; i <= 5; i++)
+    for (size_t i = 0; i <= 100  ; i++)
     {
-        setBitZero(&freeSpaceMap, i);
+       printf("getBit: %d\n", getBit(freeSpaceMap, i));
     }
+
+    // printf("sizeof(freeSpaceMap): %d\n", strlen(freeSpaceMap));
+    // //ToDo: Set remaining bits as 0 (free)
+    
+    // for (size_t i = 0; i <= 5; i++)
+    // {
+    //     setBitZero(&freeSpaceMap, i);
+    // }
     
 
 
@@ -88,9 +88,6 @@ int initFreespace(int numberOfBlocks, int blockSize) {
     //    printf("getBit: %d\n", getBit(&freeSpaceMap, i));
     // }
     
-    printf("getBit(&freeSpaceMap, ): %d\n", getBit(&freeSpaceMap, 7));
-
-    //printf("freeSpaceMap[1]: %d\n", freeSpaceMap[1]);
 
     //Block 1 is where freespace will be written
     LBAwrite(freeSpaceMap, 5, 1); 
