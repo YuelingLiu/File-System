@@ -55,40 +55,46 @@ bool getBit(uint8_t *freeSpaceMap, int i){
     return freeSpaceMap[i >> 3] & (1 << (i & 0x7));
 }
 
-int initFreespace(int numberOfBlocks, int blockSize) {
+int getFreespaceSize(int numberOfBlocks, int blockSize){
     int bytesNeeded = (numberOfBlocks + 7) / 8;
     int blocksNeeded = (bytesNeeded + (blockSize - 1)) / blockSize;
-    uint8_t* freeSpaceMap = malloc(blocksNeeded * blockSize);
+    return (blocksNeeded * blockSize);
+}
+
+int allocContBlocks(uint8_t *freeSpaceMap, size_t fssize, int num){
+    int freeBlockCounter = 0;
+    int firstBitOffset = 0;
+    for (size_t byteIndex = 0; byteIndex < fssize; byteIndex++){
+        if (freeSpaceMap[byteIndex] != 255){
+            while(getBit(freeSpaceMap, (byteIndex * 8) + firstBitOffset) == 1){
+                firstBitOffset++;
+            }
+            while(getBit(freeSpaceMap, (byteIndex * 8) + firstBitOffset + freeBlockCounter) == 0){
+                freeBlockCounter++;
+                if (freeBlockCounter == num){
+                    for (int i = firstBitOffset; i < firstBitOffset + freeBlockCounter; i++){
+                            setBitOne(freeSpaceMap, i);
+                        }
+                    return (byteIndex * 8) + firstBitOffset;
+                }
+            }
+        }
+        freeBlockCounter = 0;
+        firstBitOffset = 0;
+    }
+    return -1;
+}
+
+int initFreespace(size_t fssize) {
+    uint8_t* freeSpaceMap = malloc(fssize);
     
 
     // set the first 6 bits to 1 for the VCB and the bitmap
-    for (size_t i = 0; i <= 7; i++)
+    for (size_t i = 0; i <= 5; i++)
     {
         setBitOne(freeSpaceMap, i);
     }
-
     
-    for (size_t i = 0; i <= 100  ; i++)
-    {
-       printf("getBit: %d\n", getBit(freeSpaceMap, i));
-    }
-
-    // printf("sizeof(freeSpaceMap): %d\n", strlen(freeSpaceMap));
-    // //ToDo: Set remaining bits as 0 (free)
-    
-    // for (size_t i = 0; i <= 5; i++)
-    // {
-    //     setBitZero(&freeSpaceMap, i);
-    // }
-    
-
-
-    // for (size_t i = 0; i <=5 ; i++)
-    // {
-    //    printf("getBit: %d\n", getBit(&freeSpaceMap, i));
-    // }
-    
-
     //Block 1 is where freespace will be written
     LBAwrite(freeSpaceMap, 5, 1); 
     return 1; //Returning location of freespace to VCB
@@ -98,7 +104,7 @@ int initFileSystem (uint64_t numberOfBlocks, uint64_t blockSize)
 	{
 	printf ("Initializing File System with %ld blocks with a block size of %ld\n", numberOfBlocks, blockSize);
 	/* TODO: Add any code you need to initialize your file system. */
-
+    size_t FSSize = getFreespaceSize(numberOfBlocks, blockSize);
     // the first block will be of size BLOCKSIZE even if there is a lot of empty space that's how it do 
     // Malloc a Block of memory as your VCB pointer and LBAread block 0
 	VCB* vcb = malloc(blockSize);
@@ -127,7 +133,7 @@ int initFileSystem (uint64_t numberOfBlocks, uint64_t blockSize)
         vcb->numBlocks = numberOfBlocks;
         vcb->blockSize = blockSize;
         printf("before free space init\n");
-        vcb->locOfFreespace = initFreespace(numberOfBlocks, blockSize); //Function to be implemented
+        vcb->locOfFreespace = initFreespace(FSSize); //Function to be implemented
         //vcb->locOfRoot = initRoot(); //Function to be implemented
 		// after the values are populated into the VCB, write to storage.
         int writeReturn;
