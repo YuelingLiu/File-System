@@ -86,17 +86,30 @@ int getFreespaceSize(int numberOfBlocks, int blockSize){
 
 // allocate contiguous blocks of free space for directories/files
 int allocContBlocks(uint8_t *freeSpaceMap, size_t fssize, int num){
+    // count how many contiguous free blocks there are starting from the first free one
     int freeBlockCounter = 0;
+    // amount of used blocks inside the byte before the first free one
     int firstBitOffset = 0;
+//////////////////////////////////////////////100///////////////////////////////////////////////////
+    // read in one byte at a time ( 8 bits 1 byte block )
     for (size_t byteIndex = 0; byteIndex < fssize; byteIndex++){
+        // check to confirm that it's not all 1s
+        // if all bytes are 1111111 then that means there is no space
+        // if there are zeroes then we have to traverse to find the first zero
         if (freeSpaceMap[byteIndex] != 255){
+            // traverse through the byte until we find the first zero
             while(getBit(freeSpaceMap, (byteIndex * 8) + firstBitOffset) == 1){
                 firstBitOffset++;
             }
+            // after we found the first zero, traverse until we reach amount requested 
+            // or encounter a 1
             while(getBit(freeSpaceMap, (byteIndex * 8) + firstBitOffset + freeBlockCounter) == 0){
                 freeBlockCounter++;
+                // once freeBlockCounter is equal to userInput, we have found the space 
+                // starting at (byteIndex * 8) + firstBitOffset;
                 if (freeBlockCounter == num){
                     for (int i = firstBitOffset; i < firstBitOffset + freeBlockCounter; i++){
+                            // mark the bits as used.
                             setBitOne(freeSpaceMap, i);
                         }
                     return (byteIndex * 8) + firstBitOffset;
@@ -130,6 +143,7 @@ int initRootDE(int blockSize, int FSSize){
 	for(int i = 0 ; i < MAXDE; i++){
         strcpy(directoryEntries[i].name, "");
 	}
+
     
 	// 6. Ask the free space for 6 blocks, and it should return a starting block number for those 6 blocks
 
@@ -139,11 +153,23 @@ int initRootDE(int blockSize, int FSSize){
     int locOfRoot = allocContBlocks(freeSpaceMap, FSSize, blocksNeeded);
     printf("locOfRoot: %d\n", locOfRoot);
 
+    // set the dot
+    strcpy(directoryEntries[0].name, ".");
+    directoryEntries[0].size = MAXDE * sizeof(DirectoryEntry);
+    directoryEntries[0].location = locOfRoot;
+
+    // set the dot dot
+    strcpy(directoryEntries[1].name, "..");
+    directoryEntries[1].size = MAXDE * sizeof(DirectoryEntry);
+    directoryEntries[1].location = locOfRoot;
+
+    LBAwrite(directoryEntries, blocksNeeded, locOfRoot);
+
+    return locOfRoot;
 }
 
 int initFreespace(size_t fssize) {
     uint8_t* freeSpaceMap = malloc(fssize);
-    
 
     // set the first 6 bits to 1 for the VCB and the bitmap
     for (size_t i = 0; i <= 5; i++)
@@ -168,9 +194,8 @@ int initFileSystem (uint64_t numberOfBlocks, uint64_t blockSize)
 	//buffer and number of block, reading from the beginning 
 
 	//                           TODO check and figure out of this checker is fine.Change variable name of larry
-    int larry;
-	if(larry = LBAread(vcb, 1, 0) != 1){
-		printf("larry: %d\n", larry);
+    int initialRead;
+	if(initialRead = LBAread(vcb, 1, 0) != 1){
 		
 		printf("Error reading with LBAread, exiting program\n");
 		exit(-1);
