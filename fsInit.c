@@ -27,6 +27,8 @@
 #include "fsLow.h"
 #include "mfs.h"
 
+#define MAXDE 51
+
 typedef struct VCB {
     // Dictate the total number of blocks in the volume
     int numBlocks;
@@ -39,6 +41,25 @@ typedef struct VCB {
     // unique magic number to identify if the volume belongs to us
     long signature;
 } VCB;
+
+typedef struct DirectoryEntry{
+    // the name of the entry that is unique to that file, and is used for lookup
+    char name[256];
+    // the size of the file so we know how far to read up to
+    long size;
+    // Dictate the total number of directory entries we want for a directory.
+    int numOfDE;
+    // Dictate the bytes we need multiply the size of your directory entry by the number of entries
+    int bytesNeeded;
+    // Dictate the current time
+    time_t timeStamp;
+    // SUBJECT TO CHANGE: for now, going forward using a file allocation method that requires a “pointer” to the starting block of the file.
+    long location;
+
+} DirectoryEntry;
+
+//static array of directiry entries with a number 50 
+DirectoryEntry directoryEntries[MAXDE];
 
 long MAGICNUM = 133713371337;
 
@@ -54,32 +75,7 @@ void setBitZero(uint8_t *freeSpaceMap, int i){
 bool getBit(uint8_t *freeSpaceMap, int i){
     return freeSpaceMap[i >> 3] & (1 << (i & 0x7));
 }
-// The root directory follows the bitmap blocks
-// The 
-int initRootDE(){
-	// 1. First need space --how much? 
-	// 2. Initialize how many directory entries we want for a directory.
-	int numOfDE = 50;
-	// 3. Multiplu the size of directory entry by the number directory entries 
-	// Suppose a directory entry is 60 bytes 
-	int bytesNeeded = numOfDE * 60;  
 
-	// 4. Determine how many blocks we need. 19531 blocks, bits blockSize: 512 
-	//    6 Blocks is 3072 bytes. we have 3000 bytedNeed, so update numOfED
-
-	// 5. Now you have a pointer to an array of directory entries
-	int *ptr;
-	int directoryEntries[numOfDE];
-	ptr=&directoryEntries; // pointer points to the whole array 
-	// loop through and initialize each directory entry structure to be in a known free state.
-	for(int i = 0 ; i < numOfDE; i++){
-
-	}
-
-	// 6. Ask the free space for 6 blocks, and it should return a starting block number for those 6 blocks
-
-
-}
 
 // passing the value directly so we dont have to have ugly code
 int getFreespaceSize(int numberOfBlocks, int blockSize){
@@ -111,6 +107,38 @@ int allocContBlocks(uint8_t *freeSpaceMap, size_t fssize, int num){
         firstBitOffset = 0;
     }
     return -1;
+}
+
+// The root directory follows the bitmap blocks
+// The 
+int initRootDE(int blockSize, int FSSize){
+	// 1. First need space --how much? 
+	// 2. Initialize how many directory entries we want for a directory.
+	// 3. Multiply the size of directory entry by the number directory entries 
+    int bytesNeeded = MAXDE * sizeof(DirectoryEntry); 
+
+	// 4. Determine how many blocks we need. 19531 blocks, bits blockSize: 512 
+    int blocksNeeded = bytesNeeded / blockSize;
+
+
+	// 5. Now you have a pointer to an array of directory entries
+	DirectoryEntry *arrayPtr;
+	DirectoryEntry directoryEntries[MAXDE];
+	arrayPtr = directoryEntries; // pointer points to the whole array 
+
+	// loop through and initialize each directory entry structure to be in a known free state.
+	for(int i = 0 ; i < MAXDE; i++){
+        strcpy(directoryEntries[i].name, "");
+	}
+    
+	// 6. Ask the free space for 6 blocks, and it should return a starting block number for those 6 blocks
+
+    uint8_t* freeSpaceMap = malloc(FSSize);
+    LBAread(freeSpaceMap, 5, 1);
+
+    int locOfRoot = allocContBlocks(freeSpaceMap, FSSize, blocksNeeded);
+    printf("locOfRoot: %d\n", locOfRoot);
+
 }
 
 int initFreespace(size_t fssize) {
@@ -162,7 +190,7 @@ int initFileSystem (uint64_t numberOfBlocks, uint64_t blockSize)
         vcb->blockSize = blockSize;
         printf("before free space init\n");
         vcb->locOfFreespace = initFreespace(FSSize); //Function to be implemented
-        //vcb->locOfRoot = initRoot(); //Function to be implemented
+        vcb->locOfRoot = initRootDE(blockSize, FSSize); //Function to be implemented
 		// after the values are populated into the VCB, write to storage.
         int writeReturn;
 		if (writeReturn = LBAwrite(vcb, 1, 0) != 1){
