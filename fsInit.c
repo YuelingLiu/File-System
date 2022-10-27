@@ -26,7 +26,7 @@
 #include "fsLow.h"
 #include "mfs.h"
 
-#define MAXDE 51
+#define MAXDE 50
 
 typedef struct VCB {
     // Dictate the total number of blocks in the volume
@@ -140,12 +140,10 @@ int initRootDE(int blockSize, int FSSize){
     int bytesNeeded = MAXDE * sizeof(DirectoryEntry);
 
 	// 4. Determine how many blocks we need. 19531 blocks, bits blockSize: 512
-    int blocksNeeded = bytesNeeded / blockSize;
+    int blocksNeeded = (bytesNeeded + (blockSize - 1)) / blockSize;
 
 	// 5. Now we have a pointer to an array of directory entries.
-	DirectoryEntry *arrayPtr;
 	DirectoryEntry directoryEntries[MAXDE];
-	arrayPtr = directoryEntries; // pointer points to the whole array
 
 	// loop through and initialize each directory entry structure to be in a known free state
 	for(int i = 0 ; i < MAXDE; i++){
@@ -158,7 +156,6 @@ int initRootDE(int blockSize, int FSSize){
     LBAread(freeSpaceMap, 5, 1);
 
     int locOfRoot = allocContBlocks(freeSpaceMap, FSSize, blocksNeeded);
-    printf("locOfRoot: %d\n", locOfRoot);
 
     // set the dot
     strcpy(directoryEntries[0].name, ".");
@@ -171,6 +168,7 @@ int initRootDE(int blockSize, int FSSize){
     directoryEntries[1].location = locOfRoot;
 
     LBAwrite(directoryEntries, blocksNeeded, locOfRoot);
+    LBAwrite(freeSpaceMap, 5, 1);
 
     free(freeSpaceMap);
     freeSpaceMap = NULL;
@@ -217,8 +215,7 @@ int initFileSystem (uint64_t numberOfBlocks, uint64_t blockSize) {
 
     // You now have a pointer to a structure, so look at the signature (magic number)
     // in your structure and see if it matches.
-    printf("before comparison\n");
-    printf("vcb->signature: %ld\n", vcb->signature);
+
 
     if (vcb->signature != MAGICNUM) {
         vcb->signature = MAGICNUM;
