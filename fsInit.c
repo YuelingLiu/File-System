@@ -54,6 +54,34 @@ void setBitZero(uint8_t *freeSpaceMap, int i){
 bool getBit(uint8_t *freeSpaceMap, int i){
     return freeSpaceMap[i >> 3] & (1 << (i & 0x7));
 }
+// The root directory follows the bitmap blocks
+// The 
+int initRootDE(){
+	// 1. First need space --how much? 
+	// 2. Initialize how many directory entries we want for a directory.
+	int numOfDE = 50;
+	// 3. Multiplu the size of directory entry by the number directory entries 
+	// Suppose a directory entry is 60 bytes 
+	int bytesNeeded = numOfDE * 60;  
+
+	// 4. Determine how many blocks we need. 19531 blocks, bits blockSize: 512 
+	//    6 Blocks is 3072 bytes. we have 3000 bytedNeed, so update numOfED
+
+	// 5. Now you have a pointer to an array of directory entries
+	int *ptr;
+	int directoryEntries[numOfDE];
+	ptr=&directoryEntries; // pointer points to the whole array 
+	// loop through and initialize each directory entry structure to be in a known free state.
+	for(int i = 0 ; i < numOfDE; i++){
+
+	}
+
+	// 6. Ask the free space for 6 blocks, and it should return a starting block number for those 6 blocks
+	
+
+	
+
+}
 
 int getFreespaceSize(int numberOfBlocks, int blockSize){
     int bytesNeeded = (numberOfBlocks + 7) / 8;
