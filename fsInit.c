@@ -77,18 +77,18 @@ int initRootDE(){
 	}
 
 	// 6. Ask the free space for 6 blocks, and it should return a starting block number for those 6 blocks
-	
 
-	
 
 }
 
+// passing the value directly so we dont have to have ugly code
 int getFreespaceSize(int numberOfBlocks, int blockSize){
     int bytesNeeded = (numberOfBlocks + 7) / 8;
     int blocksNeeded = (bytesNeeded + (blockSize - 1)) / blockSize;
     return (blocksNeeded * blockSize);
 }
 
+// allocate contiguous blocks of free space for directories/files
 int allocContBlocks(uint8_t *freeSpaceMap, size_t fssize, int num){
     int freeBlockCounter = 0;
     int firstBitOffset = 0;
