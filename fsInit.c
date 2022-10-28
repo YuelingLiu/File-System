@@ -73,6 +73,8 @@ DirectoryEntry directoryEntries[MAXDE];
 
 long MAGICNUM = 133713371337;
 
+
+
 void setBitOne(uint8_t *freeSpaceMap, int i){
     freeSpaceMap[i >> 3] |= (1 << (i & 0x7));
 }
