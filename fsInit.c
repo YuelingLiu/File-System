@@ -89,9 +89,9 @@ bool getBit(uint8_t *freeSpaceMap, int i){
 
 // passing the value directly so we don't have to have ugly code
 int getFreespaceSize(int numberOfBlocks, int blockSize){
-    int bytesNeeded = (numberOfBlocks + 7) / 8;
-    int blocksNeeded = (bytesNeeded + (blockSize - 1)) / blockSize;
-    return (blocksNeeded * blockSize);
+    int bytesNeeded = (numberOfBlocks + 7) / 8; // 2442.25
+    int blocksNeeded = (bytesNeeded + (blockSize - 1)) / blockSize; // 5
+    return (blocksNeeded * blockSize); // 2560
 }
 
 // allocate contiguous blocks of free space for directories/files
@@ -217,7 +217,6 @@ int initFileSystem (uint64_t numberOfBlocks, uint64_t blockSize) {
 
     // You now have a pointer to a structure, so look at the signature (magic number)
     // in your structure and see if it matches.
-
 
     if (vcb->signature != MAGICNUM) {
         vcb->signature = MAGICNUM;
