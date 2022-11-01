@@ -14,3 +14,6 @@ typedef struct VCB {
     // unique magic number to identify if the volume belongs to us
     long signature;
 } VCB;
+
+//Ensuring the VCB is accessible from anywhere
+extern VCB* vcb;

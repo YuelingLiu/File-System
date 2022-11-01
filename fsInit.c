@@ -30,6 +30,8 @@
 
 #define MAXDE 50
 
+//Extern global variable available to all files
+VCB* vcb;
 
 
 // static array of directory entries with a number 50
@@ -119,7 +121,7 @@ int initFileSystem (uint64_t numberOfBlocks, uint64_t blockSize) {
     // even if there is a lot of empty, that's how we do it
 
     // malloc a block of memory as your VCB pointer and LBAread block 0
-	VCB* vcb = malloc(blockSize);
+	vcb = malloc(blockSize);
 	// buffer and number of block, reading from the beginning
 
     int initialRead;
@@ -151,10 +153,10 @@ int initFileSystem (uint64_t numberOfBlocks, uint64_t blockSize) {
         return 0;
     }
 
-    free(vcb);
-    vcb = NULL;
 }
 
 void exitFileSystem () {
 	printf ("System exiting\n");
+    free(vcb);
+    vcb = NULL;
 }
