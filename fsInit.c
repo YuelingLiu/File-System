@@ -66,6 +66,9 @@ typedef struct DirectoryEntry {
     // that requires a “pointer” to the starting block of the file.
     long location;
 
+    // save a bool value for if the entry is a file or directory
+    unsigned char fileType;
+
 } DirectoryEntry;
 
 // static array of directory entries with a number 50
@@ -163,11 +166,14 @@ int initRootDE(int blockSize, int FSSize){
     strcpy(directoryEntries[0].name, ".");
     directoryEntries[0].size = MAXDE * sizeof(DirectoryEntry);
     directoryEntries[0].location = locOfRoot;
+    directoryEntries[0].fileType = FT_DIRECTORY;
 
     // set the dot dot
     strcpy(directoryEntries[1].name, "..");
     directoryEntries[1].size = MAXDE * sizeof(DirectoryEntry);
     directoryEntries[1].location = locOfRoot;
+    directoryEntries[1].fileType = FT_DIRECTORY;
+
 
     LBAwrite(directoryEntries, blocksNeeded, locOfRoot);
     LBAwrite(freeSpaceMap, 5, 1);
