@@ -14,11 +14,27 @@
 **************************************************************/
 
 
-#include "mfs.h"
-#include "VCB.h"
+// #include "mfs.h"
+// #include "VCB.h"
+// #include <stdio.h>
+// #include <string.h>
+// #include <stdlib.h>
+// #include "DE.h"
+// #include "fsLow.h"
+// //#include "fsInit.h"
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
+#include <stdint.h>
+#include <stdbool.h>
+
+#include "fsLow.h"
+#include "mfs.h"
+#include "VCB.h"
+#include "DE.h"
+#include "freespace.h"
 
 
 int fs_rmdir(const char *pathname){
@@ -51,7 +67,7 @@ struct fdPathResult parsedPath(char * path){
     if (isAbsolute == 1){
         // make an array to load in data
         char * tokenArray[50];
-        int tokenIndex =0;
+        int tokenIndex = 0;
 
         char * token = strtok(path, "/");
 
@@ -59,9 +75,12 @@ struct fdPathResult parsedPath(char * path){
             tokenArray[tokenIndex++] = token;
         } while (token = strtok(NULL, "/"));
 
-        // im thinking we should load in root directory first
-        struct VCB temp;
-        printf("locOfRoot: %d\n", temp.numBlocks);
+        // load in root directory first
+        // we know that its at location 6 
+
+        VCB *vcb = malloc(sizeof(VCB));
+        
+        printf("vcb.signature: %ld\n", vcb->signature);
 
 
         struct fdPathResult result;
@@ -73,13 +92,13 @@ struct fdPathResult parsedPath(char * path){
     
 }
 
-int main(int argc, char const *argv[])
-{
-    char * temp = malloc (sizeof(char) * 40);
-    strcpy(temp, "/hello/testing");
-    parsedPath(temp);
-    return 0;
-}
+// int main(int argc, char const *argv[])
+// {
+//     char * temp = malloc (sizeof(char) * 40);
+//     strcpy(temp, "/hello/testing");
+//     parsedPath(temp);
+//     return 0;
+// }
 
 
 

@@ -1,5 +1,4 @@
 
-
 typedef struct VCB {
     // Dictate the total number of blocks in the volume
     int numBlocks;
@@ -18,4 +17,6 @@ typedef struct VCB {
 } VCB;
 
 //Ensuring the VCB is accessible from anywhere
-extern VCB* vcb;
+//extern VCB* vcb;
+
+

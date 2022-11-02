@@ -24,8 +24,9 @@
 
 #include "fsLow.h"
 #include "mfs.h"
-#include "VCB.h"
-#include "DE.h"
+#include "mfs.c"
+//#include "VCB.h"
+//#include "DE.h"
 #include "freespace.h"
 
 #define MAXDE 50
@@ -68,13 +69,13 @@ int initRootDE(int blockSize, int FSSize){
     strcpy(directoryEntries[0].name, ".");
     directoryEntries[0].size = MAXDE * sizeof(DirectoryEntry);
     directoryEntries[0].location = locOfRoot;
-    directoryEntries[0].fileType = 1;
+    //directoryEntries[0].fileType = 1;
 
     // set the dot dot
     strcpy(directoryEntries[1].name, "..");
     directoryEntries[1].size = MAXDE * sizeof(DirectoryEntry);
     directoryEntries[1].location = locOfRoot;
-    directoryEntries[1].fileType = 1;
+    //directoryEntries[1].fileType = 1;
 
 
     LBAwrite(directoryEntries, blocksNeeded, locOfRoot);
@@ -107,6 +108,7 @@ int initFileSystem (uint64_t numberOfBlocks, uint64_t blockSize) {
 	printf ("Initializing File System with %ld blocks with a block size of %ld\n",
      numberOfBlocks, blockSize);
 
+
 	/* TODO: Add any code you need to initialize your file system. */
     size_t FSSize = getFreespaceSize(numberOfBlocks, blockSize);
 
@@ -126,6 +128,9 @@ int initFileSystem (uint64_t numberOfBlocks, uint64_t blockSize) {
     // You now have a pointer to a structure, so look at the signature (magic number)
     // in your structure and see if it matches.
 
+    // temp to get the code to work
+    vcb->signature = 12;
+
     if (vcb->signature != MAGICNUM) {
         vcb->signature = MAGICNUM;
         vcb->numBlocks = numberOfBlocks;
@@ -133,6 +138,15 @@ int initFileSystem (uint64_t numberOfBlocks, uint64_t blockSize) {
         vcb->locOfFreespace = initFreespace(FSSize); // function to be implemented
         vcb->locOfRoot = initRootDE(blockSize, FSSize); // function to be implemented
 
+        /* TEST CODE */
+
+        parsedPath("/banana");
+
+
+
+
+        /* TEST CODE */
+        
 		// after the values are populated into the VCB, write to storage.
         int writeReturn;
 		if (writeReturn = LBAwrite(vcb, 1, 0) != 1){
