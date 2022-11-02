@@ -1,4 +1,4 @@
-#include "VCB.h"
+//#include "VCB.h"
 
 typedef struct DirectoryEntry {
     // the name of the entry that is unique to that file, and is used for lookup
@@ -15,14 +15,14 @@ typedef struct DirectoryEntry {
     int bytesNeeded;
 
     // Dictate the current time
-    time_t timeStamp;
+    //time_t timeStamp;
 
     // SUBJECT TO CHANGE: for now, going forward using a file allocation method
     // that requires a “pointer” to the starting block of the file.
     long location;
 
     // including a filetype for directories and files
-    bool fileType;
+    //bool fileType;
 
 } DirectoryEntry;
 

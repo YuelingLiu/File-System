@@ -54,10 +54,10 @@ typedef struct
 	uint64_t	directoryStartLocation;		/*Starting LBA of directory */
 	} fdDir;
 
-struct fdPathResult {
-	int dirPtr;
-	int index;
-}
+struct fdPathResult{
+	int dirPtr;					// pointer to the directory 
+	int index;					// index of file/directory
+};
 
 // Key directory functions
 int fs_mkdir(const char *pathname, mode_t mode);
@@ -90,6 +90,8 @@ struct fs_stat
 	};
 
 int fs_stat(const char *path, struct fs_stat *buf);
+
+struct fdPathResult parsedPath(char * path);
 
 #endif
 

@@ -25,7 +25,7 @@ int fs_rmdir(const char *pathname){
 
     // pointer to struct = fs_opendir(pathname)
     
-    
+
 
 
 
@@ -33,6 +33,12 @@ int fs_rmdir(const char *pathname){
 
     //fs_close
 }
+
+struct fdPathResult parsedPath(char * path){
+    // example to test
+    
+}
+
 
 
 
