@@ -1,4 +1,6 @@
-//#include "VCB.h"
+#ifndef DE_H
+#define DE_H
+#include "VCB.h"
 
 typedef struct DirectoryEntry {
     // the name of the entry that is unique to that file, and is used for lookup
@@ -27,3 +29,5 @@ typedef struct DirectoryEntry {
 } DirectoryEntry;
 
 int blocksNeededForDir(int maxde);
+
+#endif
