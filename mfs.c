@@ -19,8 +19,19 @@
 
 int fs_rmdir(const char *pathname){
     // fd_PathResult = fd_ParsePath(pathname);
-    fd_PathResult path;
+    struct fdPathResult path;
+    path.dirPtr = 30;
+    path.index = 5;
+
+    // pointer to struct = fs_opendir(pathname)
     
+    
+
+
+
+
+
+    //fs_close
 }
 
 

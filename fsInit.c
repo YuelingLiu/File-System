@@ -33,8 +33,6 @@
 //Extern global variable available to all files
 VCB* vcb;
 
-
-
 // static array of directory entries with a number 50
 DirectoryEntry directoryEntries[MAXDE];
 
@@ -70,13 +68,13 @@ int initRootDE(int blockSize, int FSSize){
     strcpy(directoryEntries[0].name, ".");
     directoryEntries[0].size = MAXDE * sizeof(DirectoryEntry);
     directoryEntries[0].location = locOfRoot;
-    directoryEntries[0].fileType = FT_DIRECTORY;
+    directoryEntries[0].fileType = 1;
 
     // set the dot dot
     strcpy(directoryEntries[1].name, "..");
     directoryEntries[1].size = MAXDE * sizeof(DirectoryEntry);
     directoryEntries[1].location = locOfRoot;
-    directoryEntries[1].fileType = FT_DIRECTORY;
+    directoryEntries[1].fileType = 1;
 
 
     LBAwrite(directoryEntries, blocksNeeded, locOfRoot);

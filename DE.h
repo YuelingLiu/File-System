@@ -21,6 +21,9 @@ typedef struct DirectoryEntry {
     // that requires a “pointer” to the starting block of the file.
     long location;
 
+    // including a filetype for directories and files
+    bool fileType;
+
 } DirectoryEntry;
 
 int blocksNeededForDir(int maxde);
