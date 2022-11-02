@@ -12,5 +12,7 @@ void setBitZero(uint8_t *freeSpaceMap, int i);
 
 bool getBit(uint8_t *freeSpaceMap, int i);
 
+int getFreespaceSize(int numberOfBlocks, int blockSize);
+
 // allocate contiguous blocks of free space for directories/files
 int allocContBlocks(uint8_t *freeSpaceMap, size_t fssize, int num);

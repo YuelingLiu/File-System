@@ -40,15 +40,6 @@ DirectoryEntry directoryEntries[MAXDE];
 long MAGICNUM = 133713371337;
 
 
-
-// passing the value directly so we don't have to have ugly code
-int getFreespaceSize(int numberOfBlocks, int blockSize){
-    int bytesNeeded = (numberOfBlocks + 7) / 8; // 2442.25
-    int blocksNeeded = (bytesNeeded + (blockSize - 1)) / blockSize; // 5
-    return (blocksNeeded * blockSize); // 2560
-}
-
-
 // The root directory follows the bitmap blocks
 int initRootDE(int blockSize, int FSSize){
 	// 1. First, we need space.

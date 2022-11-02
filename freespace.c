@@ -12,6 +12,13 @@ bool getBit(uint8_t *freeSpaceMap, int i){
     return freeSpaceMap[i >> 3] & (1 << (i & 0x7));
 }
 
+// passing the value directly so we don't have to have ugly code
+int getFreespaceSize(int numberOfBlocks, int blockSize){
+    int bytesNeeded = (numberOfBlocks + 7) / 8; // 2442.25
+    int blocksNeeded = (bytesNeeded + (blockSize - 1)) / blockSize; // 5
+    return (blocksNeeded * blockSize); // 2560
+}
+
 // allocate contiguous blocks of free space for directories/files
 int allocContBlocks(uint8_t *freeSpaceMap, size_t fssize, int num){
     // count how many contiguous free blocks there are starting from the first free one
