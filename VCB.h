@@ -1,3 +1,5 @@
+#ifndef VCB_H
+#define VCB_H
 
 typedef struct VCB {
     // Dictate the total number of blocks in the volume
@@ -17,6 +19,8 @@ typedef struct VCB {
 } VCB;
 
 //Ensuring the VCB is accessible from anywhere
-//extern VCB* vcb;
+extern VCB* vcb;
+
+#endif
 
 
