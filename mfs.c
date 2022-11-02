@@ -78,10 +78,14 @@ struct fdPathResult parsedPath(char * path){
         // load in root directory first
         // we know that its at location 6 
 
-        VCB *vcb = malloc(sizeof(VCB));
+        DirectoryEntry *tempRoot = malloc(sizeof(VCB));
+        LBAread(tempRoot,1,6);
+        //printf("vcb1.signature: %ld\n", vcb1->signature);
+        for (size_t i = 0; i < 10; i++)
+        {
+            printf("tempRoot[i]: %s\n", tempRoot[i].name);
+        }
         
-        printf("vcb.signature: %ld\n", vcb->signature);
-
 
         struct fdPathResult result;
         result.dirPtr = 0;
