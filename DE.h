@@ -24,7 +24,7 @@ typedef struct DirectoryEntry {
     long location;
 
     // including a filetype for directories and files
-    // bool fileType;
+    unsigned char fileType;
 
 } DirectoryEntry;
 

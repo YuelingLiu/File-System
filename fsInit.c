@@ -35,7 +35,8 @@
 VCB* vcb;
 
 // static array of directory entries with a number 50
-DirectoryEntry directoryEntries[MAXDE];
+// DirectoryEntry directoryEntries[MAXDE];
+// probably remove this later
 
 long MAGICNUM = 133713371337;
 
@@ -55,7 +56,8 @@ int initRootDE(int blockSize, int FSSize){
 
 	// loop through and initialize each directory entry structure to be in a known free state
 	for(int i = 0 ; i < MAXDE; i++){
-        strcat(directoryEntries[i].name, "blue");
+        strcpy(directoryEntries[i].name, "");
+        //printf("directoryEntries[i].name: %s\n", directoryEntries[i].name);
 	}
 
 	// 6. Ask the free space for 6 blocks, and it should return
@@ -66,10 +68,10 @@ int initRootDE(int blockSize, int FSSize){
     int locOfRoot = allocContBlocks(freeSpaceMap, FSSize, blocksNeeded);
 
     // set the dot
-    //strcpy(directoryEntries[0].name, ".");
+    strcpy(directoryEntries[0].name, ".");
     directoryEntries[0].size = MAXDE * sizeof(DirectoryEntry);
     directoryEntries[0].location = locOfRoot;
-    //directoryEntries[0].fileType = 1;
+    directoryEntries[0].fileType = FT_DIRECTORY;
 
     // set the dot dot
     strcpy(directoryEntries[1].name, "..");
@@ -77,15 +79,11 @@ int initRootDE(int blockSize, int FSSize){
     directoryEntries[1].location = locOfRoot;
     //directoryEntries[1].fileType = 1;
 
-    /* TEST CODE FOR PARSE PATH */
-
-    strcpy(directoryEntries[3].name, "..");
-    directoryEntries[3].size = MAXDE * sizeof(DirectoryEntry);
-    directoryEntries[3].location = locOfRoot;
-
-    /* TEST CODE FOR PARSE PATH */
 
     LBAwrite(directoryEntries, blocksNeeded, locOfRoot);
+
+
+
     LBAwrite(freeSpaceMap, 5, 1);
 
     free(freeSpaceMap);

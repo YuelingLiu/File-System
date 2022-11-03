@@ -36,6 +36,8 @@
 #include "DE.h"
 #include "freespace.h"
 
+#define MAXDE 50
+
 
 int fs_rmdir(const char *pathname){
     // fd_PathResult = fd_ParsePath(pathname);
@@ -82,10 +84,10 @@ struct fdPathResult parsedPath(char * path){
             token = strtok(NULL, s);
         }
 
-        for (size_t i = 0; i < tokenIndex; i++)
-        {
-            printf("tokenArray[i]: %s\n", tokenArray[i]);
-        }
+        // for (size_t i = 0; i < tokenIndex; i++)
+        // {
+        //     printf("tokenArray[i]: %s\n", tokenArray[i]);
+        // }
         
         // do{
         //     //printf("token: %s\n", token);
@@ -100,14 +102,18 @@ struct fdPathResult parsedPath(char * path){
         // we know that its at location 6 
 
         // MAXDE requires include "fsinit.c" but multiple definitions
-        // needs to be fixed with ifndef
-        DirectoryEntry *tempRoot = malloc(sizeof(DirectoryEntry) * 50);
-        LBAread(tempRoot,1,6);
+        DirectoryEntry *tempRoot = malloc(sizeof(DirectoryEntry) * MAXDE);
+        
+        // locOfRoot is initialized at location 6
+        LBAread(tempRoot, blocksNeededForDir(MAXDE), vcb->locOfRoot);
         //printf("vcb1.signature: %ld\n", vcb1->signature);
-        // for (size_t i = 0; i < tokenIndex; i++)
-        // {
-        //     printf("tempRoot[i]: %s\n", tempRoot[i].name);
-        // }
+        for (size_t i = 0; i < 10; i++)
+        {
+            // if(strcmp(tempRoot[i].name,"") == 0){
+            //     printf("testing to make sure it works\n");
+            // }
+            printf("tempRoot[i].name: %s\n", tempRoot[i].name);
+         }
         
 
         struct fdPathResult result;
@@ -119,13 +125,12 @@ struct fdPathResult parsedPath(char * path){
     
 }
 
-// int main(int argc, char const *argv[])
-// {
-//     char * temp = malloc (sizeof(char) * 40);
-//     strcpy(temp, "/hello/testing");
-//     parsedPath(temp);
-//     return 0;
-// }
+int fs_isFile(char * filename){
 
+}	//return 1 if file, 0 otherwise
+
+
+
+int fs_isDir(char * pathname);	//return 1 if directory, 0 otherwise
 
 
