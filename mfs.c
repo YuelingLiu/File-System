@@ -104,16 +104,27 @@ struct fdPathResult parsedPath(char * path){
         // MAXDE requires include "fsinit.c" but multiple definitions
         DirectoryEntry *tempRoot = malloc(sizeof(DirectoryEntry) * MAXDE);
         
-        // locOfRoot is initialized at location 6
-        LBAread(tempRoot, blocksNeededForDir(MAXDE), vcb->locOfRoot);
-        //printf("vcb1.signature: %ld\n", vcb1->signature);
-        for (size_t i = 0; i < 10; i++)
-        {
-            // if(strcmp(tempRoot[i].name,"") == 0){
-            //     printf("testing to make sure it works\n");
-            // }
-            printf("tempRoot[i].name: %s\n", tempRoot[i].name);
-         }
+        // create a variable that changes for the loop to run
+        int location = vcb->locOfRoot;
+
+        
+        for (size_t i = 0; i < tokenIndex; i++){
+            LBAread(tempRoot, blocksNeededForDir(MAXDE), location);
+            int j = 0;
+            while (j < MAXDE){
+                if (strcmp(tempRoot[j].name, tokenArray[i]) != 0){
+                    location = tempRoot[j].location;
+                    break;
+                }
+                j++;
+            }
+            if (j == 50){
+                printf("dude it works\n");
+            }else{
+                printf("tempRoot[j].: %d\n", tempRoot[j].fileType);
+            }
+        }
+        
         
 
         struct fdPathResult result;
