@@ -21,7 +21,7 @@
 // #include <stdlib.h>
 // #include "DE.h"
 // #include "fsLow.h"
-// //#include "fsInit.h"
+//#include "fsInit.c"
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -66,25 +66,48 @@ struct fdPathResult parsedPath(char * path){
 
     if (isAbsolute == 1){
         // make an array to load in data
-        char * tokenArray[50];
-        int tokenIndex = 0;
+        char * tokenArray[50];         // array of names to be tokenized
+        const char s[2] = "/";         // delimiter
+        int tokenIndex = 0;            // counter for number of tokens
+        char str[strlen(path)];        // declare a string, str to be read of size strlen(path)
+        strcpy(str,path);              // copy path into str
 
-        char * token = strtok(path, "/");
 
-        do{
+        // loop to tokenize values 
+        char * token = strtok(str, s); 
+
+        while (token != NULL){
             tokenArray[tokenIndex++] = token;
-        } while (token = strtok(NULL, "/"));
+            //printf("token: %s\n", token);
+            token = strtok(NULL, s);
+        }
+
+        for (size_t i = 0; i < tokenIndex; i++)
+        {
+            printf("tokenArray[i]: %s\n", tokenArray[i]);
+        }
+        
+        // do{
+        //     //printf("token: %s\n", token);
+        //     tokenArray[tokenIndex++] = token;
+        // } while (token = strtok(NULL, "/"));
+
+
+
+        //printf("tokenIndex: %d\n", tokenIndex);
 
         // load in root directory first
         // we know that its at location 6 
 
-        DirectoryEntry *tempRoot = malloc(sizeof(VCB));
+        // MAXDE requires include "fsinit.c" but multiple definitions
+        // needs to be fixed with ifndef
+        DirectoryEntry *tempRoot = malloc(sizeof(DirectoryEntry) * 50);
         LBAread(tempRoot,1,6);
         //printf("vcb1.signature: %ld\n", vcb1->signature);
-        for (size_t i = 0; i < 10; i++)
-        {
-            printf("tempRoot[i]: %s\n", tempRoot[i].name);
-        }
+        // for (size_t i = 0; i < tokenIndex; i++)
+        // {
+        //     printf("tempRoot[i]: %s\n", tempRoot[i].name);
+        // }
         
 
         struct fdPathResult result;
