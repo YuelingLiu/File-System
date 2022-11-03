@@ -112,16 +112,19 @@ struct fdPathResult parsedPath(char * path){
             LBAread(tempRoot, blocksNeededForDir(MAXDE), location);
             int j = 0;
             while (j < MAXDE){
+                //printf("tokenArray[i]: %s\n", tokenArray[i]);
                 if (strcmp(tempRoot[j].name, tokenArray[i]) != 0){
                     location = tempRoot[j].location;
                     break;
                 }
                 j++;
             }
+            printf("testing\n");
             if (j == 50){
+                //printf("j: %d\n", j);
                 printf("dude it works\n");
             }else{
-                printf("tempRoot[j].: %d\n", tempRoot[j].fileType);
+                
             }
         }
         

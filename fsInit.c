@@ -72,12 +72,14 @@ int initRootDE(int blockSize, int FSSize){
     directoryEntries[0].size = MAXDE * sizeof(DirectoryEntry);
     directoryEntries[0].location = locOfRoot;
     directoryEntries[0].fileType = FT_DIRECTORY;
+    
 
     // set the dot dot
     strcpy(directoryEntries[1].name, "..");
     directoryEntries[1].size = MAXDE * sizeof(DirectoryEntry);
     directoryEntries[1].location = locOfRoot;
-    //directoryEntries[1].fileType = 1;
+    directoryEntries[1].fileType = FT_DIRECTORY;
+    
 
 
     LBAwrite(directoryEntries, blocksNeeded, locOfRoot);
@@ -145,7 +147,7 @@ int initFileSystem (uint64_t numberOfBlocks, uint64_t blockSize) {
 
         /* TEST CODE */
 
-        parsedPath("/banana/notbanana");
+        parsedPath("/./notbanana");
 
 
 
