@@ -107,32 +107,46 @@ struct fdPathResult parsedPath(char * path){
         // create a variable that changes for the loop to run
         int location = vcb->locOfRoot;
 
+        struct fdPathResult result;
         
+        // loop through all of the tokens
         for (size_t i = 0; i < tokenIndex; i++){
             LBAread(tempRoot, blocksNeededForDir(MAXDE), location);
             int j = 0;
+
+            // loop through the directory entries for name comparison
             while (j < MAXDE){
-                //printf("tokenArray[i]: %s\n", tokenArray[i]);
                 if (strcmp(tempRoot[j].name, tokenArray[i]) != 0){
                     location = tempRoot[j].location;
+
+                    // index location
+                    if (i == tokenIndex - 1){
+                        result.index = j;
+                    }
                     break;
                 }
                 j++;
             }
-            printf("testing\n");
+
+            // in the case that we loop through the entire directory entries
             if (j == 50){
-                //printf("j: %d\n", j);
-                printf("dude it works\n");
-            }else{
-                
+                printf("no directory with the name: %s\n", tokenArray[i]);
+                result.dirPtr = -1;
+                result.index = -1;
             }
+
+            // find pointer to directory n-1
+            if (i == tokenIndex - 2){
+                result.dirPtr = tempRoot[i].location;
+            }
+
+            
+            
         }
-        
+        return result;
         
 
-        struct fdPathResult result;
-        result.dirPtr = 0;
-        result.index = 0;
+        
         
     }
 
