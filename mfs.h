@@ -17,7 +17,6 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <time.h>
-
 #include "b_io.h"
 
 #include <dirent.h>
@@ -37,7 +36,7 @@ typedef u_int32_t uint32_t;
 struct fs_diriteminfo
 	{
     unsigned short d_reclen;    /* length of this record */
-    unsigned char fileType;    
+    unsigned char fileType;     // if file or directory
     char d_name[256]; 			/* filename max filename is 255 characters */
 	};
 
@@ -54,6 +53,11 @@ typedef struct
 	uint64_t	directoryStartLocation;		/*Starting LBA of directory */
 	} fdDir;
 
+struct fdPathResult{
+	int dirPtr;					// pointer to the directory 
+	int index;					// index of file/directory
+};
+
 // Key directory functions
 int fs_mkdir(const char *pathname, mode_t mode);
 int fs_rmdir(const char *pathname);
@@ -65,13 +69,13 @@ int fs_closedir(fdDir *dirp);
 
 // Misc directory functions
 char * fs_getcwd(char *pathname, size_t size);
-int fs_setcwd(char *pathname);   //linux chdir
+int fs_setcwd(char *pathname);  //linux chdir
 int fs_isFile(char * filename);	//return 1 if file, 0 otherwise
-int fs_isDir(char * pathname);		//return 1 if directory, 0 otherwise
+int fs_isDir(char * pathname);	//return 1 if directory, 0 otherwise
 int fs_delete(char* filename);	//removes a file
 
 
-// This is the strucutre that is filled in from a call to fs_stat
+// This is the structure that is filled in from a call to fs_stat
 struct fs_stat
 	{
 	off_t     st_size;    		/* total size, in bytes */
@@ -85,6 +89,8 @@ struct fs_stat
 	};
 
 int fs_stat(const char *path, struct fs_stat *buf);
+
+struct fdPathResult parsedPath(char * path);
 
 #endif
 
