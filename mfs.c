@@ -36,9 +36,10 @@
 #include "freespace.h"
 
 #define MAXDE 50
-#define MAXLENGTH 256
+#define MAXLENGTH 256 
+struct fdPathResult globalTemp;
 
-char lastArg[20];
+
 
 // int fs_rmdir(const char *pathname)
 // {
@@ -132,6 +133,9 @@ struct fdPathResult parsedPath(const char * path){
     // check if absolute or relative
     char firstChar = path[0];
     int isAbsolute = 0;
+    struct fdPathResult result;
+    
+
 
     // this works
     if (strcmp(&firstChar, "/") == 0)
@@ -240,6 +244,7 @@ struct fdPathResult parsedPath(const char * path){
         directoryEntries[3].numOfDE = 66;
         directoryEntries[3].location = 4000;
 
+        
 
         LBAwrite(directoryEntries, blocksNeededForDir(numberofDE), location);
 
@@ -309,7 +314,7 @@ struct fdPathResult parsedPath(const char * path){
             tokenArray[tokenIndex++] = token;
         }
 
-        printf("tokenIndex: %d\n", tokenIndex);
+        //printf("tokenIndex: %d\n", tokenIndex);
 
         // load in root directory first
         // we know that its at location 6
@@ -323,15 +328,15 @@ struct fdPathResult parsedPath(const char * path){
         //int location = vcb->locOfRoot;
         location = vcb->locOfRoot;
 
-        struct fdPathResult result;
-
         // assign the last value in tokenArray to result last arg
         // save last arg
-        strcpy(lastArg, tokenArray[tokenIndex-1]);
+        strcpy(globalTemp.lastArg, tokenArray[tokenIndex-1]);
+        //printf("*********result.lastArg: %s\n", result.lastArg);
+    
         //printf("lastArg: %s\n", lastArg);
 
         numberofDE = MAXDE;
-        
+
         // loop through all of the tokens in root
         for (size_t i = 0; i < tokenIndex; i++)
         {
@@ -342,29 +347,32 @@ struct fdPathResult parsedPath(const char * path){
             // loop through the directory entries for name comparison
             while (j < numberofDE)
             {
-                if (strcmp(tempBuffer[j].name, tokenArray[i]) != 0)
+                if (strcmp(tempBuffer[j].name, tokenArray[i]) == 0)
                 {
                     // works up to here 100%
-                    printf("tempBuffer[j].name: %s\n", tempBuffer[j].name);
+                   
+                    //printf("tempBuffer[j].name: %s\n", tempBuffer[j].name);
                     
-                    // this will update only once to grab the final
+                    // this will update and it's to grab the final index
                     // index locaiton
-                    // if (i == tokenIndex - 1){
-                    //     result.index = j;
-                    //     printf("result.index: %d\n", result.index);
-                    //     break;
-                    // }
-                    
-                }else{ 
                     location = tempBuffer[j].location;
-                    printf("location: %d\n", location);
+                    //printf("location: %d\n", location);
                     numberofDE = tempBuffer[j].numOfDE;
-                    printf("numberofDE: %d\n", numberofDE);
-                    printf("tempBuffer[j].name22: %s\n", tempBuffer[j].name);
+                    //printf("numberofDE: %d\n", numberofDE);
+                    //printf("tempBuffer[j].name22: %s\n", tempBuffer[j].name);
+
+                    // once the comparison is found, we read in the next location
                     LBAread(tempBuffer, blocksNeededForDir(numberofDE), location);
                     break;
+                    
                 }
                 j++;
+                // grabbing result
+                if (i == tokenIndex -1 ){
+                        globalTemp.index = j;
+                        //printf("result.index: %d\n", result.index);
+                        //break;
+                    }
             }
             // prints out 1 bc the first parameter is /./notbanana
             //printf("j: %d\n", j);
@@ -374,28 +382,38 @@ struct fdPathResult parsedPath(const char * path){
 
             // find pointer to directory n-1
             // this will update multiple times but that's intentional
+            // this works
             if (i == tokenIndex - 2){
-                result.dirPtr = tempBuffer[i].location;
+                globalTemp.dirPtr = tempBuffer[i].location;
             }
 
             // in the case that we loop through the entire directory entries
             if (j == 50)
             {
                 printf("no directory with the name: %s\n", tokenArray[i]);
-                result.dirPtr = -1;
-                result.index = -1;
+                globalTemp.dirPtr = -1;
+                globalTemp.index = -1;
             }
+            
 
-
-            // find pointer to directory n-1
-            if (i == tokenIndex - 2)
-            {
-                result.dirPtr = tempBuffer[i].location;
-            }
-
+        
         }
-         return result;
+       
     }
+    //  printf("globalTemp.index: %d\n", globalTemp.index);
+    //     printf("globalTemp.dirPtr: %d\n", globalTemp.dirPtr);
+    //     printf("globalTemp.lastArg: %s\n", globalTemp.lastArg);
+
+    result.dirPtr = globalTemp.dirPtr;
+    result.index = globalTemp.index;
+    strcpy( result.lastArg,globalTemp.lastArg);
+
+
+    // printf("result.index: %d\n", result.index);
+    // printf("result.dirPtr: %d\n", result.dirPtr);
+    // printf("result.lastArg: %s\n", result.lastArg);
+    return result;
+
 }
 
 

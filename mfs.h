@@ -31,6 +31,8 @@ typedef u_int64_t uint64_t;
 typedef u_int32_t uint32_t;
 #endif
 
+
+
 // This structure is returned by fs_readdir to provide the caller with information
 // about each file as it iterates through a directory
 struct fs_diriteminfo
@@ -56,7 +58,7 @@ typedef struct
 struct fdPathResult{
 	int dirPtr;					// pointer to the directory 
 	int index;					// index of file/directory
-	char *lastArg;				// the name of the final file /foo/"bar"
+	char lastArg[20];				// the name of the final file /foo/"bar"
 };
 
 // Key directory functions
