@@ -111,6 +111,11 @@ int fs_delete(char *filename)
     strcpy(parentDir[path.index].name, "");
 
     // Write freespace and parentDir back to disk, free malloc
+
+    // do we have to change the fileType to FT_REGFILE?
+
+    //Write freespace and parentDir back to disk, free malloc
+
     LBAwrite(freeSpaceMap, 5, vcb->locOfFreespace);
     LBAwrite(parentDir, dirBlocks, path.dirPtr);
     free(freeSpaceMap);
@@ -121,6 +126,9 @@ int fs_delete(char *filename)
 
 struct fdPathResult parsedPath(char *path)
 {
+
+struct fdPathResult parsedPath(const char * path){
+
     // check if absolute or relative
     char firstChar = path[0];
     int isAbsolute = 0;
@@ -150,6 +158,8 @@ struct fdPathResult parsedPath(char *path)
             token = strtok(NULL, s);
         }
 
+        
+
         // for (size_t i = 0; i < tokenIndex; i++)
         // {
         //     printf("tokenArray[i]: %s\n", tokenArray[i]);
@@ -173,6 +183,11 @@ struct fdPathResult parsedPath(char *path)
 
         struct fdPathResult result;
 
+        // assign the last value in tokenArray to result last arg
+        // last arg may need to have a size initiated lastArg[20]
+        strcpy(result.lastArg, tokenArray[tokenIndex]);
+        
+
         // loop through all of the tokens
         for (size_t i = 0; i < tokenIndex; i++)
         {
@@ -186,14 +201,26 @@ struct fdPathResult parsedPath(char *path)
                 {
                     location = tempRoot[j].location;
 
+
                     // index location
                     if (i == tokenIndex - 1)
                     {
+
+                    // this will update only once to grab the final
+                    // index locaiton
+                    if (i == tokenIndex - 1){
                         result.index = j;
                     }
                     break;
                 }
                 j++;
+            }
+
+
+            // find pointer to directory n-1
+            // this will update multiple times but that's intentional
+            if (i == tokenIndex - 2){
+                result.dirPtr = tempRoot[i].location;
             }
 
             // in the case that we loop through the entire directory entries
@@ -204,11 +231,13 @@ struct fdPathResult parsedPath(char *path)
                 result.index = -1;
             }
 
+
             // find pointer to directory n-1
             if (i == tokenIndex - 2)
             {
                 result.dirPtr = tempRoot[i].location;
             }
+
         }
         return result;
     }
@@ -245,8 +274,55 @@ char *fs_getcwd(char *pathname, size_t size)
         cwd_buf = malloc(size);
     }
 
+
     strcpy(pathname, cwd_buf);
     printf("cwd_buf %s\n",cwd_buf);
     return cwd_buf;
 }
 int fs_setcwd(char *pathname); // linux chdir
+
+int fs_mkdir(const char *pathname, mode_t mode){
+    struct fdPathResult path = parsedPath(pathname);
+     if (path.dirPtr == -1 && path.index == -1){
+        return -1;
+    }
+    
+    int dirBlocks = blocksNeededForDir(MAXDE);
+
+    // gain access to n directory by reading in the (n-1)directory
+    DirectoryEntry parentDir[MAXDE];
+    LBAread(parentDir, dirBlocks, path.dirPtr);
+
+    //Read in the directory we want to remove
+    DirectoryEntry dirToEnter[MAXDE];
+    LBAread(dirToEnter, dirBlocks, parentDir[path.index].location);
+
+
+    // loop through dirToEnter, checking each DE for an empty DE 
+    for (size_t i = 2; i < MAXDE; i++){
+        if (strcmp(dirToEnter[i].name, "") == 0){
+            dirToEnter[i].fileType = FT_DIRECTORY;
+            strcpy(dirToEnter[i].name, path.lastArg); // FIGURE THIS OUT
+        }
+    }
+    
+    // mark blocks as used
+    uint8_t* freeSpaceMap = malloc(getFreespaceSize(vcb->numBlocks, vcb->blockSize));
+    LBAread(freeSpaceMap, 5, vcb->locOfFreespace);
+    for (int i = parentDir[path.index].location; i < parentDir[path.index].location + dirBlocks; i++){
+        setBitOne(freeSpaceMap, i);
+    }
+
+    //Write freespace and parentDir back to disk, free malloc
+    LBAwrite(freeSpaceMap, 5, vcb->locOfFreespace);
+    LBAwrite(parentDir, dirBlocks, path.dirPtr);
+    free(freeSpaceMap);
+    freeSpaceMap = NULL;
+
+    return 0;
+
+
+
+
+}
+

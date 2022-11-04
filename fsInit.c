@@ -147,8 +147,9 @@ int initFileSystem (uint64_t numberOfBlocks, uint64_t blockSize) {
 
         /* TEST CODE */
 
-        parsedPath("/./notbanana");
-
+        //parsedPath("/./notbanana");
+        mode_t test;
+        fs_mkdir("path", test);
 
 
 

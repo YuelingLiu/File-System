@@ -56,6 +56,7 @@ typedef struct
 struct fdPathResult{
 	int dirPtr;					// pointer to the directory 
 	int index;					// index of file/directory
+	char lastArg;				// the name of the final file /foo/"bar"
 };
 
 // Key directory functions
@@ -90,7 +91,7 @@ struct fs_stat
 
 int fs_stat(const char *path, struct fs_stat *buf);
 
-struct fdPathResult parsedPath(char * path);
+struct fdPathResult parsedPath(const char * path);
 
 #endif
 
