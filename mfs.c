@@ -119,13 +119,21 @@ struct fdPathResult parsedPath(char * path){
                 if (strcmp(tempRoot[j].name, tokenArray[i]) != 0){
                     location = tempRoot[j].location;
 
-                    // index location
+                    // this will update only once to grab the final
+                    // index locaiton
                     if (i == tokenIndex - 1){
                         result.index = j;
                     }
                     break;
                 }
                 j++;
+            }
+
+
+            // find pointer to directory n-1
+            // this will update multiple times but that's intentional
+            if (i == tokenIndex - 2){
+                result.dirPtr = tempRoot[i].location;
             }
 
             // in the case that we loop through the entire directory entries
@@ -135,10 +143,7 @@ struct fdPathResult parsedPath(char * path){
                 result.index = -1;
             }
 
-            // find pointer to directory n-1
-            if (i == tokenIndex - 2){
-                result.dirPtr = tempRoot[i].location;
-            }
+
 
             
             
@@ -160,5 +165,38 @@ int fs_isFile(char * filename){
 
 
 int fs_isDir(char * pathname);	//return 1 if directory, 0 otherwise
+
+
+int fs_mkdir(const char *pathname, mode_t mode){
+    
+    int dirPtr = 30;
+    int index = 5;
+    int dirBlocks = blocksNeededForDir(MAXDE);
+
+    // gain access to n directory by reading in the (n-1)directory
+    DirectoryEntry parentDir[MAXDE];
+    LBAread(parentDir, dirBlocks, dirPtr);
+
+    // not 100 sure about this 
+    // access directory at n
+    DirectoryEntry dirToEnter[MAXDE];
+    LBAread(dirToEnter, dirBlocks, parentDir[index].location);
+
+    // loop through dirToEnter, checking each DE for an empty DE 
+    for (size_t i = 2; i < MAXDE; i++){
+        if (strcmp(dirToEnter[i].name, "") == 0){
+            dirToEnter[i].fileType = FT_DIRECTORY;
+        
+        }
+    }
+    
+
+    
+
+
+
+
+}
+
 
 
