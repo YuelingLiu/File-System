@@ -38,91 +38,91 @@
 #define MAXDE 50
 #define MAXLENGTH 256
 
-int fs_rmdir(const char *pathname)
-{
-    struct fdPathResult path = parsedPath(pathname);
-    if (path.dirPtr == -1 && path.index == -1)
-    {
-        return -1;
-    }
-    int dirBlocks = blocksNeededForDir(MAXDE);
+// int fs_rmdir(const char *pathname)
+// {
+//     struct fdPathResult path = parsedPath(pathname);
+//     if (path.dirPtr == -1 && path.index == -1)
+//     {
+//         return -1;
+//     }
+//     int dirBlocks = blocksNeededForDir(MAXDE);
 
-    // Gain access to the directory we want to remove by reading in its parent directory
-    DirectoryEntry parentDir[MAXDE];
-    LBAread(parentDir, dirBlocks, path.dirPtr);
+//     // Gain access to the directory we want to remove by reading in its parent directory
+//     DirectoryEntry parentDir[MAXDE];
+//     LBAread(parentDir, dirBlocks, path.dirPtr);
 
-    // Read in the directory we want to remove
-    DirectoryEntry dirToRemove[MAXDE];
-    LBAread(dirToRemove, dirBlocks, parentDir[path.index].location);
+//     // Read in the directory we want to remove
+//     DirectoryEntry dirToRemove[MAXDE];
+//     LBAread(dirToRemove, dirBlocks, parentDir[path.index].location);
 
-    // Loop through dirToRemove, checking that each DE except "." and ".." is known free state
-    for (int i = 2; i < MAXDE; i++)
-    {
-        if (strcmp(dirToRemove[i].name, "") != 0)
-        {
-            return -1;
-        }
-    }
+//     // Loop through dirToRemove, checking that each DE except "." and ".." is known free state
+//     for (int i = 2; i < MAXDE; i++)
+//     {
+//         if (strcmp(dirToRemove[i].name, "") != 0)
+//         {
+//             return -1;
+//         }
+//     }
 
-    // Mark blocks as free
-    uint8_t *freeSpaceMap = malloc(getFreespaceSize(vcb->numBlocks, vcb->blockSize));
-    LBAread(freeSpaceMap, 5, vcb->locOfFreespace);
-    for (int i = parentDir[path.index].location; i < parentDir[path.index].location + dirBlocks; i++)
-    {
-        setBitZero(freeSpaceMap, i);
-    }
+//     // Mark blocks as free
+//     uint8_t *freeSpaceMap = malloc(getFreespaceSize(vcb->numBlocks, vcb->blockSize));
+//     LBAread(freeSpaceMap, 5, vcb->locOfFreespace);
+//     for (int i = parentDir[path.index].location; i < parentDir[path.index].location + dirBlocks; i++)
+//     {
+//         setBitZero(freeSpaceMap, i);
+//     }
 
-    // Set dirToRemove's DE to known free state
-    strcpy(parentDir[path.index].name, "");
+//     // Set dirToRemove's DE to known free state
+//     strcpy(parentDir[path.index].name, "");
 
-    // Write freespace and parentDir back to disk, free malloc
-    LBAwrite(freeSpaceMap, 5, vcb->locOfFreespace);
-    LBAwrite(parentDir, dirBlocks, path.dirPtr);
-    free(freeSpaceMap);
-    freeSpaceMap = NULL;
+//     // Write freespace and parentDir back to disk, free malloc
+//     LBAwrite(freeSpaceMap, 5, vcb->locOfFreespace);
+//     LBAwrite(parentDir, dirBlocks, path.dirPtr);
+//     free(freeSpaceMap);
+//     freeSpaceMap = NULL;
 
-    return 0;
-}
-int fs_delete(char *filename)
-{
-    struct fdPathResult path = parsedPath(filename);
-    if (path.dirPtr == -1 && path.index == -1)
-    {
-        return -1;
-    }
-    int dirBlocks = blocksNeededForDir(MAXDE);
+//     return 0;
+// }
+// int fs_delete(char *filename)
+// {
+//     struct fdPathResult path = parsedPath(filename);
+//     if (path.dirPtr == -1 && path.index == -1)
+//     {
+//         return -1;
+//     }
+//     int dirBlocks = blocksNeededForDir(MAXDE);
 
-    // Gain access to the file we want to remove by reading in its parent directory
-    DirectoryEntry parentDir[MAXDE];
-    LBAread(parentDir, dirBlocks, path.dirPtr);
+//     // Gain access to the file we want to remove by reading in its parent directory
+//     DirectoryEntry parentDir[MAXDE];
+//     LBAread(parentDir, dirBlocks, path.dirPtr);
 
-    // Get number of blocks being used by file
-    int fileBlocks = (parentDir[path.index].size + (vcb->blockSize - 1)) / vcb->blockSize;
+//     // Get number of blocks being used by file
+//     int fileBlocks = (parentDir[path.index].size + (vcb->blockSize - 1)) / vcb->blockSize;
 
-    // Mark blocks as free
-    uint8_t *freeSpaceMap = malloc(getFreespaceSize(vcb->numBlocks, vcb->blockSize));
-    LBAread(freeSpaceMap, 5, vcb->locOfFreespace);
-    for (int i = parentDir[path.index].location; i < parentDir[path.index].location + fileBlocks; i++)
-    {
-        setBitZero(freeSpaceMap, i);
-    }
+//     // Mark blocks as free
+//     uint8_t *freeSpaceMap = malloc(getFreespaceSize(vcb->numBlocks, vcb->blockSize));
+//     LBAread(freeSpaceMap, 5, vcb->locOfFreespace);
+//     for (int i = parentDir[path.index].location; i < parentDir[path.index].location + fileBlocks; i++)
+//     {
+//         setBitZero(freeSpaceMap, i);
+//     }
 
-    // Set file's DE to known free state
-    strcpy(parentDir[path.index].name, "");
+//     // Set file's DE to known free state
+//     strcpy(parentDir[path.index].name, "");
 
-    // Write freespace and parentDir back to disk, free malloc
+//     // Write freespace and parentDir back to disk, free malloc
 
-    // do we have to change the fileType to FT_REGFILE?
+//     // do we have to change the fileType to FT_REGFILE?
 
-    //Write freespace and parentDir back to disk, free malloc
+//     //Write freespace and parentDir back to disk, free malloc
 
-    LBAwrite(freeSpaceMap, 5, vcb->locOfFreespace);
-    LBAwrite(parentDir, dirBlocks, path.dirPtr);
-    free(freeSpaceMap);
-    freeSpaceMap = NULL;
+//     LBAwrite(freeSpaceMap, 5, vcb->locOfFreespace);
+//     LBAwrite(parentDir, dirBlocks, path.dirPtr);
+//     free(freeSpaceMap);
+//     freeSpaceMap = NULL;
 
-    return 0;
-}
+//     return 0;
+// }
 
 
 struct fdPathResult parsedPath(const char * path){
@@ -156,9 +156,7 @@ struct fdPathResult parsedPath(const char * path){
             token = strtok(NULL, s);
         }
 
-<<<<<<< HEAD
         //printf("tokenIndex: %d\n", tokenIndex);
-=======
         
 
         // for (size_t i = 0; i < tokenIndex; i++)
@@ -172,7 +170,6 @@ struct fdPathResult parsedPath(const char * path){
         // } while (token = strtok(NULL, "/"));
 
         // printf("tokenIndex: %d\n", tokenIndex);
->>>>>>> 594c34936878720cdcad2328c4718affea58c54b
 
         // load in root directory first
         // we know that its at location 6
@@ -244,94 +241,95 @@ struct fdPathResult parsedPath(const char * path){
         return result;
     }
 }
+}
 
-int fs_isFile(char *filename)
-{
+// int fs_isFile(char *filename)
+// {
 
-} // return 1 if file, 0 otherwise
+// } // return 1 if file, 0 otherwise
 
-int fs_isDir(char *pathname); // return 1 if directory, 0 otherwise
+//int fs_isDir(char *pathname); // return 1 if directory, 0 otherwise
 
 // Misc directory functions
 // This function is to get the working directory for the current task
 // Returns a pointer to pathname, and pointer so NULL otherwise
-char *fs_getcwd(char *pathname, size_t size)
-{
-    // copy the abosulte pathname for the current working directory
-    printf("what is pathname %s\n", pathname);
-    char *cwd_buf;
-    if (pathname[0] != '/')
-    {
-        return NULL;
-    }
+// char *fs_getcwd(char *pathname, size_t size)
+// {
+//     // copy the abosulte pathname for the current working directory
+//     printf("what is pathname %s\n", pathname);
+//     char *cwd_buf;
+//     if (pathname[0] != '/')
+//     {
+//         return NULL;
+//     }
 
-    memcpy(cwd_buf, pathname, size);
-    if (strlen(pathname) + 1 >=size)
-    {
-        return NULL;
-    }
+//     memcpy(cwd_buf, pathname, size);
+//     if (strlen(pathname) + 1 >=size)
+//     {
+//         return NULL;
+//     }
 
-    if (!cwd_buf)
-    {
-        cwd_buf = malloc(size);
-    }
+//     if (!cwd_buf)
+//     {
+//         cwd_buf = malloc(size);
+//     }
 
 
-    strncpy(cwd_buf, pathname,size);
-    printf("cwd_buf %s\n",cwd_buf);
-    return cwd_buf;
-}
+//     strncpy(cwd_buf, pathname,size);
+//     //printf("cwd_buf %s\n",cwd_buf);
+//     return cwd_buf;
+// }
 // Linux chdir 
 
-int fs_setcwd(char *pathname){
-    // check if the pathname starts in the root direcotry 
-    if(pathname[0]!='/'){
-        return -1;
-    }
-}
+// int fs_setcwd(char *pathname){
+//     // check if the pathname starts in the root direcotry 
+//     if(pathname[0]!='/'){
+//         return -1;
+//     }
+// }
 
-int fs_mkdir(const char *pathname, mode_t mode){
-    struct fdPathResult path = parsedPath(pathname);
-     if (path.dirPtr == -1 && path.index == -1){
-        return -1;
-    }
+// int fs_mkdir(const char *pathname, mode_t mode){
+//     struct fdPathResult path = parsedPath(pathname);
+//      if (path.dirPtr == -1 && path.index == -1){
+//         return -1;
+//     }
     
-    int dirBlocks = blocksNeededForDir(MAXDE);
+//     int dirBlocks = blocksNeededForDir(MAXDE);
 
-    // gain access to n directory by reading in the (n-1)directory
-    DirectoryEntry parentDir[MAXDE];
-    LBAread(parentDir, dirBlocks, path.dirPtr);
+//     // gain access to n directory by reading in the (n-1)directory
+//     DirectoryEntry parentDir[MAXDE];
+//     LBAread(parentDir, dirBlocks, path.dirPtr);
 
-    //Read in the directory we want to remove
-    DirectoryEntry dirToEnter[MAXDE];
-    LBAread(dirToEnter, dirBlocks, parentDir[path.index].location);
+//     //Read in the directory we want to remove
+//     DirectoryEntry dirToEnter[MAXDE];
+//     LBAread(dirToEnter, dirBlocks, parentDir[path.index].location);
 
 
-    // loop through dirToEnter, checking each DE for an empty DE 
-    for (size_t i = 2; i < MAXDE; i++){
-        if (strcmp(dirToEnter[i].name, "") == 0){
-            dirToEnter[i].fileType = FT_DIRECTORY;
-            strcpy(dirToEnter[i].name, path.lastArg); // FIGURE THIS OUT
-        }
-    }
+//     // loop through dirToEnter, checking each DE for an empty DE 
+//     for (size_t i = 2; i < MAXDE; i++){
+//         if (strcmp(dirToEnter[i].name, "") == 0){
+//             dirToEnter[i].fileType = FT_DIRECTORY;
+//             strcpy(dirToEnter[i].name, path.lastArg); // FIGURE THIS OUT
+//         }
+//     }
     
-    // mark blocks as used
-    uint8_t* freeSpaceMap = malloc(getFreespaceSize(vcb->numBlocks, vcb->blockSize));
-    LBAread(freeSpaceMap, 5, vcb->locOfFreespace);
-    for (int i = parentDir[path.index].location; i < parentDir[path.index].location + dirBlocks; i++){
-        setBitOne(freeSpaceMap, i);
-    }
+//     // mark blocks as used
+//     uint8_t* freeSpaceMap = malloc(getFreespaceSize(vcb->numBlocks, vcb->blockSize));
+//     LBAread(freeSpaceMap, 5, vcb->locOfFreespace);
+//     for (int i = parentDir[path.index].location; i < parentDir[path.index].location + dirBlocks; i++){
+//         setBitOne(freeSpaceMap, i);
+//     }
 
-    //Write freespace and parentDir back to disk, free malloc
-    LBAwrite(freeSpaceMap, 5, vcb->locOfFreespace);
-    LBAwrite(parentDir, dirBlocks, path.dirPtr);
-    free(freeSpaceMap);
-    freeSpaceMap = NULL;
+//     //Write freespace and parentDir back to disk, free malloc
+//     LBAwrite(freeSpaceMap, 5, vcb->locOfFreespace);
+//     LBAwrite(parentDir, dirBlocks, path.dirPtr);
+//     free(freeSpaceMap);
+//     freeSpaceMap = NULL;
 
-    return 0;
-
-
+//     return 0;
 
 
-}
+
+
+// }
 
