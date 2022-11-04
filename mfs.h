@@ -90,7 +90,7 @@ struct fs_stat
 
 int fs_stat(const char *path, struct fs_stat *buf);
 
-struct fdPathResult parsedPath(char * path);
+struct fdPathResult parsedPath(const char * path);
 
 #endif
 

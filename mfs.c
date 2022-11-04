@@ -104,6 +104,8 @@ int fs_delete(char* filename){
     //Set file's DE to known free state
     strcpy(parentDir[path.index].name, "");
 
+    // do we have to change the fileType to FT_REGFILE?
+
     //Write freespace and parentDir back to disk, free malloc
     LBAwrite(freeSpaceMap, 5, vcb->locOfFreespace);
     LBAwrite(parentDir, dirBlocks, path.dirPtr);
@@ -113,7 +115,7 @@ int fs_delete(char* filename){
     return 0;
 }
 
-struct fdPathResult parsedPath(char * path){
+struct fdPathResult parsedPath(const char * path){
     // check if absolute or relative
     char firstChar = path[0];
     int isAbsolute = 0;
@@ -225,30 +227,44 @@ int fs_isDir(char * pathname);	//return 1 if directory, 0 otherwise
 
 
 int fs_mkdir(const char *pathname, mode_t mode){
+    struct fdPathResult path = parsedPath(pathname);
+     if (path.dirPtr == -1 && path.index == -1){
+        return -1;
+    }
     
-    int dirPtr = 30;
-    int index = 5;
     int dirBlocks = blocksNeededForDir(MAXDE);
 
     // gain access to n directory by reading in the (n-1)directory
     DirectoryEntry parentDir[MAXDE];
-    LBAread(parentDir, dirBlocks, dirPtr);
+    LBAread(parentDir, dirBlocks, path.dirPtr);
 
-    // not 100 sure about this 
-    // access directory at n
+    //Read in the directory we want to remove
     DirectoryEntry dirToEnter[MAXDE];
-    LBAread(dirToEnter, dirBlocks, parentDir[index].location);
+    LBAread(dirToEnter, dirBlocks, parentDir[path.index].location);
+
 
     // loop through dirToEnter, checking each DE for an empty DE 
     for (size_t i = 2; i < MAXDE; i++){
         if (strcmp(dirToEnter[i].name, "") == 0){
             dirToEnter[i].fileType = FT_DIRECTORY;
-        
+            strcpy(dirToEnter[i].name, "temp name"); // FIGURE THIS OUT
         }
     }
     
+    // mark blocks as used
+    uint8_t* freeSpaceMap = malloc(getFreespaceSize(vcb->numBlocks, vcb->blockSize));
+    LBAread(freeSpaceMap, 5, vcb->locOfFreespace);
+    for (int i = parentDir[path.index].location; i < parentDir[path.index].location + dirBlocks; i++){
+        setBitOne(freeSpaceMap, i);
+    }
 
-    
+    //Write freespace and parentDir back to disk, free malloc
+    LBAwrite(freeSpaceMap, 5, vcb->locOfFreespace);
+    LBAwrite(parentDir, dirBlocks, path.dirPtr);
+    free(freeSpaceMap);
+    freeSpaceMap = NULL;
+
+    return 0;
 
 
 
