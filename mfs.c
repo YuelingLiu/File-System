@@ -143,20 +143,6 @@ struct fdPathResult parsedPath(const char * path){
             token = strtok(NULL, s);
         }
 
-        
-
-        // for (size_t i = 0; i < tokenIndex; i++)
-        // {
-        //     printf("tokenArray[i]: %s\n", tokenArray[i]);
-        // }
-        
-        // do{
-        //     //printf("token: %s\n", token);
-        //     tokenArray[tokenIndex++] = token;
-        // } while (token = strtok(NULL, "/"));
-
-
-
         //printf("tokenIndex: %d\n", tokenIndex);
 
         // load in root directory first
