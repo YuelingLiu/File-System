@@ -56,6 +56,7 @@ typedef struct
 struct fdPathResult{
 	int dirPtr;					// pointer to the directory 
 	int index;					// index of file/directory
+	char lastArg;				// the name of the final file /foo/"bar"
 };
 
 // Key directory functions

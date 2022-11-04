@@ -143,6 +143,8 @@ struct fdPathResult parsedPath(const char * path){
             token = strtok(NULL, s);
         }
 
+        
+
         // for (size_t i = 0; i < tokenIndex; i++)
         // {
         //     printf("tokenArray[i]: %s\n", tokenArray[i]);
@@ -167,6 +169,9 @@ struct fdPathResult parsedPath(const char * path){
         int location = vcb->locOfRoot;
 
         struct fdPathResult result;
+        // assign the last value in tokenArray to result last arg
+        // last arg may need to have a size initiated lastArg[20]
+        strcpy(result.lastArg, tokenArray[tokenIndex]);
         
         // loop through all of the tokens
         for (size_t i = 0; i < tokenIndex; i++){
@@ -247,7 +252,7 @@ int fs_mkdir(const char *pathname, mode_t mode){
     for (size_t i = 2; i < MAXDE; i++){
         if (strcmp(dirToEnter[i].name, "") == 0){
             dirToEnter[i].fileType = FT_DIRECTORY;
-            strcpy(dirToEnter[i].name, "temp name"); // FIGURE THIS OUT
+            strcpy(dirToEnter[i].name, path.lastArg); // FIGURE THIS OUT
         }
     }
     
