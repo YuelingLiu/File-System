@@ -277,8 +277,9 @@ char *fs_getcwd(char *pathname, size_t size)
     printf("cwd_buf %s\n",cwd_buf);
     return cwd_buf;
 }
-// Linux chdir 
 
+
+// Linux chdir 
 int fs_setcwd(char *pathname){
     // check if the pathname starts in the root direcotry 
     if(pathname[0]!='/'){
