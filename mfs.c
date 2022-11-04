@@ -124,8 +124,6 @@ int fs_delete(char *filename)
     return 0;
 }
 
-struct fdPathResult parsedPath(char *path)
-{
 
 struct fdPathResult parsedPath(const char * path){
 
@@ -275,11 +273,18 @@ char *fs_getcwd(char *pathname, size_t size)
     }
 
 
-    strcpy(pathname, cwd_buf);
+    strncpy(cwd_buf, pathname,size);
     printf("cwd_buf %s\n",cwd_buf);
     return cwd_buf;
 }
-int fs_setcwd(char *pathname); // linux chdir
+// Linux chdir 
+
+int fs_setcwd(char *pathname){
+    // check if the pathname starts in the root direcotry 
+    if(pathname[0]!='/'){
+        return -1;
+    }
+}
 
 int fs_mkdir(const char *pathname, mode_t mode){
     struct fdPathResult path = parsedPath(pathname);
