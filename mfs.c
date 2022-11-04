@@ -172,8 +172,8 @@ struct fdPathResult parsedPath(const char * path){
 
         DirectoryEntry *tempBuffer = malloc(sizeof(DirectoryEntry) * MAXDE);
 
-        int location = vcb->locOfRoot;
-        int numberofDE = MAXDE;
+        volatile int location = vcb->locOfRoot;
+        volatile int numberofDE = MAXDE;
 
         // load in root
         LBAread(tempBuffer, blocksNeededForDir(numberofDE), location);
@@ -323,7 +323,6 @@ struct fdPathResult parsedPath(const char * path){
         //int location = vcb->locOfRoot;
         location = vcb->locOfRoot;
 
-
         struct fdPathResult result;
 
         // assign the last value in tokenArray to result last arg
@@ -341,26 +340,36 @@ struct fdPathResult parsedPath(const char * path){
             int j = 0;
 
             // loop through the directory entries for name comparison
-            while (j < MAXDE)
+            while (j < numberofDE)
             {
                 if (strcmp(tempBuffer[j].name, tokenArray[i]) != 0)
                 {
                     // works up to here 100%
-                    location = tempBuffer[j].location;
-                    numberofDE = tempBuffer[j].numOfDE;
-
+                    printf("tempBuffer[j].name: %s\n", tempBuffer[j].name);
+                    
                     // this will update only once to grab the final
                     // index locaiton
-                    if (i == tokenIndex - 1){
-                        result.index = j;
-                        printf("j: %d\n", j);
-                    }
+                    // if (i == tokenIndex - 1){
+                    //     result.index = j;
+                    //     printf("result.index: %d\n", result.index);
+                    //     break;
+                    // }
+                    
+                }else{ 
+                    location = tempBuffer[j].location;
+                    printf("location: %d\n", location);
+                    numberofDE = tempBuffer[j].numOfDE;
+                    printf("numberofDE: %d\n", numberofDE);
+                    printf("tempBuffer[j].name22: %s\n", tempBuffer[j].name);
+                    LBAread(tempBuffer, blocksNeededForDir(numberofDE), location);
                     break;
                 }
                 j++;
             }
             // prints out 1 bc the first parameter is /./notbanana
-            printf("j: %d\n", j);
+            //printf("j: %d\n", j);
+
+            
 
 
             // find pointer to directory n-1

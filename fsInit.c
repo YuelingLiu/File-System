@@ -72,6 +72,7 @@ int initRootDE(int blockSize, int FSSize){
     directoryEntries[0].size = MAXDE * sizeof(DirectoryEntry);
     directoryEntries[0].location = locOfRoot;
     directoryEntries[0].fileType = FT_DIRECTORY;
+    directoryEntries[0].numOfDE = MAXDE;
     
 
     // set the dot dot
@@ -79,7 +80,8 @@ int initRootDE(int blockSize, int FSSize){
     directoryEntries[1].size = MAXDE * sizeof(DirectoryEntry);
     directoryEntries[1].location = locOfRoot;
     directoryEntries[1].fileType = FT_DIRECTORY;
-    
+    directoryEntries[1].numOfDE = MAXDE;
+
 
 
     LBAwrite(directoryEntries, blocksNeeded, locOfRoot);
@@ -147,7 +149,7 @@ int initFileSystem (uint64_t numberOfBlocks, uint64_t blockSize) {
 
         /* TEST CODE */
 
-        parsedPath("/banana/apple");
+        parsedPath("/banana2/apple2/pear");
         //mode_t test;
         //fs_mkdir("path", test);
 
