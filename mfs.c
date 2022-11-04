@@ -40,20 +40,77 @@
 
 
 int fs_rmdir(const char *pathname){
-    // fd_PathResult = fd_ParsePath(pathname);
-    struct fdPathResult path;
-    path.dirPtr = 30;
-    path.index = 5;
+    struct fdPathResult path = parsedPath(pathname);
+    if (path.dirPtr == -1 && path.index == -1){
+        return -1;
+    }
+    int dirBlocks = blocksNeededForDir(MAXDE);
 
-    // pointer to struct = fs_opendir(pathname)
+    //Gain access to the directory we want to remove by reading in its parent directory
+    DirectoryEntry parentDir[MAXDE];
+    LBAread(parentDir, dirBlocks, path.dirPtr);
+
+    //Read in the directory we want to remove
+    DirectoryEntry dirToRemove[MAXDE];
+    LBAread(dirToRemove, dirBlocks, parentDir[path.index].location);
     
+    //Loop through dirToRemove, checking that each DE except "." and ".." is known free state
+    for (int i = 2; i < MAXDE; i++){
+        if (strcmp(dirToRemove[i].name, "") != 0){
+            return -1;
+        }
+    }
 
+    //Mark blocks as free
+    uint8_t* freeSpaceMap = malloc(getFreespaceSize(vcb->numBlocks, vcb->blockSize));
+    LBAread(freeSpaceMap, 5, vcb->locOfFreespace);
+    for (int i = parentDir[path.index].location; i < parentDir[path.index].location + dirBlocks; i++){
+        setBitZero(freeSpaceMap, i);
+    }
 
+    //Set dirToRemove's DE to known free state
+    strcpy(parentDir[path.index].name, "");
 
+    //Write freespace and parentDir back to disk, free malloc
+    LBAwrite(freeSpaceMap, 5, vcb->locOfFreespace);
+    LBAwrite(parentDir, dirBlocks, path.dirPtr);
+    free(freeSpaceMap);
+    freeSpaceMap = NULL;
 
+    return 0;
 
+}
+int fs_delete(char* filename){
+    struct fdPathResult path = parsedPath(filename);
+    if (path.dirPtr == -1 && path.index == -1){
+        return -1;
+    }
+    int dirBlocks = blocksNeededForDir(MAXDE);
+    
+    //Gain access to the file we want to remove by reading in its parent directory
+    DirectoryEntry parentDir[MAXDE];
+    LBAread(parentDir, dirBlocks, path.dirPtr);
 
-    //fs_close
+    //Get number of blocks being used by file
+    int fileBlocks = (parentDir[path.index].size + (vcb->blockSize - 1)) / vcb->blockSize;
+
+    //Mark blocks as free
+    uint8_t* freeSpaceMap = malloc(getFreespaceSize(vcb->numBlocks, vcb->blockSize));
+    LBAread(freeSpaceMap, 5, vcb->locOfFreespace);
+    for (int i = parentDir[path.index].location; i < parentDir[path.index].location + fileBlocks; i++){
+        setBitZero(freeSpaceMap, i);
+    }
+
+    //Set file's DE to known free state
+    strcpy(parentDir[path.index].name, "");
+
+    //Write freespace and parentDir back to disk, free malloc
+    LBAwrite(freeSpaceMap, 5, vcb->locOfFreespace);
+    LBAwrite(parentDir, dirBlocks, path.dirPtr);
+    free(freeSpaceMap);
+    freeSpaceMap = NULL;
+
+    return 0;
 }
 
 struct fdPathResult parsedPath(char * path){
