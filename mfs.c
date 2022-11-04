@@ -142,7 +142,7 @@ int fs_isDir(char * pathname);	//return 1 if directory, 0 otherwise
 // This function is to get the working directory for the current task
 // Returns a pointer to pathname, and pointer so NULL otherwise 
 char * fs_getcwd(char *pathname, size_t size){
-
+    //copy the abosulte pathname for the current working directory
 
 }
 int fs_setcwd(char *pathname);  //linux chdir
