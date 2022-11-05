@@ -31,6 +31,7 @@
 
 #define MAXDE 50
 
+
 //Extern global variable available to all files
 VCB* vcb;
 
@@ -39,6 +40,7 @@ VCB* vcb;
 // probably remove this later
 
 long MAGICNUM = 133713371337;
+
 
 
 // The root directory follows the bitmap blocks
@@ -72,6 +74,7 @@ int initRootDE(int blockSize, int FSSize){
     directoryEntries[0].size = MAXDE * sizeof(DirectoryEntry);
     directoryEntries[0].location = locOfRoot;
     directoryEntries[0].fileType = FT_DIRECTORY;
+    directoryEntries[0].numOfDE = MAXDE;
     
 
     // set the dot dot
@@ -79,7 +82,8 @@ int initRootDE(int blockSize, int FSSize){
     directoryEntries[1].size = MAXDE * sizeof(DirectoryEntry);
     directoryEntries[1].location = locOfRoot;
     directoryEntries[1].fileType = FT_DIRECTORY;
-    
+    directoryEntries[1].numOfDE = MAXDE;
+
 
 
     LBAwrite(directoryEntries, blocksNeeded, locOfRoot);
@@ -146,12 +150,15 @@ int initFileSystem (uint64_t numberOfBlocks, uint64_t blockSize) {
         vcb->locOfRoot = initRootDE(blockSize, FSSize); // function to be implemented
 
         /* TEST CODE */
+        
+        struct fdPathResult tempPath = parsedPath("/banana2/apple2/pear");
+        //parsedPath("/banana2/apple2/pear2");
 
-        //parsedPath("/./notbanana");
-        mode_t test;
-        fs_mkdir("path", test);
+        printf("result.index: %d\n", tempPath.index);
+        printf("result.dirPtr: %d\n", tempPath.dirPtr);
+        printf("result.lastArg: %s\n", tempPath.lastArg);
 
-
+        int isDirr = fs_isDir("/banana2/apple");
 
         /* TEST CODE */
         
