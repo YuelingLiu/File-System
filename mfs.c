@@ -606,13 +606,18 @@ fdDir * fs_opendir(const char *pathname){
 
 }
 
+
  // takes a pointer and returns a pointer to fs_diriteminfo struct 
  // fs_diriteminfo contains d_name, filetType, d_reclen
  // this is just do a for loop
- //fs_readdir - Read the next directory entry in the directory stream.
+ // returns a pointer to fs_diriteminfo struct 
+ // return null when Error occurs 
+
+
 
 //struct fs_diriteminfo *fs_readdir(fdDir *dirp){
    // start from where we last left off, which was position 0 
+
     
     // for(int i = dirp->dirEntryPosition ; i < total_direcotory_entries; i++){
         // if this directory is used, 
@@ -630,8 +635,31 @@ fdDir * fs_opendir(const char *pathname){
 
 //}
 
+// my version
+// struct fs_diriteminfo *fs_readdir(fdDir *dirp){
+//     //base case
+//     if(dirp ==NULL){
+//         return NULL;
+//     }
+
+//     for(int i = 0 ; i < MAXDE;i++){
+//         // DirectoryEntryUsed by checking the d_reclen length or dirEntryPosition
+//         if(dirp[i].d_reclen > 4){
+//              // copy the name from our directory entry to the struct 
+//             strcpy(dirp->dirp_fs.d_name,dirp[i].d_name);
+//             dirp->dirp_fs.fileType = FT_DIRECTORY;
+//             dirp->dirEntryPosition =i+1;
+
+//           return &dirp->dirp_fs;
+//     }
+
+//     return NULL;
+
+// }
+
+
 // free up memory here  we allocated in the open
-int fs_closedir(fdDir *dirp){
+// int fs_closedir(fdDir *dirp){
   
-}
+// }
 
