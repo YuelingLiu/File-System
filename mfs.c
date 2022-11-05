@@ -39,6 +39,8 @@
 #define MAXLENGTH 256 
 struct fdPathResult globalTemp;
 char * globalPath = "/";
+DirectoryEntry *tempBuffer;
+
 
 
 
@@ -130,57 +132,11 @@ char * globalPath = "/";
 // }
 
 
-
-struct fdPathResult parsedPath(const char * path){
-
-    // check if absolute or relative
-    char firstChar = path[0];
-    int isAbsolute = 0;
-    struct fdPathResult result;
-    DirectoryEntry *tempBuffer = malloc(sizeof(DirectoryEntry) * MAXDE);
+// used as a test function to populate storage for parse path to run
+void testPopulateStorage ( const char * path){
     
 
-
-    // this works
-    if (strcmp(&firstChar, "/") == 0)
-    {
-        isAbsolute = 1;
-    }
-
-    if(isAbsolute == 0){
-        // grab in global variable which is the absolute location
-        // from root given(root location)
-        // parse the absolute location
-        // starting from root, we go to next location, then next location 
-        // until we get to end then finally we search for path.name
-
-
-    }
-
-    if (isAbsolute == 1)
-    {
-        // make an array to load in data
-        char *tokenArray[50];   // array of names to be tokenized
-        const char s[2] = "/";  // delimiter
-        int tokenIndex = 0;     // counter for number of tokens
-        char str[strlen(path)]; // declare a string, str to be read of size strlen(path)
-        strcpy(str, path);      // copy path into str
-
-        // loop to tokenize values
-        char *token = strtok(str, s);
-
-        while (token != NULL)
-        {
-            tokenArray[tokenIndex++] = token;
-            // printf("token: %s\n", token);
-            token = strtok(NULL, s);
-        }
-
-        
-
-        //printf("tokenIndex: %d\n", tokenIndex);
-
-        /* TEST CODE */
+    /* TEST CODE */
 
         // LBAread and LBAwrite in storage so i have something to test and confirm the function works
         // EVERYTHING WORKS 
@@ -190,7 +146,7 @@ struct fdPathResult parsedPath(const char * path){
         // layer 3 apple
         // layer 4 pear
 
-        //DirectoryEntry *tempBuffer = malloc(sizeof(DirectoryEntry) * MAXDE);
+        tempBuffer = malloc(sizeof(DirectoryEntry) * MAXDE);
         // remove volatile and test
         volatile int location = vcb->locOfRoot;
         volatile int numberofDE = MAXDE;
@@ -317,7 +273,58 @@ struct fdPathResult parsedPath(const char * path){
 
 
         /* TEST CODE */
+    
 
+
+   
+}
+
+
+
+struct fdPathResult parsedPath(const char * path){
+
+    // check if absolute or relative
+    char firstChar = path[0];
+    int isAbsolute = 0;
+    struct fdPathResult result;
+
+    // confirm if the path is relative to absolute
+    if (strcmp(&firstChar, "/") == 0)
+    {
+        isAbsolute = 1;
+    }
+
+    // for a relative path, we need to grab the path first
+    if(isAbsolute == 0){
+        // grab in global variable which is the absolute location
+        // from root given(root location)
+        // parse the absolute location
+        // starting from root, we go to next location, then next location 
+        // until we get to end then finally we search for path.name
+
+    }
+
+    // for absolute path, we will parse the path starting from root
+    if (isAbsolute == 1)
+    {
+        // tokenizes path into tokens
+        char *tokenArray[50];   // array of names to be tokenized
+        const char s[2] = "/";  // delimiter
+        int tokenIndex = 0;     // counter for number of tokens
+        char str[strlen(path)]; // declare a string, str to be read of size strlen(path)
+        strcpy(str, path);      // copy path into str
+
+        // loop to tokenize values
+        char *token = strtok(str, s);
+
+        while (token != NULL)
+        {
+            tokenArray[tokenIndex++] = token;
+            // printf("token: %s\n", token);
+            token = strtok(NULL, s);
+        }
+        
+        // print tokens
         for (size_t i = 0; i < tokenIndex; i++)
         {
             printf("tokenArray[i]: %s\n", tokenArray[i]);
@@ -328,25 +335,20 @@ struct fdPathResult parsedPath(const char * path){
             tokenArray[tokenIndex++] = token;
         }
 
-        //printf("tokenIndex: %d\n", tokenIndex);
+        // end of tokenizer
 
-        // load in root directory first
-        // we know that its at location 6
-        //************************************************
-        // MAXDE requires include "fsinit.c" but multiple definitions
 
         // im using tempBuffer instead of tempRoot
         // create a variable that changes for the loop to run
         // commented out bc location is made in the test above
-        //int location = vcb->locOfRoot;
-        location = vcb->locOfRoot;
+        int location = vcb->locOfRoot;
 
         // assign the last value in tokenArray to result last arg
         // save last arg
         strcpy(globalTemp.lastArg, tokenArray[tokenIndex-1]);
     
 
-        numberofDE = MAXDE;
+        int numberofDE = MAXDE;
 
         // loop through all of the tokens in root
         for (size_t i = 0; i < tokenIndex; i++)
