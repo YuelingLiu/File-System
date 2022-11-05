@@ -87,9 +87,9 @@ char * globalPath = "/";
 //     freeSpaceMap = NULL;
 
 //     return 0;
-// }
-// int fs_delete(char *filename)
-// {
+//      }
+//      int fs_delete(char *filename)
+//      {
 //     struct fdPathResult path = parsedPath(filename);
 //     if (path.dirPtr == -1 && path.index == -1)
 //     {
