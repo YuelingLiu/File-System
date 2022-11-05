@@ -248,7 +248,30 @@ struct fdPathResult parsedPath(const char * path){
 
 // } // return 1 if file, 0 otherwise
 
-//int fs_isDir(char *pathname); // return 1 if directory, 0 otherwise
+// return 1 if directory, 0 otherwise
+int fs_isDir(char *pathname){
+}
+
+int isFile(const char* name)
+{
+    struct fs_diriteminfo *ptr= fs_readdir(name);
+    if(ptr != NULL)
+    {
+     closedir(ptr);
+     ptr->fileType=FT_REGFILE;
+     return 0;
+    }
+
+    if(errno == ENOTDIR)
+    {
+     return 1;
+    }
+
+    return -1;
+}
+
+    
+
 
 // Misc directory functions
 // This function is to get the working directory for the current task
