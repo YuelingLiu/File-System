@@ -508,6 +508,16 @@ struct fdPathResult parsedPath(const char * path){
 
 // }
 
+// getcwd version 3
+//  char *fs_getcwd(char *pathname, size_t size){
+//     if(strlen(globalPath)>size){
+//         return NULL;
+//     }
+
+//     strcpy(pathname,globalPath);
+//     return globalPath;
+
+// }
 
 
 
@@ -575,4 +585,53 @@ struct fdPathResult parsedPath(const char * path){
 
 
 //}
+
+// 
+fdDir * fs_opendir(const char *pathname){
+ // 1. parse the pathname, make sure path is valid and find the last element 
+ // 2. check the last element to see if it is a directory  
+ //      a: yes if last Arg type  IS directory
+ //      b: no -> fail return null it is not a directory
+ // 3.  Load this directory 
+//      dirp = loadDir(DE); this directory entry we know from step 2 
+
+//    fdDir *fd = malloc(sizeof(fdDir));
+//  4. set fd position to 0 
+//    fd->dirEntryPosition=0;
+//    fd->dirp=dirp; 
+//    
+//  5. return a pointer to fdDir struct 
+
+ //  return fd; 
+
+}
+
+ // takes a pointer and returns a pointer to fs_diriteminfo struct 
+ // fs_diriteminfo contains d_name, filetType, d_reclen
+ // this is just do a for loop
+ //fs_readdir - Read the next directory entry in the directory stream.
+
+//struct fs_diriteminfo *fs_readdir(fdDir *dirp){
+   // start from where we last left off, which was position 0 
+    
+    // for(int i = dirp->dirEntryPosition ; i < total_direcotory_entries; i++){
+        // if this directory is used, 
+    //     if DirectoryEntryUsed(dirp->dirp[i]){
+    //         // ii fs_diriteminfo 
+    //         // copy the name from our directory entry to the struct 
+    //         strcpy(fd->dirp->fs_diriteminfo.d_name, fd->dirp[i].name);
+    //         fd-dirp->fs_diriteminfo.fileType= typedef(fd->dirp[i]);
+    //         fd->position =i+1;
+
+    //         return (fd->dirp->fs_diriteminfo);
+    //     }
+    // // }
+    // return NULL
+
+//}
+
+// free up memory here  we allocated in the open
+int fs_closedir(fdDir *dirp){
+  
+}
 
