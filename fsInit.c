@@ -42,6 +42,7 @@ VCB* vcb;
 long MAGICNUM = 133713371337;
 
 
+
 // The root directory follows the bitmap blocks
 int initRootDE(int blockSize, int FSSize){
 	// 1. First, we need space.
@@ -149,22 +150,15 @@ int initFileSystem (uint64_t numberOfBlocks, uint64_t blockSize) {
         vcb->locOfRoot = initRootDE(blockSize, FSSize); // function to be implemented
 
         /* TEST CODE */
-
+        
         struct fdPathResult tempPath = parsedPath("/banana2/apple2/pear2");
         //parsedPath("/banana2/apple2/pear2");
-        // printf("globalTemp.index: %d\n", globalTemp.index);
-        // printf("globalTemp.dirPtr: %d\n", globalTemp.dirPtr);
-        // printf("globalTemp.lastArg: %s\n", globalTemp.lastArg);
-
 
         printf("result.index: %d\n", tempPath.index);
         printf("result.dirPtr: %d\n", tempPath.dirPtr);
         printf("result.lastArg: %s\n", tempPath.lastArg);
 
-        //mode_t test;
-        //fs_mkdir("path", test);
-
-
+        //int isDirr = fs_isDir("/banana2/apple");
 
         /* TEST CODE */
         

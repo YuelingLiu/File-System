@@ -41,6 +41,7 @@ struct fdPathResult globalTemp;
 
 
 
+
 // int fs_rmdir(const char *pathname)
 // {
 //     struct fdPathResult path = parsedPath(pathname);
@@ -128,12 +129,14 @@ struct fdPathResult globalTemp;
 // }
 
 
+
 struct fdPathResult parsedPath(const char * path){
 
     // check if absolute or relative
     char firstChar = path[0];
     int isAbsolute = 0;
     struct fdPathResult result;
+    DirectoryEntry *tempBuffer = malloc(sizeof(DirectoryEntry) * MAXDE);
     
 
 
@@ -162,6 +165,8 @@ struct fdPathResult parsedPath(const char * path){
             token = strtok(NULL, s);
         }
 
+        
+
         //printf("tokenIndex: %d\n", tokenIndex);
 
         /* TEST CODE */
@@ -174,8 +179,7 @@ struct fdPathResult parsedPath(const char * path){
         // layer 3 apple
         // layer 4 pear
 
-        DirectoryEntry *tempBuffer = malloc(sizeof(DirectoryEntry) * MAXDE);
-
+        //DirectoryEntry *tempBuffer = malloc(sizeof(DirectoryEntry) * MAXDE);
         volatile int location = vcb->locOfRoot;
         volatile int numberofDE = MAXDE;
 
@@ -244,7 +248,6 @@ struct fdPathResult parsedPath(const char * path){
         directoryEntries[3].numOfDE = 66;
         directoryEntries[3].location = 4000;
 
-        
 
         LBAwrite(directoryEntries, blocksNeededForDir(numberofDE), location);
 
@@ -292,7 +295,6 @@ struct fdPathResult parsedPath(const char * path){
         directoryEntries[3].numOfDE = 88;
         directoryEntries[3].location = 6000;
 
-
         LBAwrite(directoryEntries, blocksNeededForDir(numberofDE), location);
 
         LBAread (tempBuffer,12,0);
@@ -321,7 +323,6 @@ struct fdPathResult parsedPath(const char * path){
         //************************************************
         // MAXDE requires include "fsinit.c" but multiple definitions
 
-        //DirectoryEntry *tempRoot = malloc(sizeof(DirectoryEntry) * MAXDE);
         // im using tempBuffer instead of tempRoot
         // create a variable that changes for the loop to run
         // commented out bc location is made in the test above
@@ -331,9 +332,7 @@ struct fdPathResult parsedPath(const char * path){
         // assign the last value in tokenArray to result last arg
         // save last arg
         strcpy(globalTemp.lastArg, tokenArray[tokenIndex-1]);
-        //printf("*********result.lastArg: %s\n", result.lastArg);
     
-        //printf("lastArg: %s\n", lastArg);
 
         numberofDE = MAXDE;
 
@@ -377,8 +376,6 @@ struct fdPathResult parsedPath(const char * path){
             // prints out 1 bc the first parameter is /./notbanana
             //printf("j: %d\n", j);
 
-            
-
 
             // find pointer to directory n-1
             // this will update multiple times but that's intentional
@@ -393,26 +390,36 @@ struct fdPathResult parsedPath(const char * path){
                 printf("no directory with the name: %s\n", tokenArray[i]);
                 globalTemp.dirPtr = -1;
                 globalTemp.index = -1;
+                break;
             }
-            
-
-        
         }
        
+        result.dirPtr = globalTemp.dirPtr;
+    result.index = globalTemp.index;
+    strcpy( result.lastArg,globalTemp.lastArg);
+
+    
+    return result;
+     
+     
     }
+    free(tempBuffer);
+    tempBuffer = NULL;
+    
     //  printf("globalTemp.index: %d\n", globalTemp.index);
     //     printf("globalTemp.dirPtr: %d\n", globalTemp.dirPtr);
     //     printf("globalTemp.lastArg: %s\n", globalTemp.lastArg);
 
-    result.dirPtr = globalTemp.dirPtr;
-    result.index = globalTemp.index;
-    strcpy( result.lastArg,globalTemp.lastArg);
+    // result.dirPtr = globalTemp.dirPtr;
+    // result.index = globalTemp.index;
+    // strcpy( result.lastArg,globalTemp.lastArg);
 
 
     // printf("result.index: %d\n", result.index);
     // printf("result.dirPtr: %d\n", result.dirPtr);
     // printf("result.lastArg: %s\n", result.lastArg);
-    return result;
+    
+    // return result;
 
 }
 
@@ -424,7 +431,49 @@ struct fdPathResult parsedPath(const char * path){
 
 // } // return 1 if file, 0 otherwise
 
-//int fs_isDir(char *pathname); // return 1 if directory, 0 otherwise
+// return 1 if directory, 0 otherwise
+int fs_isDir(char *pathname) {
+    //DirectoryEntry *tempBuff = malloc(sizeof(DirectoryEntry) * MAXDE);
+    //DirectoryEntry *tempBuffer = malloc(sizeof(DirectoryEntry) * MAXDE);
+
+    // need to make a general function for token array
+    // make an array to load in data
+    char *tokenArray[50];   // array of names to be tokenized
+    const char s[2] = "/";  // delimiter
+    int tokenIndex = 0;     // counter for number of tokens
+    char str[strlen(pathname)]; // declare a string, str to be read of size strlen(path)
+    strcpy(str, pathname);      // copy path into str
+
+    // loop to tokenize values
+    char *token = strtok(str, s);
+
+    while (token != NULL)
+    {
+        tokenArray[tokenIndex++] = token;
+        //printf("token: %s\n", token);
+        token = strtok(NULL, s);
+    }
+
+    struct fdPathResult tempPath = parsedPath(pathname);
+    // printf("MAXDE: %d\n", MAXDE);
+    // printf("sizeof(DirectoryEntry): %d\n", sizeof(DirectoryEntry));
+    //DirectoryEntry *tempBuff = malloc(sizeof(DirectoryEntry) * MAXDE);
+    
+   // LBAread(tempBuffer, blocksNeededForDir(MAXDE), tempPath.dirPtr);
+
+    //printf("tokenArray[tokenIndex]: %s\n", tokenArray[tokenIndex-1]);
+    //printf("tempBuff[0]: %s\n", tempBuff[0].name);
+    // for (size_t i = 0; i < MAXDE; i++)
+    // {
+    //     if(strcmp(tokenArray[tokenIndex-1], tempBuffer[i].name) == 0){
+    //         printf("it works!\n");
+    //     }
+    // }
+    
+
+
+    
+}
 
 // Misc directory functions
 // This function is to get the working directory for the current task
