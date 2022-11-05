@@ -406,7 +406,7 @@ struct fdPathResult parsedPath(const char * path){
             }
         }
        
-        result.dirPtr = globalTemp.dirPtr;
+    result.dirPtr = globalTemp.dirPtr;
     result.index = globalTemp.index;
     strcpy( result.lastArg,globalTemp.lastArg);
 
