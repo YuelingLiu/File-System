@@ -158,7 +158,7 @@ int initFileSystem (uint64_t numberOfBlocks, uint64_t blockSize) {
         printf("result.dirPtr: %d\n", tempPath.dirPtr);
         printf("result.lastArg: %s\n", tempPath.lastArg);
 
-        int isDirr = fs_isDir("/banana2/apple");
+        //int isDirr = fs_isDir("/banana2/apple");
 
         /* TEST CODE */
         
