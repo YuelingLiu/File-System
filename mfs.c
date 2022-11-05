@@ -38,6 +38,7 @@
 #define MAXDE 50
 #define MAXLENGTH 256 
 struct fdPathResult globalTemp;
+char * globalPath = "/";
 
 
 
@@ -146,6 +147,16 @@ struct fdPathResult parsedPath(const char * path){
         isAbsolute = 1;
     }
 
+    if(isAbsolute == 0){
+        // grab in global variable which is the absolute location
+        // from root given(root location)
+        // parse the absolute location
+        // starting from root, we go to next location, then next location 
+        // until we get to end then finally we search for path.name
+
+
+    }
+
     if (isAbsolute == 1)
     {
         // make an array to load in data
@@ -180,6 +191,7 @@ struct fdPathResult parsedPath(const char * path){
         // layer 4 pear
 
         //DirectoryEntry *tempBuffer = malloc(sizeof(DirectoryEntry) * MAXDE);
+        // remove volatile and test
         volatile int location = vcb->locOfRoot;
         volatile int numberofDE = MAXDE;
 
@@ -428,56 +440,37 @@ struct fdPathResult parsedPath(const char * path){
 
 // int fs_isFile(char *filename)
 // {
+//     // run parsepath to get a struct 
+//     // parsepath will determine if its in the same folder or absolute
+//     // dirPtr, index, lastArg will be returned from parsePath
+//     // LBAread (tempBuffer, MAXDE, dirPtr);
 
-// } // return 1 if file, 0 otherwise
-
-// return 1 if directory, 0 otherwise
-int fs_isDir(char *pathname) {
-    //DirectoryEntry *tempBuff = malloc(sizeof(DirectoryEntry) * MAXDE);
-    //DirectoryEntry *tempBuffer = malloc(sizeof(DirectoryEntry) * MAXDE);
-
-    // need to make a general function for token array
-    // make an array to load in data
-    char *tokenArray[50];   // array of names to be tokenized
-    const char s[2] = "/";  // delimiter
-    int tokenIndex = 0;     // counter for number of tokens
-    char str[strlen(pathname)]; // declare a string, str to be read of size strlen(path)
-    strcpy(str, pathname);      // copy path into str
-
-    // loop to tokenize values
-    char *token = strtok(str, s);
-
-    while (token != NULL)
-    {
-        tokenArray[tokenIndex++] = token;
-        //printf("token: %s\n", token);
-        token = strtok(NULL, s);
-    }
-
-    struct fdPathResult tempPath = parsedPath(pathname);
-    // printf("MAXDE: %d\n", MAXDE);
-    // printf("sizeof(DirectoryEntry): %d\n", sizeof(DirectoryEntry));
-    //DirectoryEntry *tempBuff = malloc(sizeof(DirectoryEntry) * MAXDE);
+//      // iterate through tempBuffer to strcpy(tempbuffer[i].name, lastArg) == 0
+//          // tempBuffer[i].fileType
     
-   // LBAread(tempBuffer, blocksNeededForDir(MAXDE), tempPath.dirPtr);
-
-    //printf("tokenArray[tokenIndex]: %s\n", tokenArray[tokenIndex-1]);
-    //printf("tempBuff[0]: %s\n", tempBuff[0].name);
-    // for (size_t i = 0; i < MAXDE; i++)
-    // {
-    //     if(strcmp(tokenArray[tokenIndex-1], tempBuffer[i].name) == 0){
-    //         printf("it works!\n");
-    //     }
-    // }
+//     // return 1 if file, 0 otherwise
     
 
+// }
 
+
+// int fs_isDir(char *pathname) {
     
-}
+//     // run parsepath we get a struct to confirm it is a path as welll as location and stuff
+//     // dirPtr, index, lastArg
+//     // LBAread (tempBuffer, MAXDE, dirPtr);
+
+//     // iterate through tempBuffer to strcpy(tempbuffer[i].name, lastArg) == 0
+//         // tempBuffer[i].fileType
+
+//      //return 1 if directory, 0 otherwise
+//  }
+
 
 // Misc directory functions
 // This function is to get the working directory for the current task
-// Returns a pointer to pathname, and pointer so NULL otherwise
+// Returns a pointer to absolute pathname, and pointer so NULL otherwise
+
 // char *fs_getcwd(char *pathname, size_t size)
 // {
 //     // copy the abosulte pathname for the current working directory
@@ -504,6 +497,19 @@ int fs_isDir(char *pathname) {
 //     //printf("cwd_buf %s\n",cwd_buf);
 //     return cwd_buf;
 // }
+
+// getcwd version 2
+// char *fs_getcwd(char *pathname, size_t size){
+    
+//     strcpy(pathname, globalPath);
+
+//     return pathname;
+
+// }
+
+
+
+
 // Linux chdir 
 
 // int fs_setcwd(char *pathname){
@@ -511,6 +517,17 @@ int fs_isDir(char *pathname) {
 //     if(pathname[0]!='/'){
 //         return -1;
 //     }
+// }
+
+// swtcwd version 2
+// int fs_setcwd(char *pathname){
+
+//     strcpy(globalPath, pathname);
+
+//     return 0;
+
+//     // return a different number if error
+
 // }
 
 // int fs_mkdir(const char *pathname, mode_t mode){
