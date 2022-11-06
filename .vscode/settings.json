@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "unistd.h": "c",
-        "mfs.h": "c"
+        "mfs.h": "c",
+        "getopt.h": "c"
     }
 }

@@ -32,6 +32,8 @@
 #define MAXDE 50
 
 
+
+
 //Extern global variable available to all files
 VCB* vcb;
 
@@ -161,7 +163,23 @@ int initFileSystem (uint64_t numberOfBlocks, uint64_t blockSize) {
         printf("result.lastArg: %s\n", tempPath.lastArg);
 
     
-        int isDirr = fs_isDir("/banana2/apple2");
+        int retisDir = fs_isDir("/banana2/apple2");
+        if (retisDir == 1){
+            printf("the folder exists\n");
+        }
+
+        // getcwd works!!
+        int size = strlen("/banana2");
+        printf("before getcwd\n");
+        char * retPath = fs_getcwd("/banana2", size);
+        printf("after getcwd\n");
+
+
+        // int retisFile = fs_isFile("/banana");
+        // if (retisFile == 1){
+        //     printf("the file exists\n");
+        // }
+
 
         /* TEST CODE */
         

@@ -53,7 +53,7 @@ typedef struct
 	unsigned short  d_reclen;		/*length of this record */
 	unsigned short	dirEntryPosition;	/*which directory entry position, like file pos */
 	uint64_t	directoryStartLocation;		/*Starting LBA of directory */
-	uintptr_t  dirp; // I added this directory pointer
+	//intptr_t  dirp; // I added this directory pointer
 
 	char d_name[256];               
 	struct fs_diriteminfo  dirp_fs; // This a nested struct pointer that points to fs_diriteminfo
@@ -97,7 +97,7 @@ struct fs_stat
 
 int fs_stat(const char *path, struct fs_stat *buf);
 
-struct fdPathResult parsedPath(const char * path);
+struct fdPathResult parsedPath( char * path);
 
 // test function
 void testPopulateStorage ( const char * path);

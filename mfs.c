@@ -38,8 +38,10 @@
 #define MAXDE 50
 #define MAXLENGTH 256 
 struct fdPathResult globalTemp;
-char * globalPath = "/";
 DirectoryEntry *tempBuffer;
+char * globalPath = "/";
+
+
 
 
 
@@ -281,22 +283,37 @@ void testPopulateStorage ( const char * path){
 
 
 
-struct fdPathResult parsedPath(const char * path){
-
+struct fdPathResult parsedPath(char * path){
+    
     // check if absolute or relative
     char firstChar = path[0];
     int isAbsolute = 0;
     struct fdPathResult result;
-
     // confirm if the path is relative to absolute
     if (strcmp(&firstChar, "/") == 0)
     {
         isAbsolute = 1;
+        // in the case that the path is just the root
+        if (strlen(path) == 1){
+            result.dirPtr = vcb->locOfRoot;
+            
+            // need to fix this size
+            int size = strlen(path);
+            strcpy(result.lastArg, fs_getcwd(path,size));
+            printf("result.lastArg: %s\n", result.lastArg);
+            
+        }
     }
+
+    
 
     // for a relative path, we need to grab the path first
     if(isAbsolute == 0){
+        printf("testing\n");
         // grab in global variable which is the absolute location
+        // need to figure out what to do with this size.
+        // int size = 300;
+        // char * tempPath = fs_getcwd(path,size);
         // from root given(root location)
         // parse the absolute location
         // starting from root, we go to next location, then next location 
@@ -307,6 +324,7 @@ struct fdPathResult parsedPath(const char * path){
     // for absolute path, we will parse the path starting from root
     if (isAbsolute == 1)
     {
+       
         // tokenizes path into tokens
         char *tokenArray[50];   // array of names to be tokenized
         const char s[2] = "/";  // delimiter
@@ -334,7 +352,6 @@ struct fdPathResult parsedPath(const char * path){
         while (token = strtok(NULL, "/")){
             tokenArray[tokenIndex++] = token;
         }
-
         // end of tokenizer
 
 
@@ -346,14 +363,12 @@ struct fdPathResult parsedPath(const char * path){
         // assign the last value in tokenArray to result last arg
         // save last arg
         strcpy(globalTemp.lastArg, tokenArray[tokenIndex-1]);
-    
 
         int numberofDE = MAXDE;
 
         // loop through all of the tokens in root
         for (size_t i = 0; i < tokenIndex; i++)
         {
-            
             LBAread(tempBuffer, blocksNeededForDir(numberofDE), location);
             int j = 0;
 
@@ -440,108 +455,74 @@ struct fdPathResult parsedPath(const char * path){
 
     
 
-// int fs_isFile(char *filename)
-// {
-//     // run parsepath to get a struct 
-//     // parsepath will determine if its in the same folder or absolute
-//     // dirPtr, index, lastArg will be returned from parsePath
-//     // LBAread (tempBuffer, MAXDE, dirPtr);
+int fs_isFile(char *filename)
+{
+    // run parsepath to get a struct
+    mode_t temp1;
+    char * tempLastArg = fs_getcwd(filename, temp1);
+    // so the tempLastArg is the current folder
 
-//      // iterate through tempBuffer to strcpy(tempbuffer[i].name, lastArg) == 0
-//          // tempBuffer[i].fileType
+    // parsepath will determine if its in the same folder or absolute
     
-//     // return 1 if file, 0 otherwise
+    struct fdPathResult tempPath = parsedPath(tempLastArg);
+    
+    //LBAread(tempBuffer, MAXDE, tempPath.dirPtr);
+
+    //printf("tempPath.lastArg: %s\n", tempPath.lastArg);
+    // dirPtr, index, lastArg will be returned from parsePath
+    // LBAread (tempBuffer, MAXDE, dirPtr);
+
+     // iterate through tempBuffer to strcpy(tempbuffer[i].name, lastArg) == 0
+         // tempBuffer[i].fileType
+    
+    // return 1 if file, 0 otherwise
     
 
-// }
+}
 
 
 int fs_isDir(char *pathname) {
     // run parsepath we get a struct to confirm it is a path as welll as location and stuff
     struct fdPathResult tempPath = parsedPath(pathname);
     // dirPtr, index, lastArg
-    
     // LBAread (tempBuffer, MAXDE, dirPtr);
     LBAread(tempBuffer, MAXDE, tempPath.dirPtr);
 
     // iterate through tempBuffer to strcpy(tempbuffer[i].name, lastArg) == 0
-        // tempBuffer[i].fileType
-    printf("inside isdir\n");
     for (size_t i = 0; i < MAXDE; i++)
     {   
-        printf("inside loop\n");
+        // check in the same folder and see if the file name passed in exists in the 
+        // current directory.
         if(strcmp(tempBuffer[i].name, tempPath.lastArg) == 0){
             printf("tempBuffer[i].name: %s\n", tempBuffer[i].name);
             if(tempBuffer[i].fileType == FT_DIRECTORY){
-                printf("works\n");
                 return 1;
-            }
-            else if (i == MAXDE -1 ){
-                return 0;
             }
             
         }
-        return 0;
+        // in the case that i is MAXDE and tempBuffer[i].name does not exist
+        // return 0
+        if (i == MAXDE -1 ){
+            printf("file does not exist***\n");
+            return 0;
+        }
+        
     }
-    
-
-     //return 1 if directory, 0 otherwise
-
+    printf("file does not exist\n");
+    return 0;
  }
 
-//int fs_isDir(char *pathname); // return 1 if directory, 0 otherwise
 
 // Misc directory functions
 // This function is to get the working directory for the current task
 // Returns a pointer to absolute pathname, and pointer so NULL otherwise
 
-// char *fs_getcwd(char *pathname, size_t size)
-// {
-//     // copy the abosulte pathname for the current working directory
-//     printf("what is pathname %s\n", pathname);
-//     char *cwd_buf;
-//     if (pathname[0] != '/')
-//     {
-//         return NULL;
-//     }
 
-//     memcpy(cwd_buf, pathname, size);
-//     if (strlen(pathname) + 1 >=size)
-//     {
-//         return NULL;
-//     }
-
-//     if (!cwd_buf)
-//     {
-//         cwd_buf = malloc(size);
-//     }
-
-
-//     strncpy(cwd_buf, pathname,size);
-//     //printf("cwd_buf %s\n",cwd_buf);
-//     return cwd_buf;
-// }
-
-// getcwd version 2
-// char *fs_getcwd(char *pathname, size_t size){
-    
-//     strcpy(pathname, globalPath);
-
-//     return pathname;
-
-// }
-
-// getcwd version 3
-//  char *fs_getcwd(char *pathname, size_t size){
-//     if(strlen(globalPath)>size){
-//         return NULL;
-//     }
-
-//     strcpy(pathname,globalPath);
-//     return globalPath;
-
-// }
-
+//getcwd version 2
+char *fs_getcwd(char *pathname, size_t size){
+    memcpy(&pathname, &globalPath, strlen(globalPath));
+    return pathname;
+}
 
 
 // Linux chdir 
