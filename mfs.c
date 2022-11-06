@@ -368,23 +368,13 @@ struct fdPathResult parsedPath(char * path){
         strcat(currentDir, path);
         
         struct fdPathResult tempPath = parsedPath(currentDir);
-        printf("tempPath.lastArg: %s\n", tempPath.lastArg);
-        // may need to fix MAXDE
-        LBAread(tempBuffer, MAXDE, tempPath.dirPtr);
 
-
-        // may need to fix MAXDE
-        for (size_t i = 0; i < MAXDE; i++)
-        {
-            printf("tempBuffer[i].name: %s\n", tempBuffer[i].name);
-            if(strcmp(tempBuffer[i].name, tokenArray[tokenIndex-1]) == 0){
-                result.dirPtr = tempBuffer[i].location;
-                result.index = i;
-                strcpy(result.lastArg, tempPath.lastArg);
-                return result;
-            }
-        }
-          
+        result.dirPtr = tempPath.dirPtr;
+        result.index = tempPath.index;  
+        strcpy(result.lastArg, tempPath.lastArg);
+        return result;    
+        
+        
         
         
 
@@ -531,7 +521,7 @@ int fs_isFile(char *filename)
     // so the tempLastArg is the current folder
 
     // parsepath will determine if its in the same folder or absolute
-    
+
     struct fdPathResult tempPath = parsedPath(filename);
     
     LBAread(tempBuffer, MAXDE, tempPath.dirPtr);
@@ -597,12 +587,15 @@ char *fs_getcwd(char *pathname, size_t size){
 
 // Linux chdir 
 
-// int fs_setcwd(char *pathname){
-//     // check if the pathname starts in the root direcotry 
-//     if(pathname[0]!='/'){
-//         return -1;
-//     }
-// }
+int fs_setcwd(char *pathname){
+    // check if the pathname starts in the root direcotry 
+    if(pathname[0]!='/'){
+        return -1;
+    }
+    strcpy(globalPath, pathname);
+    return 0;
+
+}
 
 // swtcwd version 2
 // int fs_setcwd(char *pathname){
