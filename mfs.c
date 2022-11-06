@@ -410,7 +410,7 @@ struct fdPathResult parsedPath(const char * path){
        
     result.dirPtr = globalTemp.dirPtr;
     result.index = globalTemp.index;
-    strcpy( result.lastArg,globalTemp.lastArg);
+    strcpy( result.lastArg, globalTemp.lastArg);
 
     
     return result;
@@ -456,17 +456,38 @@ struct fdPathResult parsedPath(const char * path){
 // }
 
 
-// int fs_isDir(char *pathname) {
+int fs_isDir(char *pathname) {
+    // run parsepath we get a struct to confirm it is a path as welll as location and stuff
+    struct fdPathResult tempPath = parsedPath(pathname);
+    // dirPtr, index, lastArg
     
-//     // run parsepath we get a struct to confirm it is a path as welll as location and stuff
-//     // dirPtr, index, lastArg
-//     // LBAread (tempBuffer, MAXDE, dirPtr);
+    // LBAread (tempBuffer, MAXDE, dirPtr);
+    LBAread(tempBuffer, MAXDE, tempPath.dirPtr);
 
-//     // iterate through tempBuffer to strcpy(tempbuffer[i].name, lastArg) == 0
-//         // tempBuffer[i].fileType
+    // iterate through tempBuffer to strcpy(tempbuffer[i].name, lastArg) == 0
+        // tempBuffer[i].fileType
+    printf("inside isdir\n");
+    for (size_t i = 0; i < MAXDE; i++)
+    {   
+        printf("inside loop\n");
+        if(strcmp(tempBuffer[i].name, tempPath.lastArg) == 0){
+            printf("tempBuffer[i].name: %s\n", tempBuffer[i].name);
+            if(tempBuffer[i].fileType == FT_DIRECTORY){
+                printf("works\n");
+                return 1;
+            }
+            else if (i == MAXDE -1 ){
+                return 0;
+            }
+            
+        }
+        return 0;
+    }
+    
 
-//      //return 1 if directory, 0 otherwise
-//  }
+     //return 1 if directory, 0 otherwise
+
+ }
 
 //int fs_isDir(char *pathname); // return 1 if directory, 0 otherwise
 
