@@ -294,15 +294,17 @@ struct fdPathResult parsedPath(char * path){
     {
         isAbsolute = 1;
         // in the case that the path is just the root
-        if (strlen(path) == 1){
-            result.dirPtr = vcb->locOfRoot;
+        // if (strlen(path) == 1){
+        //     result.dirPtr = vcb->locOfRoot;
             
-            // need to fix this size
-            int size = strlen(path);
-            strcpy(result.lastArg, fs_getcwd(path,size));
-            printf("result.lastArg: %s\n", result.lastArg);
+        //     int size = strlen(path);
+        //     strcpy(result.lastArg, fs_getcwd(path,size));
             
-        }
+        //     // retrieve result.index
+            
+            
+        
+        // }
     }
 
     
