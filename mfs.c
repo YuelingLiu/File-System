@@ -221,6 +221,13 @@ void testPopulateStorage ( const char * path){
         directoryEntries[3].numOfDE = 66;
         directoryEntries[3].location = 4000;
 
+        // set apple47 
+        strcpy(directoryEntries[25].name, "apple25");
+        directoryEntries[25].location = location;
+        directoryEntries[25].fileType = FT_DIRECTORY;
+        directoryEntries[25].numOfDE = 50;
+        directoryEntries[25].location = 9000;
+
 
         LBAwrite(directoryEntries, blocksNeededForDir(numberofDE), location);
 
@@ -456,9 +463,9 @@ struct fdPathResult parsedPath(char * path){
                 j++;
                 // grabbing result
                 if (i == tokenIndex -1 ){
-                        globalTemp.index = j;
-                        //printf("result.index: %d\n", result.index);
-                        //break;
+                    globalTemp.index = j;
+                    //printf("result.index: %d\n", result.index);
+                    //break;
                     }
 
                 // in the case that we loop through the entire directory entries
@@ -581,6 +588,9 @@ int fs_isDir(char *pathname) {
 //getcwd version 2
 char *fs_getcwd(char *pathname, size_t size){
     // why does it need these parameters?
+    if (strlen(globalPath) > size){
+        return NULL;
+    }
     return globalPath;
 }
 
@@ -648,15 +658,28 @@ int fs_setcwd(char *pathname){
 
 //     return 0;
 
-
-
+// mkdir version 2
+//int fs_mkdir(const char *pathname, mode_t mode)
+/*
+1 grab current directory
+2 parsePath
+3 LBAread 
+4 iterate through to find name empty
+5 set as folder
+6 find space in free space map
+7 populate space with DEs
+8 return 1
+*/
 
 //}
 
 // 
 fdDir * fs_opendir(const char *pathname){
  // 1. parse the pathname, make sure path is valid and find the last element 
+        struct fdPathResult tempPath = parsedPath(pathname);
  // 2. check the last element to see if it is a directory  
+         LBAread(tempBuffer, MAXDE, tempPath.dirPtr);
+        printf("tempBuffer[tempPath.index].fileType: %d\n", tempBuffer[tempPath.index].fileType);
  //      a: yes if last Arg type  IS directory
  //      b: no -> fail return null it is not a directory
  // 3.  Load this directory 
