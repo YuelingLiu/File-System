@@ -39,7 +39,7 @@
 #define MAXLENGTH 256 
 struct fdPathResult globalTemp;
 DirectoryEntry *tempBuffer;
-char * globalPath = "/";
+char globalPath[MAXLENGTH];
 
 
 
@@ -137,7 +137,10 @@ char * globalPath = "/";
 // used as a test function to populate storage for parse path to run
 void testPopulateStorage ( const char * path){
     
-
+    //gotta figure this out
+    printf("before\n");
+    strcpy(globalPath, "/banana2/apple2");
+    printf("after\n");
     /* TEST CODE */
 
         // LBAread and LBAwrite in storage so i have something to test and confirm the function works
@@ -261,7 +264,7 @@ void testPopulateStorage ( const char * path){
         // set pear2 
         strcpy(directoryEntries[3].name, "pear2");
         directoryEntries[3].location = location;
-        directoryEntries[3].fileType = FT_DIRECTORY;
+        directoryEntries[3].fileType = FT_REGFILE;
         directoryEntries[3].numOfDE = 88;
         directoryEntries[3].location = 6000;
 
@@ -310,16 +313,80 @@ struct fdPathResult parsedPath(char * path){
     
 
     // for a relative path, we need to grab the path first
+    /* 
+    relative path means you want to find the file/folder in the current directory
+    first we need to get current directory (absolute path)
+    then we need to tokenize the relative path. to grab the last argument
+    we then concatenate the current directory with the absolute path
+    once we have the entire absolute path, we run parsepath and this time,
+    absolute value is 1 so it parses the entire path and returns fdPathResult
+    */
     if(isAbsolute == 0){
-        printf("testing\n");
-        // grab in global variable which is the absolute location
-        // need to figure out what to do with this size.
-        // int size = 300;
-        // char * tempPath = fs_getcwd(path,size);
+        // grab in global current directory variable which is the absolute location
+        char * currentDir = fs_getcwd(path,strlen(path));
+        
+
+        // tokenize the path passed in
+        // tokenizes path into tokens
+        char *tokenArray[50];   // array of names to be tokenized
+        const char s[2] = "/";  // delimiter
+        int tokenIndex = 0;     // counter for number of tokens
+        char str[strlen(path)]; // declare a string, str to be read of size strlen(path)
+        strcpy(str, path);      // copy path into str
+
+        // loop to tokenize values
+        char *token = strtok(str, s);
+
+        while (token != NULL)
+        {
+            tokenArray[tokenIndex++] = token;
+            // printf("token: %s\n", token);
+            token = strtok(NULL, s);
+        }
+        
+        // print tokens
+        for (size_t i = 0; i < tokenIndex; i++)
+        {
+            printf("tokenArray[i]: %s\n", tokenArray[i]);
+        }
+
+
+        while (token = strtok(NULL, "/")){
+            tokenArray[tokenIndex++] = token;
+        }
+        // end of tokenizer
+
+
         // from root given(root location)
         // parse the absolute location
         // starting from root, we go to next location, then next location 
         // until we get to end then finally we search for path.name
+
+        
+        strcat(currentDir, "/");
+
+        strcat(currentDir, path);
+        
+        struct fdPathResult tempPath = parsedPath(currentDir);
+        printf("tempPath.lastArg: %s\n", tempPath.lastArg);
+        // may need to fix MAXDE
+        LBAread(tempBuffer, MAXDE, tempPath.dirPtr);
+
+
+        // may need to fix MAXDE
+        for (size_t i = 0; i < MAXDE; i++)
+        {
+            printf("tempBuffer[i].name: %s\n", tempBuffer[i].name);
+            if(strcmp(tempBuffer[i].name, tokenArray[tokenIndex-1]) == 0){
+                result.dirPtr = tempBuffer[i].location;
+                result.index = i;
+                strcpy(result.lastArg, tempPath.lastArg);
+                return result;
+            }
+        }
+          
+        
+        
 
     }
 
@@ -403,7 +470,16 @@ struct fdPathResult parsedPath(char * path){
                         //printf("result.index: %d\n", result.index);
                         //break;
                     }
-            }
+
+                // in the case that we loop through the entire directory entries
+                if (j == numberofDE -1)
+                {
+                    printf("no directory with the name: %s\n", tokenArray[i]);
+                    globalTemp.dirPtr = -1;
+                    globalTemp.index = -1;
+                    break;
+                }
+            }   
             // prints out 1 bc the first parameter is /./notbanana
             //printf("j: %d\n", j);
 
@@ -415,14 +491,6 @@ struct fdPathResult parsedPath(char * path){
                 globalTemp.dirPtr = tempBuffer[i].location;
             }
 
-            // in the case that we loop through the entire directory entries
-            if (j == 50)
-            {
-                printf("no directory with the name: %s\n", tokenArray[i]);
-                globalTemp.dirPtr = -1;
-                globalTemp.index = -1;
-                break;
-            }
         }
        
     result.dirPtr = globalTemp.dirPtr;
@@ -460,24 +528,24 @@ struct fdPathResult parsedPath(char * path){
 int fs_isFile(char *filename)
 {
     // run parsepath to get a struct
-    mode_t temp1;
-    char * tempLastArg = fs_getcwd(filename, temp1);
     // so the tempLastArg is the current folder
 
     // parsepath will determine if its in the same folder or absolute
     
-    struct fdPathResult tempPath = parsedPath(tempLastArg);
+    struct fdPathResult tempPath = parsedPath(filename);
     
-    //LBAread(tempBuffer, MAXDE, tempPath.dirPtr);
+    LBAread(tempBuffer, MAXDE, tempPath.dirPtr);
 
-    //printf("tempPath.lastArg: %s\n", tempPath.lastArg);
-    // dirPtr, index, lastArg will be returned from parsePath
-    // LBAread (tempBuffer, MAXDE, dirPtr);
-
-     // iterate through tempBuffer to strcpy(tempbuffer[i].name, lastArg) == 0
-         // tempBuffer[i].fileType
+    for (size_t i = 0; i < MAXDE; i++)
+    {
+        if (strcmp(tempBuffer[i].name, tempPath.lastArg) == 0){
+            if(tempBuffer[i].fileType == FT_REGFILE){
+                return 1;
+            }
+        }
+    }
     
-    // return 1 if file, 0 otherwise
+    return 0;
     
 
 }
@@ -522,8 +590,8 @@ int fs_isDir(char *pathname) {
 
 //getcwd version 2
 char *fs_getcwd(char *pathname, size_t size){
-    memcpy(&pathname, &globalPath, strlen(globalPath));
-    return pathname;
+    // why does it need these parameters?
+    return globalPath;
 }
 
 

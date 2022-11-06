@@ -155,7 +155,7 @@ int initFileSystem (uint64_t numberOfBlocks, uint64_t blockSize) {
 
         testPopulateStorage("/");
         
-        struct fdPathResult tempPath = parsedPath("/banana2/apple2/pear");
+        struct fdPathResult tempPath = parsedPath("/banana2/apple2/dfd");
         
 
         printf("result.index: %d\n", tempPath.index);
@@ -175,10 +175,10 @@ int initFileSystem (uint64_t numberOfBlocks, uint64_t blockSize) {
         printf("after getcwd\n");
 
 
-        // int retisFile = fs_isFile("/banana");
-        // if (retisFile == 1){
-        //     printf("the file exists\n");
-        // }
+        int retisFile = fs_isFile("/banana2/apple2/pear2");
+        if (retisFile == 1){
+            printf("the file exists\n");
+        }
 
 
         /* TEST CODE */
