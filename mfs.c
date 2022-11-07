@@ -735,6 +735,12 @@ int fs_setcwd(char *pathname){
 
 //}
 
+struct fs_diriteminfo * loadDir (DirectoryEntry temp){
+    struct fs_diriteminfo temp2; 
+
+    
+}
+
 // 
 fdDir * fs_opendir(const char *pathname){
     printf("works inside of opendir\n");
@@ -757,9 +763,8 @@ fdDir * fs_opendir(const char *pathname){
 
         // we need to create a temporary struct of type fs_diriteminfo
         // populate that temp struct with the values listed below
-     
-        
-        
+
+    
 
         // copy over the name
         // strcpy(fd->dirp_fs.d_name, tempBuffer[tempPath.index].name);
