@@ -695,15 +695,20 @@ fdDir * fs_opendir(const char *pathname){
  // 3.  Load this directory 
 //      dirp = loadDir(DE); this directory entry we know from step 2 
 
+        // we need to create a temporary struct of type fs_diriteminfo
+        // populate that temp struct with the values listed below
+
+        
+
         // copy over the name
-        strcpy(fd->dirp_fs.d_name, tempBuffer[tempPath.index].name);
-        printf("fd->dirp_fs.d_name: %s\n", fd->dirp_fs.d_name);
+        // strcpy(fd->dirp_fs.d_name, tempBuffer[tempPath.index].name);
+        // printf("fd->dirp_fs.d_name: %s\n", fd->dirp_fs.d_name);
 
-        // copy over the fileType
-        fd->dirp_fs.fileType = tempBuffer[tempPath.index].fileType;
+        // // copy over the fileType
+        // fd->dirp_fs.fileType = tempBuffer[tempPath.index].fileType;
 
-        struct fs_diriteminfo temp;
-        fd->dirp_fs.d_reclen = sizeof(temp);
+        // struct fs_diriteminfo temp;
+        // fd->dirp_fs.d_reclen = sizeof(temp);
 
 
 //  4. set fd position to 0 

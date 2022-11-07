@@ -57,6 +57,7 @@ typedef struct
 
 	char d_name[256];               
 	struct fs_diriteminfo dirp_fs; // This a nested struct pointer that points to fs_diriteminfo
+	//fileInfo * GetFileInfo (char * fname);
 	} fdDir;
 
 struct fdPathResult{
