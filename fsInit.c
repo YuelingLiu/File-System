@@ -31,6 +31,7 @@
 
 #define MAXDE 50
 
+
 //Extern global variable available to all files
 VCB* vcb;
 
@@ -72,6 +73,7 @@ int initRootDE(int blockSize, int FSSize){
     directoryEntries[0].size = MAXDE * sizeof(DirectoryEntry);
     directoryEntries[0].location = locOfRoot;
     directoryEntries[0].fileType = FT_DIRECTORY;
+    directoryEntries[0].numOfDE = MAXDE;
     
 
     // set the dot dot
@@ -79,7 +81,8 @@ int initRootDE(int blockSize, int FSSize){
     directoryEntries[1].size = MAXDE * sizeof(DirectoryEntry);
     directoryEntries[1].location = locOfRoot;
     directoryEntries[1].fileType = FT_DIRECTORY;
-    
+    directoryEntries[1].numOfDE = MAXDE;
+
 
 
     LBAwrite(directoryEntries, blocksNeeded, locOfRoot);
@@ -147,9 +150,19 @@ int initFileSystem (uint64_t numberOfBlocks, uint64_t blockSize) {
 
         /* TEST CODE */
 
-        //parsedPath("/./notbanana");
-        mode_t test;
-        fs_mkdir("path", test);
+        struct fdPathResult tempPath = parsedPath("/banana2/apple2/pear2");
+        //parsedPath("/banana2/apple2/pear2");
+        // printf("globalTemp.index: %d\n", globalTemp.index);
+        // printf("globalTemp.dirPtr: %d\n", globalTemp.dirPtr);
+        // printf("globalTemp.lastArg: %s\n", globalTemp.lastArg);
+
+
+        printf("result.index: %d\n", tempPath.index);
+        printf("result.dirPtr: %d\n", tempPath.dirPtr);
+        printf("result.lastArg: %s\n", tempPath.lastArg);
+
+        //mode_t test;
+        //fs_mkdir("path", test);
 
 
 
