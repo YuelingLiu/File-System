@@ -54,7 +54,6 @@ typedef struct
 	unsigned short	dirEntryPosition;	/*which directory entry position, like file pos */
 	uint64_t	directoryStartLocation;		/*Starting LBA of directory */
 	//intptr_t  dirp; // I added this directory pointer
-
 	char d_name[256];               
 	struct fs_diriteminfo dirp_fs; // This a nested struct pointer that points to fs_diriteminfo
 	//fileInfo * GetFileInfo (char * fname);
