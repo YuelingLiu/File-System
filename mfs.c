@@ -586,7 +586,7 @@ int fs_isDir(char *pathname) {
 // This function is to get the working directory for the current task
 // Returns a pointer to pathname, and pointer so NULL otherwise
 
-char *fs_getcwd(char *pathname, size_t size)
+char *fs_getcwd(const char *pathname, size_t size)
 {
     // copy the abosulte pathname for the current working directory
     printf("what is pathname %s\n", pathname);
@@ -736,7 +736,12 @@ int fs_setcwd(char *pathname){
 //}
 
 struct fs_diriteminfo * loadDir (DirectoryEntry temp){
-    struct fs_diriteminfo temp2; 
+    struct fs_diriteminfo *temp2; 
+    strcpy(temp2.d_name,temp.name);
+    temp2.fileType=temp.fileType;
+ //   temp2.d_reclen=temp.sizeof(DirectoryEntry);
+
+    return &temp2;
 
     
 }
@@ -760,7 +765,7 @@ fdDir * fs_opendir(const char *pathname){
 
  // 3.  Load this directory 
 //      dirp = loadDir(DE); this directory entry we know from step 2 
-
+        
         // we need to create a temporary struct of type fs_diriteminfo
         // populate that temp struct with the values listed below
 
@@ -775,6 +780,9 @@ fdDir * fs_opendir(const char *pathname){
 
         // struct fs_diriteminfo temp;
         // fd->dirp_fs.d_reclen = sizeof(temp);
+        struct fs_diriteminfo *dirp = loadDir(tempBuffer[tempPath.index]);
+
+
 
 
 //  4. set fd position to 0 
@@ -782,10 +790,12 @@ fdDir * fs_opendir(const char *pathname){
 //    fd->dirp=dirp; 
         // fd->dirEntryPosition = 0;
         // fd->dirp_fs = 
+        dirp->dirEntryPosition =0;
+        
 //    
 //  5. return a pointer to fdDir struct 
 
- //  return fd; 
+  return &dirp; 
 
 }
 
