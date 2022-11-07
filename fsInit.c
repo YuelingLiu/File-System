@@ -32,6 +32,8 @@
 #define MAXDE 50
 
 
+
+
 //Extern global variable available to all files
 VCB* vcb;
 
@@ -40,6 +42,7 @@ VCB* vcb;
 // probably remove this later
 
 long MAGICNUM = 133713371337;
+
 
 
 // The root directory follows the bitmap blocks
@@ -150,21 +153,39 @@ int initFileSystem (uint64_t numberOfBlocks, uint64_t blockSize) {
 
         /* TEST CODE */
 
-        struct fdPathResult tempPath = parsedPath("/banana2/apple2/pear2");
-        //parsedPath("/banana2/apple2/pear2");
-        // printf("globalTemp.index: %d\n", globalTemp.index);
-        // printf("globalTemp.dirPtr: %d\n", globalTemp.dirPtr);
-        // printf("globalTemp.lastArg: %s\n", globalTemp.lastArg);
-
+        testPopulateStorage("/");
+        
+        struct fdPathResult tempPath = parsedPath("banana2/apple25");
+        
 
         printf("result.index: %d\n", tempPath.index);
         printf("result.dirPtr: %d\n", tempPath.dirPtr);
         printf("result.lastArg: %s\n", tempPath.lastArg);
 
-        //mode_t test;
-        //fs_mkdir("path", test);
+        // test for isDir
+        int retisDir = fs_isDir("/banana2/apple2");
+        if (retisDir == 1){
+            printf("the folder exists\n");
+        }
 
+        // test for getcwd
+        int size = strlen("/banana2");
+        printf("before getcwd\n");
+        char * retPath = fs_getcwd("/banana2", size);
+        printf("after getcwd\n");
 
+        // test for isfile
+        int retisFile = fs_isFile("/banana2/apple2/pear2");
+        if (retisFile == 1){
+            printf("the file exists\n");
+        }
+
+        
+        // test for openDir
+        fs_opendir("/banana2/apple25");
+
+        printf("SANITY CHECK after opendir\n");
+        
 
         /* TEST CODE */
         

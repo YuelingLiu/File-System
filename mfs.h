@@ -53,7 +53,16 @@ typedef struct
 	unsigned short  d_reclen;		/*length of this record */
 	unsigned short	dirEntryPosition;	/*which directory entry position, like file pos */
 	uint64_t	directoryStartLocation;		/*Starting LBA of directory */
+	//intptr_t  dirp; // I added this directory pointer
+
+	char d_name[256];               
+	struct fs_diriteminfo dirp_fs; // This a nested struct pointer that points to fs_diriteminfo
+	//fileInfo * GetFileInfo (char * fname);
 	} fdDir;
+
+
+
+ 
 
 struct fdPathResult{
 	int dirPtr;					// pointer to the directory 
@@ -71,7 +80,7 @@ struct fs_diriteminfo *fs_readdir(fdDir *dirp);
 int fs_closedir(fdDir *dirp);
 
 // Misc directory functions
-char * fs_getcwd(char *pathname, size_t size);
+char * fs_getcwd(const char *pathname, size_t size);
 int fs_setcwd(char *pathname);  //linux chdir
 int fs_isFile(char * filename);	//return 1 if file, 0 otherwise
 int fs_isDir(char * pathname);	//return 1 if directory, 0 otherwise
@@ -94,6 +103,9 @@ struct fs_stat
 int fs_stat(const char *path, struct fs_stat *buf);
 
 struct fdPathResult parsedPath(const char * path);
+
+// test function
+void testPopulateStorage ( const char * path);
 
 #endif
 
