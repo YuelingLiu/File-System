@@ -39,6 +39,7 @@
 #define MAXLENGTH 256 
 struct fdPathResult globalTemp;
 DirectoryEntry *tempBuffer;
+fdDir *fd;
 char globalPath[MAXLENGTH];
 
 
@@ -151,6 +152,8 @@ void testPopulateStorage ( const char * path){
         // layer 3 apple
         // layer 4 pear
 
+        // move these two out into initfilesystem
+        fd = malloc(sizeof(fdDir));
         tempBuffer = malloc(sizeof(DirectoryEntry) * MAXDE);
         // remove volatile and test
         volatile int location = vcb->locOfRoot;
@@ -225,8 +228,7 @@ void testPopulateStorage ( const char * path){
         strcpy(directoryEntries[25].name, "apple25");
         directoryEntries[25].location = location;
         directoryEntries[25].fileType = FT_DIRECTORY;
-        directoryEntries[25].numOfDE = 50;
-        directoryEntries[25].location = 9000;
+        
 
 
         LBAwrite(directoryEntries, blocksNeededForDir(numberofDE), location);
@@ -293,7 +295,7 @@ void testPopulateStorage ( const char * path){
 
 
 
-struct fdPathResult parsedPath(char * path){
+struct fdPathResult parsedPath(const char * path){
     
     // check if absolute or relative
     char firstChar = path[0];
@@ -586,7 +588,7 @@ int fs_isDir(char *pathname) {
 
 
 //getcwd version 2
-char *fs_getcwd(char *pathname, size_t size){
+char *fs_getcwd(const char *pathname, size_t size){
     // why does it need these parameters?
     if (strlen(globalPath) > size){
         return NULL;
@@ -675,20 +677,40 @@ int fs_setcwd(char *pathname){
 
 // 
 fdDir * fs_opendir(const char *pathname){
+    printf("works inside of opendir\n");
  // 1. parse the pathname, make sure path is valid and find the last element 
         struct fdPathResult tempPath = parsedPath(pathname);
+        
  // 2. check the last element to see if it is a directory  
-         LBAread(tempBuffer, MAXDE, tempPath.dirPtr);
-        printf("tempBuffer[tempPath.index].fileType: %d\n", tempBuffer[tempPath.index].fileType);
+        LBAread(tempBuffer, MAXDE, tempPath.dirPtr);
+        // printf("tempBuffer[tempPath.index].fileType: %d\n", tempBuffer[tempPath.index].fileType);
+    
  //      a: yes if last Arg type  IS directory
  //      b: no -> fail return null it is not a directory
+        if (tempBuffer[tempPath.index].fileType != FT_DIRECTORY){
+            printf("return NULL\n");
+            return NULL;
+        }
+
  // 3.  Load this directory 
 //      dirp = loadDir(DE); this directory entry we know from step 2 
 
-//    fdDir *fd = malloc(sizeof(fdDir));
+        // copy over the name
+        strcpy(fd->dirp_fs.d_name, tempBuffer[tempPath.index].name);
+        printf("fd->dirp_fs.d_name: %s\n", fd->dirp_fs.d_name);
+
+        // copy over the fileType
+        fd->dirp_fs.fileType = tempBuffer[tempPath.index].fileType;
+
+        struct fs_diriteminfo temp;
+        fd->dirp_fs.d_reclen = sizeof(temp);
+
+
 //  4. set fd position to 0 
 //    fd->dirEntryPosition=0;
 //    fd->dirp=dirp; 
+        // fd->dirEntryPosition = 0;
+        // fd->dirp_fs = 
 //    
 //  5. return a pointer to fdDir struct 
 

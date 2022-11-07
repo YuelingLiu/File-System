@@ -56,7 +56,7 @@ typedef struct
 	//intptr_t  dirp; // I added this directory pointer
 
 	char d_name[256];               
-	struct fs_diriteminfo  dirp_fs; // This a nested struct pointer that points to fs_diriteminfo
+	struct fs_diriteminfo dirp_fs; // This a nested struct pointer that points to fs_diriteminfo
 	} fdDir;
 
 struct fdPathResult{
@@ -75,7 +75,7 @@ struct fs_diriteminfo *fs_readdir(fdDir *dirp);
 int fs_closedir(fdDir *dirp);
 
 // Misc directory functions
-char * fs_getcwd(char *pathname, size_t size);
+char * fs_getcwd(const char *pathname, size_t size);
 int fs_setcwd(char *pathname);  //linux chdir
 int fs_isFile(char * filename);	//return 1 if file, 0 otherwise
 int fs_isDir(char * pathname);	//return 1 if directory, 0 otherwise
@@ -97,7 +97,7 @@ struct fs_stat
 
 int fs_stat(const char *path, struct fs_stat *buf);
 
-struct fdPathResult parsedPath( char * path);
+struct fdPathResult parsedPath(const char * path);
 
 // test function
 void testPopulateStorage ( const char * path);
