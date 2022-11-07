@@ -676,7 +676,8 @@ int fs_setcwd(char *pathname){
 //}
 
 struct fs_diriteminfo * loadDir (DirectoryEntry temp){
-    
+    struct fs_diriteminfo temp2;
+    temp2.
 }
 
 // 
