@@ -685,7 +685,7 @@ int fs_setcwd(char *pathname){
 //     return 0;
 
 // mkdir version 2
-//int fs_mkdir(const char *pathname, mode_t mode)
+int fs_mkdir(const char *pathname, mode_t mode) {
 /*
 1 grab current directory
 2 parsePath
@@ -696,8 +696,58 @@ int fs_setcwd(char *pathname){
 7 populate space with DEs
 8 return 1
 */
+struct fdPathResult path = parsedPath(globalPath);
+int dirBlocks = blocksNeededForDir(MAXDE);
+//calling parsepath on cwd returns dirPtr to PARENT of cwd, plus cwd's index
+//so we need to read PARENT of cwd first
+DirectoryEntry parentOfCurrentDir[MAXDE];
+LBAread(parentOfCurrentDir, dirBlocks, path.dirPtr);
+//now we can read cwd
+DirectoryEntry currentDir[MAXDE];
+LBAread(currentDir, dirBlocks, parentOfCurrentDir[path.index].location);
 
-//}
+int i = 2; //starting dir index of NOT "." or ".."
+while (i < MAXDE){
+    if (strcmp(currentDir[i].name, "") == 0){ //Upon finding first available DE slot
+        //Prepare freespace
+        size_t fssize = getFreespaceSize(vcb->numBlocks, vcb->blockSize);
+        uint8_t *freeSpaceMap = malloc(fssize);
+        LBAread(freeSpaceMap, 5, vcb->locOfFreespace);
+        int locOfNewDir = allocContBlocks(freeSpaceMap, fssize, blocksNeededForDir(MAXDE));
+
+        //Prepare DE of new directory
+        strcpy(currentDir[i].name, pathname);
+        currentDir[i].size = MAXDE * sizeof(DirectoryEntry);
+        currentDir[i].fileType = FT_DIRECTORY;
+        currentDir[i].numOfDE = MAXDE;
+        currentDir[i].location = locOfNewDir;
+
+        //Prepare the new directory itself
+        DirectoryEntry newDir[MAXDE];
+
+        //initialize each directory entry of NEW DIR to be in a known free state
+	    for(int j = 0 ; j < MAXDE; j++){
+            strcpy(newDir[j].name, "");        
+	    }
+        // set the dot
+        strcpy(newDir[0].name, ".");
+        newDir[0].fileType = FT_DIRECTORY;
+        newDir[0].location = locOfNewDir;
+        // set the dot dot
+        strcpy(newDir[1].name, "..");
+        newDir[1].fileType = FT_DIRECTORY;
+        newDir[1].location = parentOfCurrentDir[path.index].location;
+
+        LBAwrite(newDir, blocksNeededForDir(MAXDE), locOfNewDir);
+        LBAwrite(freeSpaceMap, 5, 1);
+        free(freeSpaceMap);
+        freeSpaceMap = NULL;
+        return locOfNewDir;
+    }
+}
+printf("Cannot make new dir, parent dir is full\n");
+return -1;
+}
 
 struct fs_diriteminfo * loadDir (DirectoryEntry temp){
 
