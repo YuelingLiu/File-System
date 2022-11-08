@@ -155,7 +155,7 @@ int initFileSystem (uint64_t numberOfBlocks, uint64_t blockSize) {
 
         testPopulateStorage("/");
         
-        struct fdPathResult tempPath = parsedPath("banana2/apple25");
+        struct fdPathResult tempPath = parsedPath("/banana2/apple2/pear2");
         
 
         printf("result.index: %d\n", tempPath.index);
@@ -182,9 +182,11 @@ int initFileSystem (uint64_t numberOfBlocks, uint64_t blockSize) {
 
         
         // test for openDir
-        fs_opendir("/banana2/apple25");
+        //fs_opendir("/banana2/apple25");
 
         printf("SANITY CHECK after opendir\n");
+        mode_t temp;
+        fs_mkdir("/banana2/grape", temp);
         
 
         /* TEST CODE */
