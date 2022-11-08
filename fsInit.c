@@ -36,6 +36,8 @@
 //Extern global variable available to all files
 VCB* vcb;
 
+uint8_t *freeSpaceMap;
+
 // static array of directory entries with a number 50
 // DirectoryEntry directoryEntries[MAXDE];
 // probably remove this later
@@ -65,7 +67,7 @@ int initRootDE(int blockSize, int FSSize){
 
 	// 6. Ask the free space for 6 blocks, and it should return
 	// a starting block number for those 6 blocks
-    uint8_t* freeSpaceMap = malloc(FSSize);
+    freeSpaceMap = malloc(FSSize);
     LBAread(freeSpaceMap, 5, 1);
 
     int locOfRoot = allocContBlocks(freeSpaceMap, FSSize, blocksNeeded);
@@ -93,8 +95,6 @@ int initRootDE(int blockSize, int FSSize){
 
     LBAwrite(freeSpaceMap, 5, 1);
 
-    free(freeSpaceMap);
-    freeSpaceMap = NULL;
 
     return locOfRoot;
 }
@@ -209,4 +209,6 @@ void exitFileSystem () {
 	printf ("System exiting\n");
     free(vcb);
     vcb = NULL;
+    free(freeSpaceMap);
+    freeSpaceMap = NULL;
 }
