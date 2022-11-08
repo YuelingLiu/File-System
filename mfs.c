@@ -137,10 +137,11 @@ char globalPath[MAXLENGTH];
 
 // used as a test function to populate storage for parse path to run
 void testPopulateStorage ( const char * path){
-    
+    // **************************************************
+    //*********************************************
     //gotta figure this out
     printf("before\n");
-    strcpy(globalPath, "/banana2/apple2");
+    strcpy(globalPath, "/banana2");
     printf("after\n");
     /* TEST CODE */
 
@@ -334,47 +335,20 @@ struct fdPathResult parsedPath(const char * path){
         // grab in global current directory variable which is the absolute location
         char * currentDir = fs_getcwd(path,strlen(path));
         
-
-        // tokenize the path passed in
-        // tokenizes path into tokens
-        char *tokenArray[50];   // array of names to be tokenized
-        const char s[2] = "/";  // delimiter
-        int tokenIndex = 0;     // counter for number of tokens
-        char str[strlen(path)]; // declare a string, str to be read of size strlen(path)
-        strcpy(str, path);      // copy path into str
-
-        // loop to tokenize values
-        char *token = strtok(str, s);
-
-        while (token != NULL)
-        {
-            tokenArray[tokenIndex++] = token;
-            // printf("token: %s\n", token);
-            token = strtok(NULL, s);
-        }
         
-        // print tokens
-        for (size_t i = 0; i < tokenIndex; i++)
-        {
-            printf("tokenArray[i]: %s\n", tokenArray[i]);
-        }
-
-
-        while (token = strtok(NULL, "/")){
-            tokenArray[tokenIndex++] = token;
-        }
-        // end of tokenizer
-
-
+        
         // from root given(root location)
         // parse the absolute location
         // starting from root, we go to next location, then next location 
         // until we get to end then finally we search for path.name
-
         
-        strcat(currentDir, "/");
-
+        printf("currentDir: %s\n", currentDir);
+        if (strcmp(currentDir, "/") != 0){
+            strcat(currentDir, "/");
+        }
         strcat(currentDir, path);
+
+        printf("currentDir: %s\n", currentDir);
         
         struct fdPathResult tempPath = parsedPath(currentDir);
 
@@ -474,9 +448,13 @@ struct fdPathResult parsedPath(const char * path){
                 if (j == numberofDE -1)
                 {
                     printf("no directory with the name: %s\n", tokenArray[i]);
-                    globalTemp.dirPtr = -1;
+                    globalTemp.dirPtr = tempBuffer[i-1].location;
                     globalTemp.index = -1;
-                    break;
+                    result.dirPtr = globalTemp.dirPtr;
+                    result.index = globalTemp.index;
+                    strcpy( result.lastArg, globalTemp.lastArg);
+                    return result;
+                    //break;
                 }
             }   
             // prints out 1 bc the first parameter is /./notbanana
@@ -586,51 +564,15 @@ int fs_isDir(char *pathname) {
 // This function is to get the working directory for the current task
 // Returns a pointer to pathname, and pointer so NULL otherwise
 
-char *fs_getcwd(const char *pathname, size_t size)
-{
-    // copy the abosulte pathname for the current working directory
-    printf("what is pathname %s\n", pathname);
-    char *cwd_buf;
-    if (pathname[0] != '/')
-    {
-        return NULL;
-    }
-
-    memcpy(cwd_buf, pathname, size);
-    if (strlen(pathname) + 1 >=size)
-    {
-        return NULL;
-    }
-
-    if (!cwd_buf)
-    {
-        cwd_buf = malloc(size);
-    }
 
 
-    strncpy(cwd_buf, pathname,size);
-    printf("cwd_buf %s\n",cwd_buf);
-    return cwd_buf;
-}
 
+// int fs_mkdir(const char *pathname, mode_t mode){
+//     struct fdPathResult path = parsedPath(pathname);
+//      if (path.dirPtr == -1 && path.index == -1){
+//         return -1;
+//     }
 
-// Linux chdir 
-int fs_setcwd(char *pathname){
-    // check if the pathname starts in the root direcotry 
-    if(pathname[0]!='/'){
-        return -1;
-    }
-
-    if(strcmp(pathname,"..")==0){
-      //  if(strcmp(cwd,"root")==0)
-    }
-}
-
-int fs_mkdir(const char *pathname, mode_t mode){
-    struct fdPathResult path = parsedPath(pathname);
-     if (path.dirPtr == -1 && path.index == -1){
-        return -1;
-    }
 
 // char *fs_getcwd(char *pathname, size_t size)
 // {
@@ -647,11 +589,11 @@ int fs_mkdir(const char *pathname, mode_t mode){
 
 
 //getcwd version 2
-char *fs_getcwd(const char *pathname, size_t size){
+char *fs_getcwd( const char *pathname, size_t size){
     // why does it need these parameters?
-    if (strlen(globalPath) > size){
-        return NULL;
-    }
+    // if (strlen(globalPath) > size){
+    //     return NULL;
+    // }
     return globalPath;
 }
 
@@ -721,7 +663,7 @@ int fs_setcwd(char *pathname){
 //     return 0;
 
 // mkdir version 2
-//int fs_mkdir(const char *pathname, mode_t mode)
+int fs_mkdir(const char *pathname, mode_t mode) {
 /*
 1 grab current directory
 2 parsePath
@@ -732,72 +674,145 @@ int fs_setcwd(char *pathname){
 7 populate space with DEs
 8 return 1
 */
+struct fdPathResult path = parsedPath(pathname);
+// if the file already exists we dont need to make another
+if (path.index != -1){
+    printf("file exists\n");
+    return -1;
+}
+printf("path.index: %d\n", path.index);
+printf("path.dirPtr: %d\n", path.dirPtr);
+printf("path.lastArg: %s\n", path.lastArg);
+// int tempSize = 10;
+// char * tempCurrentDir = fs_getcwd(pathname ,tempSize);
 
-//}
+// int dirBlocks = blocksNeededForDir(MAXDE);
+// //calling parsepath on cwd returns dirPtr to PARENT of cwd, plus cwd's index
+// //so we need to read PARENT of cwd first
 
-struct fs_diriteminfo * loadDir (DirectoryEntry temp){
-    struct fs_diriteminfo *temp2; 
-    strcpy(temp2.d_name,temp.name);
-    temp2.fileType=temp.fileType;
- //   temp2.d_reclen=temp.sizeof(DirectoryEntry);
+// we have the pointer to the directory of where we want
+// to make the path.lastArg
+LBAread(tempBuffer, blocksNeededForDir(MAXDE), path.dirPtr );
 
-    return &temp2;
 
-    
+
+// DirectoryEntry parentOfCurrentDir[MAXDE];
+// LBAread(parentOfCurrentDir, dirBlocks, path.dirPtr);
+// //now we can read cwd
+// DirectoryEntry currentDir[MAXDE];
+// LBAread(currentDir, dirBlocks, parentOfCurrentDir[path.index].location);
+
+int i = 2; //starting dir index of NOT "." or ".."
+while (i < MAXDE){
+    if (strcmp(tempBuffer[i].name, "") == 0){ //Upon finding first available DE slot
+        //Prepare freespace
+        size_t fssize = getFreespaceSize(vcb->numBlocks, vcb->blockSize);
+        //uint8_t *freeSpaceMap = malloc(fssize);
+        LBAread(freeSpaceMap, 5, vcb->locOfFreespace);
+        int locOfNewDir = allocContBlocks(freeSpaceMap, fssize, blocksNeededForDir(MAXDE));
+
+        //Prepare DE of new directory
+        strcpy(tempBuffer[i].name, pathname);
+        tempBuffer[i].size = MAXDE * sizeof(DirectoryEntry);
+        tempBuffer[i].fileType = FT_DIRECTORY;
+        tempBuffer[i].numOfDE = MAXDE;
+        tempBuffer[i].location = locOfNewDir;
+
+        //Prepare the new directory itself
+        DirectoryEntry newDir[MAXDE];
+
+        //initialize each directory entry of NEW DIR to be in a known free state
+	    for(int j = 0 ; j < MAXDE; j++){
+            strcpy(newDir[j].name, "");        
+	    }
+        // set the dot
+        strcpy(newDir[0].name, ".");
+        newDir[0].fileType = FT_DIRECTORY;
+        newDir[0].location = locOfNewDir;
+        // set the dot dot
+        strcpy(newDir[1].name, "..");
+        newDir[1].fileType = FT_DIRECTORY;
+        newDir[1].location = path.dirPtr;
+
+        LBAwrite(newDir, blocksNeededForDir(MAXDE), locOfNewDir);
+        LBAwrite(freeSpaceMap, 5, 1);
+        
+        return locOfNewDir;
+    }i++;
+}
+printf("Cannot make new dir, parent dir is full\n");
+return -1;
 }
 
-// 
-fdDir * fs_opendir(const char *pathname){
-    printf("works inside of opendir\n");
- // 1. parse the pathname, make sure path is valid and find the last element 
-        struct fdPathResult tempPath = parsedPath(pathname);
-        
- // 2. check the last element to see if it is a directory  
-        LBAread(tempBuffer, MAXDE, tempPath.dirPtr);
-        // printf("tempBuffer[tempPath.index].fileType: %d\n", tempBuffer[tempPath.index].fileType);
+// load into a temporary fs_diriteminfo struct and save its pointer
+// struct fs_diriteminfo * loadDir (DirectoryEntry temp){
+
+//     struct fs_diriteminfo temp2;
     
- //      a: yes if last Arg type  IS directory
- //      b: no -> fail return null it is not a directory
-        if (tempBuffer[tempPath.index].fileType != FT_DIRECTORY){
-            printf("return NULL\n");
-            return NULL;
-        }
+//     // populate name 
+//     strcpy(temp2.d_name,temp.name);
 
- // 3.  Load this directory 
-//      dirp = loadDir(DE); this directory entry we know from step 2 
+//     // populate fileType
+//     temp2.fileType = temp.fileType;
+
+//     // populate reclen, size of struct
+//     temp2.d_reclen = sizeof(temp2);
+
+//     return &temp2;
+// }
+
+// // 
+// fdDir * fs_opendir(const char *pathname){
+//     printf("works inside of opendir\n");
+//  // 1. parse the pathname, make sure path is valid and find the last element 
+//         struct fdPathResult tempPath = parsedPath(pathname);
         
-        // we need to create a temporary struct of type fs_diriteminfo
-        // populate that temp struct with the values listed below
+//  // 2. check the last element to see if it is a directory  
+//         LBAread(tempBuffer, MAXDE, tempPath.dirPtr);
+//         // printf("tempBuffer[tempPath.index].fileType: %d\n", tempBuffer[tempPath.index].fileType);
+    
+//  //      a: yes if last Arg type  IS directory
+//  //      b: no -> fail return null it is not a directory
+//         if (tempBuffer[tempPath.index].fileType != FT_DIRECTORY){
+//             printf("return NULL\n");
+//             return NULL;
+//         }
+
+//  // 3.  Load this directory 
+// //      dirp = loadDir(DE); this directory entry we know from step 2 
+        
+//         // we need to create a temporary struct of type fs_diriteminfo
+//         // populate that temp struct with the values listed below
 
     
 
-        // copy over the name
-        // strcpy(fd->dirp_fs.d_name, tempBuffer[tempPath.index].name);
-        // printf("fd->dirp_fs.d_name: %s\n", fd->dirp_fs.d_name);
+//         // copy over the name
+//         // strcpy(fd->dirp_fs.d_name, tempBuffer[tempPath.index].name);
+//         // printf("fd->dirp_fs.d_name: %s\n", fd->dirp_fs.d_name);
 
-        // // copy over the fileType
-        // fd->dirp_fs.fileType = tempBuffer[tempPath.index].fileType;
+//         // // copy over the fileType
+//         // fd->dirp_fs.fileType = tempBuffer[tempPath.index].fileType;
 
-        // struct fs_diriteminfo temp;
-        // fd->dirp_fs.d_reclen = sizeof(temp);
-        struct fs_diriteminfo *dirp = loadDir(tempBuffer[tempPath.index]);
-
-
+//         // struct fs_diriteminfo temp;
+//         // fd->dirp_fs.d_reclen = sizeof(temp);
+//         struct fs_diriteminfo *dirp = loadDir(tempBuffer[tempPath.index]);
 
 
-//  4. set fd position to 0 
-//    fd->dirEntryPosition=0;
-//    fd->dirp=dirp; 
-        // fd->dirEntryPosition = 0;
-        // fd->dirp_fs = 
-        dirp->dirEntryPosition =0;
+
+
+// //  4. set fd position to 0 
+// //    fd->dirEntryPosition=0;
+// //    fd->dirp=dirp; 
+//         // fd->dirEntryPosition = 0;
+//         // fd->dirp_fs = 
+//         //dirp->dirEntryPosition =0;
         
-//    
-//  5. return a pointer to fdDir struct 
+// //    
+// //  5. return a pointer to fdDir struct 
 
-  return &dirp; 
+//   return &dirp; 
 
-}
+// }
 
 
  // takes a pointer and returns a pointer to fs_diriteminfo struct 
@@ -827,7 +842,7 @@ fdDir * fs_opendir(const char *pathname){
     // return NULL
 
 
- }
+ //}
 
 //}
 

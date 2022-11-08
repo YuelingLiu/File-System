@@ -37,6 +37,8 @@
 //Extern global variable available to all files
 VCB* vcb;
 
+uint8_t *freeSpaceMap;
+
 // static array of directory entries with a number 50
 // DirectoryEntry directoryEntries[MAXDE];
 // probably remove this later
@@ -66,7 +68,7 @@ int initRootDE(int blockSize, int FSSize){
 
 	// 6. Ask the free space for 6 blocks, and it should return
 	// a starting block number for those 6 blocks
-    uint8_t* freeSpaceMap = malloc(FSSize);
+    freeSpaceMap = malloc(FSSize);
     LBAread(freeSpaceMap, 5, 1);
 
     int locOfRoot = allocContBlocks(freeSpaceMap, FSSize, blocksNeeded);
@@ -94,8 +96,6 @@ int initRootDE(int blockSize, int FSSize){
 
     LBAwrite(freeSpaceMap, 5, 1);
 
-    free(freeSpaceMap);
-    freeSpaceMap = NULL;
 
     return locOfRoot;
 }
@@ -155,7 +155,7 @@ int initFileSystem (uint64_t numberOfBlocks, uint64_t blockSize) {
 
         testPopulateStorage("/");
         
-        struct fdPathResult tempPath = parsedPath("banana2/apple25");
+        struct fdPathResult tempPath = parsedPath("/banana2/apple2/pear2");
         
 
         printf("result.index: %d\n", tempPath.index);
@@ -182,9 +182,11 @@ int initFileSystem (uint64_t numberOfBlocks, uint64_t blockSize) {
 
         
         // test for openDir
-        fs_opendir("/banana2/apple25");
+        //fs_opendir("/banana2/apple25");
 
         printf("SANITY CHECK after opendir\n");
+        mode_t temp;
+        fs_mkdir("/banana2/grape", temp);
         
 
         /* TEST CODE */
@@ -208,4 +210,6 @@ void exitFileSystem () {
 	printf ("System exiting\n");
     free(vcb);
     vcb = NULL;
+    free(freeSpaceMap);
+    freeSpaceMap = NULL;
 }
