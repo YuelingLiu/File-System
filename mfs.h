@@ -18,7 +18,7 @@
 #include <unistd.h>
 #include <time.h>
 #include "b_io.h"
-
+#include "DE.h"
 #include <dirent.h>
 #define FT_REGFILE	DT_REG
 #define FT_DIRECTORY DT_DIR
