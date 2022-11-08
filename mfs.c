@@ -707,7 +707,7 @@ while (i < MAXDE){
     if (strcmp(tempBuffer[i].name, "") == 0){ //Upon finding first available DE slot
         //Prepare freespace
         size_t fssize = getFreespaceSize(vcb->numBlocks, vcb->blockSize);
-        uint8_t *freeSpaceMap = malloc(fssize);
+        //uint8_t *freeSpaceMap = malloc(fssize);
         LBAread(freeSpaceMap, 5, vcb->locOfFreespace);
         int locOfNewDir = allocContBlocks(freeSpaceMap, fssize, blocksNeededForDir(MAXDE));
 
@@ -736,8 +736,7 @@ while (i < MAXDE){
 
         LBAwrite(newDir, blocksNeededForDir(MAXDE), locOfNewDir);
         LBAwrite(freeSpaceMap, 5, 1);
-        free(freeSpaceMap);
-        freeSpaceMap = NULL;
+        
         return locOfNewDir;
     }i++;
 }
