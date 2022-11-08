@@ -154,7 +154,7 @@ int initFileSystem (uint64_t numberOfBlocks, uint64_t blockSize) {
 
         testPopulateStorage("/");
         
-        struct fdPathResult tempPath = parsedPath("/banana2/apple2/pear2");
+        struct fdPathResult tempPath = parsedPath("apple2/pear2");
         
 
         printf("result.index: %d\n", tempPath.index);
@@ -166,6 +166,8 @@ int initFileSystem (uint64_t numberOfBlocks, uint64_t blockSize) {
         if (retisDir == 1){
             printf("the folder exists\n");
         }
+
+        printf("FT_DIRECTORY: %d\n", FT_DIRECTORY);
 
         // test for getcwd
         int size = strlen("/banana2");
@@ -184,8 +186,11 @@ int initFileSystem (uint64_t numberOfBlocks, uint64_t blockSize) {
         //fs_opendir("/banana2/apple25");
 
         printf("SANITY CHECK after opendir\n");
-        mode_t temp;
-        fs_mkdir("/banana2/grape", temp);
+        // mode_t temp;
+        // fs_mkdir("/banana2/grape", temp);
+        
+        // struct fdPathResult tempPath2 = parsedPath("/banana2/grape");
+        // printf("tempPath2.dirPtr: %d\n", tempPath2.index);
         
 
         /* TEST CODE */

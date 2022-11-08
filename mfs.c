@@ -342,8 +342,14 @@ struct fdPathResult parsedPath(const char * path){
         // starting from root, we go to next location, then next location 
         // until we get to end then finally we search for path.name
         
+        // this is an edge case such that if the currentDir is "/"
+        // we dont want to add another "/" as that would set the 
+        // currentDir to "//"
+        // so if the currdir is "/", we skip concatenating "/"
+        // if the currDir is "/banana", we concatenate "/"
+        printf("path: %s\n", path);
         printf("currentDir: %s\n", currentDir);
-        if (strcmp(currentDir, "/") != 0){
+        if (strcmp(currentDir, "/") != 0 && strlen(currentDir)>2){
             strcat(currentDir, "/");
         }
         strcat(currentDir, path);
@@ -738,6 +744,7 @@ while (i < MAXDE){
         LBAwrite(freeSpaceMap, 5, 1);
         
         return locOfNewDir;
+        
     }i++;
 }
 printf("Cannot make new dir, parent dir is full\n");
