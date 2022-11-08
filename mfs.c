@@ -699,18 +699,21 @@ int fs_setcwd(char *pathname){
 
 //}
 
+// load into a temporary fs_diriteminfo struct and save its pointer
 struct fs_diriteminfo * loadDir (DirectoryEntry temp){
 
     struct fs_diriteminfo temp2;
     
+    // populate name 
     strcpy(temp2.d_name,temp.name);
-    temp2.fileType=temp.fileType;
- //   temp2.d_reclen=temp.sizeof(DirectoryEntry);
+
+    // populate fileType
+    temp2.fileType = temp.fileType;
+
+    // populate reclen, size of struct
+    temp2.d_reclen = sizeof(temp2);
 
     return &temp2;
-
-    
-
 }
 
 // 
@@ -794,7 +797,7 @@ fdDir * fs_opendir(const char *pathname){
     // return NULL
 
 
- }
+ //}
 
 //}
 
