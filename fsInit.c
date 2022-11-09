@@ -189,14 +189,24 @@ int initFileSystem (uint64_t numberOfBlocks, uint64_t blockSize) {
         printf("SANITY CHECK after opendir\n");
 
         // testing read dir
-        struct fd_diriteminfo *returnItemInfo = fs_readdir(tempDir);
+        fs_diriteminfo *returnItemInfo = fs_readdir(tempDir);
+        printf("returnItemInfo.d_name: %s\n", returnItemInfo->d_name);
 
+        returnItemInfo = fs_readdir(tempDir);
+        printf("returnItemInfo.d_name: %s\n", returnItemInfo->d_name);
 
+        returnItemInfo = fs_readdir(tempDir);
+        printf("returnItemInfo.d_name: %s\n", returnItemInfo->d_name);
+
+        returnItemInfo = fs_readdir(tempDir);
+        printf("returnItemInfo.d_name: %s\n", returnItemInfo->d_name);
         // mode_t temp;
         // fs_mkdir("/banana2/grape", temp);
         // // mkdir works. gotta check free space somehow or assume it works
         // struct fdPathResult tempPath2 = parsedPath("/banana2/grape");
         
+        int temp = fs_closedir(tempDir);
+        printf("temp: %d\n", temp);
         
 
         /* TEST CODE */

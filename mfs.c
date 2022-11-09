@@ -41,7 +41,7 @@ struct fdPathResult globalTemp;
 DirectoryEntry *tempBuffer;
 fdDir *fd;
 char globalPath[MAXLENGTH];
-struct fs_diriteminfo *retTempDir;
+fs_diriteminfo *retTempDir;
 
 
 
@@ -798,7 +798,7 @@ fdDir * fs_opendir(const char *pathname){
 
 
 
-struct fs_diriteminfo *fs_readdir(fdDir *fd){
+fs_diriteminfo *fs_readdir(fdDir *fd){
    // start from where we last left off, which was position 0 
 
    
@@ -807,7 +807,7 @@ struct fs_diriteminfo *fs_readdir(fdDir *fd){
     for(int i = fd->dirEntryPosition ; i < MAXDE; i++){
         //if this directory is used, 
         //if DirectoryEntryUsed(dirp->dirp[i]){
-        if (strcmp(tempBuffer[i].name, "") == 0){
+        if (strcmp(tempBuffer[i].name, "") != 0){
             
             // ii fs_diriteminfo 
             // copy the name from our directory entry to the struct 
@@ -815,13 +815,13 @@ struct fs_diriteminfo *fs_readdir(fdDir *fd){
 
             //printf("retTempDir->d_name: %s\n", retTempDir->d_name);
             // copy the fileType over to struct
-            //retTempDir->fileType = tempBuffer[i].fileType;
+            retTempDir->fileType = tempBuffer[i].fileType;
             
             // iterate the directory entry position to read the next slot
             fd->dirEntryPosition = i+1;
 
 
-            // return (fd->dirp->fs_diriteminfo);
+            return retTempDir;
         }
     }
     return NULL;
@@ -862,7 +862,8 @@ so readdir can iterate through that directory entry
 
 
 // free up memory here  we allocated in the open
-// int fs_closedir(fdDir *dirp){
-  
-// }
+int fs_closedir(fdDir *dirp){
+    free(fd);
+    fd = NULL;
+}
 
