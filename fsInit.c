@@ -183,9 +183,12 @@ int initFileSystem (uint64_t numberOfBlocks, uint64_t blockSize) {
 
         
         // test for openDir
-        fs_opendir("/banana2/apple25");
-
+        fdDir *tempDir = fs_opendir("/banana2/apple25");
+        printf("tempDir->dirEntryPosition: %d\n", tempDir->dirEntryPosition);
+        
         printf("SANITY CHECK after opendir\n");
+
+
         // mode_t temp;
         // fs_mkdir("/banana2/grape", temp);
         // // mkdir works. gotta check free space somehow or assume it works

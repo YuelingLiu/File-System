@@ -802,28 +802,28 @@ fdDir * fs_opendir(const char *pathname){
 
 
 
-struct fs_diriteminfo *fs_readdir(fdDir *dirp){
-   // start from where we last left off, which was position 0 
+// struct fs_diriteminfo *fs_readdir(fdDir *dirPtr){
+//    // start from where we last left off, which was position 0 
 
-    for(int i = dirp->dirEntryPosition ; i < MAXDE; i++){
-        //if this directory is used, 
-        //if DirectoryEntryUsed(dirp->dirp[i]){
-        if (strcmp(fd->dirp_fs[i].d_name,"") != 0){
-            // ii fs_diriteminfo 
-            // copy the name from our directory entry to the struct 
-            strcpy(fd->dirp_fs->d_name, fd->dirp[i].name);
-            fd-dirp->fs_diriteminfo.fileType= typedef(fd->dirp[i]);
-            fd->position =i+1;
+//     for(int i = dirPtr->dirEntryPosition ; i < MAXDE; i++){
+//         //if this directory is used, 
+//         //if DirectoryEntryUsed(dirp->dirp[i]){
+//         if (strcmp(dirPtr->dirp_fs[i].d_name,"") != 0){
+//             // ii fs_diriteminfo 
+//             // copy the name from our directory entry to the struct 
+//             strcpy(fd->dirp_fs->d_name, fd->dirp[i].name);
+//             fd-dirp->fs_diriteminfo.fileType= typedef(fd->dirp[i]);
+//             fd->position =i+1;
 
-            return (fd->dirp->fs_diriteminfo);
-        }
-    // }
-    return NULL
+//             return (fd->dirp->fs_diriteminfo);
+//         }
+//     // }
+//     return NULL
 
 
- }
+//  }
 
-}
+// }
 
 // my version
 // struct fs_diriteminfo *fs_readdir(fdDir *dirp){
