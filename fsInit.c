@@ -185,8 +185,11 @@ int initFileSystem (uint64_t numberOfBlocks, uint64_t blockSize) {
         // test for openDir
         fdDir *tempDir = fs_opendir("/banana2/apple25");
         printf("tempDir->dirEntryPosition: %d\n", tempDir->dirEntryPosition);
-        
+
         printf("SANITY CHECK after opendir\n");
+
+        // testing read dir
+        struct fd_diriteminfo *returnItemInfo = fs_readdir(tempDir);
 
 
         // mode_t temp;

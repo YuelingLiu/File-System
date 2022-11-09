@@ -108,7 +108,5 @@ struct fdPathResult parsedPath(const char * path);
 // test function
 void testPopulateStorage ( const char * path);
 
-struct fs_diriteminfo * loadDir (DirectoryEntry temp);
-
 #endif
 

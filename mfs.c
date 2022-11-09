@@ -41,7 +41,7 @@ struct fdPathResult globalTemp;
 DirectoryEntry *tempBuffer;
 fdDir *fd;
 char globalPath[MAXLENGTH];
-struct fs_diriteminfo diiHolder;
+struct fs_diriteminfo *retTempDir;
 
 
 
@@ -156,6 +156,8 @@ void testPopulateStorage ( const char * path){
 
         // move these two out into initfilesystem
         fd = malloc(sizeof(fdDir));
+        retTempDir = malloc(sizeof(fs_diriteminfo));
+
         tempBuffer = malloc(sizeof(DirectoryEntry) * MAXDE);
         // remove volatile and test
         volatile int location = vcb->locOfRoot;
@@ -756,20 +758,6 @@ printf("Cannot make new dir, parent dir is full\n");
 return -1;
 }
 
-// load into a temporary fs_diriteminfo struct and save its pointer
-struct fs_diriteminfo * loadDir (DirectoryEntry temp){
-    
-    // populate name 
-    strcpy(diiHolder.d_name,temp.name);
-
-    // populate fileType
-    diiHolder.fileType = temp.fileType;
-
-    // populate reclen, size of struct
-    diiHolder.d_reclen = sizeof(diiHolder);
-
-    return &diiHolder;
-}
 
 // 
 fdDir * fs_opendir(const char *pathname){
@@ -789,11 +777,13 @@ fdDir * fs_opendir(const char *pathname){
         }
 
  // 3.  Load this directory 
-        struct fs_diriteminfo * dirp = loadDir(tempBuffer[tempPath.index]); 
+        
+        // load directory into starting location for LBAread
+        fd->directoryStartLocation = tempBuffer[tempPath.index].location;
+        printf("fd->directoryStartLocation: %ld\n", fd->directoryStartLocation);
         
         // fd already malloced in testPopulateStorage
         fd->dirEntryPosition = 0;
-        fd->dirp_fs = dirp;
         return fd;
 
 }
@@ -808,28 +798,38 @@ fdDir * fs_opendir(const char *pathname){
 
 
 
-// struct fs_diriteminfo *fs_readdir(fdDir *dirPtr){
-//    // start from where we last left off, which was position 0 
+struct fs_diriteminfo *fs_readdir(fdDir *fd){
+   // start from where we last left off, which was position 0 
 
-//     for(int i = dirPtr->dirEntryPosition ; i < MAXDE; i++){
-//         //if this directory is used, 
-//         //if DirectoryEntryUsed(dirp->dirp[i]){
-//         if (strcmp(dirPtr->dirp_fs[i].d_name,"") != 0){
-//             // ii fs_diriteminfo 
-//             // copy the name from our directory entry to the struct 
-//             strcpy(fd->dirp_fs->d_name, fd->dirp[i].name);
-//             fd-dirp->fs_diriteminfo.fileType= typedef(fd->dirp[i]);
-//             fd->position =i+1;
+   
+   LBAread(tempBuffer, MAXDE, fd->directoryStartLocation);
 
-//             return (fd->dirp->fs_diriteminfo);
-//         }
-//     // }
-//     return NULL
+    for(int i = fd->dirEntryPosition ; i < MAXDE; i++){
+        //if this directory is used, 
+        //if DirectoryEntryUsed(dirp->dirp[i]){
+        if (strcmp(tempBuffer[i].name, "") == 0){
+            
+            // ii fs_diriteminfo 
+            // copy the name from our directory entry to the struct 
+            strcpy(retTempDir->d_name, tempBuffer[i].name);
+
+            //printf("retTempDir->d_name: %s\n", retTempDir->d_name);
+            // copy the fileType over to struct
+            //retTempDir->fileType = tempBuffer[i].fileType;
+            
+            // iterate the directory entry position to read the next slot
+            fd->dirEntryPosition = i+1;
 
 
-//  }
+            // return (fd->dirp->fs_diriteminfo);
+        }
+    }
+    return NULL;
 
-// }
+
+}
+
+
 
 /* open dir opens up a folder for you to iterate through
 we have to use the directory entry value of dirPtr inside of 
@@ -837,28 +837,28 @@ fs_diriteminfo so we can LBAread into that directory entry
 so readdir can iterate through that directory entry
 */
 // my version
-struct fs_diriteminfo *fs_readdir(fdDir *dirp){
-    //base case
-    if(dirp ==NULL){
-        return NULL;
-    }
+// struct fs_diriteminfo *fs_readdir(fdDir *dirp){
+//     //base case
+//     if(dirp ==NULL){
+//         return NULL;
+//     }
 
-    //LBAread(tempBuffer, MAXDE, ptrToDir)
+//     //LBAread(tempBuffer, MAXDE, ptrToDir)
 
-    for(int i = 0 ; i < MAXDE;i++){
-        // DirectoryEntryUsed by checking the d_reclen length or dirEntryPosition
-        if(dirp[i].d_reclen > 4){
-             // copy the name from our directory entry to the struct 
-            strcpy(dirp->dirp_fs->d_name,dirp[i].d_name);
-            dirp->dirp_fs->fileType = FT_DIRECTORY;
-            dirp->dirEntryPosition =i+1;
+//     for(int i = 0 ; i < MAXDE;i++){
+//         // DirectoryEntryUsed by checking the d_reclen length or dirEntryPosition
+//         if(dirp[i].d_reclen > 4){
+//              // copy the name from our directory entry to the struct 
+//             strcpy(dirp->dirp_fs->d_name,dirp[i].d_name);
+//             dirp->dirp_fs->fileType = FT_DIRECTORY;
+//             dirp->dirEntryPosition =i+1;
 
-          return dirp->dirp_fs;
-    }
-    }
-    return NULL;
+//           return dirp->dirp_fs;
+//     }
+//     }
+//     return NULL;
 
-}
+// }
 
 
 // free up memory here  we allocated in the open
