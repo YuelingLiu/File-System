@@ -807,7 +807,7 @@ fdDir * fs_opendir(const char *pathname){
 
 
 
-<<<<<<< HEAD
+
 // struct fs_diriteminfo *fs_readdir(fdDir *dirPtr){
 //    // start from where we last left off, which was position 0 
 
@@ -830,15 +830,20 @@ fdDir * fs_opendir(const char *pathname){
 //  }
 
 // }
-=======
->>>>>>> 35a7f151a52d1de4995751ce703e9e7479dc8fa3
 
+/* open dir opens up a folder for you to iterate through
+we have to use the directory entry value of dirPtr inside of 
+fs_diriteminfo so we can LBAread into that directory entry
+so readdir can iterate through that directory entry
+*/
 // my version
 struct fs_diriteminfo *fs_readdir(fdDir *dirp){
     //base case
     if(dirp ==NULL){
         return NULL;
     }
+
+    //LBAread(tempBuffer, MAXDE, ptrToDir)
 
     for(int i = 0 ; i < MAXDE;i++){
         // DirectoryEntryUsed by checking the d_reclen length or dirEntryPosition
