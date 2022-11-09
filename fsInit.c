@@ -183,14 +183,14 @@ int initFileSystem (uint64_t numberOfBlocks, uint64_t blockSize) {
 
         
         // test for openDir
-        //fs_opendir("/banana2/apple25");
+        fs_opendir("/banana2/apple25");
 
         printf("SANITY CHECK after opendir\n");
         // mode_t temp;
         // fs_mkdir("/banana2/grape", temp);
-        
+        // // mkdir works. gotta check free space somehow or assume it works
         // struct fdPathResult tempPath2 = parsedPath("/banana2/grape");
-        // printf("tempPath2.dirPtr: %d\n", tempPath2.index);
+        
         
 
         /* TEST CODE */
