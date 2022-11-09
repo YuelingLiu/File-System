@@ -41,6 +41,7 @@ struct fdPathResult globalTemp;
 DirectoryEntry *tempBuffer;
 fdDir *fd;
 char globalPath[MAXLENGTH];
+struct fs_diriteminfo diiHolder;
 
 
 
@@ -343,9 +344,16 @@ struct fdPathResult parsedPath(const char * path){
         // starting from root, we go to next location, then next location 
         // until we get to end then finally we search for path.name
         
-        printf("Checkin currentDir: %s\n", currentDir);
-        if (strcmp(currentDir, "/" ) != 0 &&strlen(currentDir) >2){
-                    strcat(currentDir, "/");
+        
+     
+        // this is an edge case such that if the currentDir is "/"
+        // we dont want to add another "/" as that would set the 
+        // currentDir to "//"
+        // so if the currdir is "/", we skip concatenating "/"
+        // if the currDir is "/banana", we concatenate "/"
+        printf("currentDir: %s\n", currentDir);
+        if (strcmp(currentDir, "/") != 0 && strlen(currentDir)>2){
+            strcat(currentDir, "/");
         }
         strcat(currentDir, path);
         //printf("checking path %s\n",path);
@@ -741,6 +749,7 @@ while (i < MAXDE){
         LBAwrite(freeSpaceMap, 5, 1);
         
         return locOfNewDir;
+        
     }i++;
 }
 printf("Cannot make new dir, parent dir is full\n");
@@ -748,74 +757,46 @@ return -1;
 }
 
 // load into a temporary fs_diriteminfo struct and save its pointer
-// struct fs_diriteminfo * loadDir (DirectoryEntry temp){
-
-//     struct fs_diriteminfo temp2;
+struct fs_diriteminfo * loadDir (DirectoryEntry temp){
     
-//     // populate name 
-//     strcpy(temp2.d_name,temp.name);
+    // populate name 
+    strcpy(diiHolder.d_name,temp.name);
 
-//     // populate fileType
-//     temp2.fileType = temp.fileType;
+    // populate fileType
+    diiHolder.fileType = temp.fileType;
 
-//     // populate reclen, size of struct
-//     temp2.d_reclen = sizeof(temp2);
+    // populate reclen, size of struct
+    diiHolder.d_reclen = sizeof(diiHolder);
 
-//     return &temp2;
-// }
+    return &diiHolder;
+}
 
-// // 
-// fdDir * fs_opendir(const char *pathname){
-//     printf("works inside of opendir\n");
-//  // 1. parse the pathname, make sure path is valid and find the last element 
-//         struct fdPathResult tempPath = parsedPath(pathname);
+// 
+fdDir * fs_opendir(const char *pathname){
+    printf("works inside of opendir\n");
+ // 1. parse the pathname, make sure path is valid and find the last element 
+        struct fdPathResult tempPath = parsedPath(pathname);
         
-//  // 2. check the last element to see if it is a directory  
-//         LBAread(tempBuffer, MAXDE, tempPath.dirPtr);
-//         // printf("tempBuffer[tempPath.index].fileType: %d\n", tempBuffer[tempPath.index].fileType);
+ // 2. check the last element to see if it is a directory  
+        LBAread(tempBuffer, MAXDE, tempPath.dirPtr);
+        // printf("tempBuffer[tempPath.index].fileType: %d\n", tempBuffer[tempPath.index].fileType);
     
-//  //      a: yes if last Arg type  IS directory
-//  //      b: no -> fail return null it is not a directory
-//         if (tempBuffer[tempPath.index].fileType != FT_DIRECTORY){
-//             printf("return NULL\n");
-//             return NULL;
-//         }
+ //      a: yes if last Arg type  IS directory
+ //      b: no -> fail return null it is not a directory
+        if (tempBuffer[tempPath.index].fileType != FT_DIRECTORY){
+            printf("return NULL\n");
+            return NULL;
+        }
 
-//  // 3.  Load this directory 
-// //      dirp = loadDir(DE); this directory entry we know from step 2 
+ // 3.  Load this directory 
+        struct fs_diriteminfo * dirp = loadDir(tempBuffer[tempPath.index]); 
         
-//         // we need to create a temporary struct of type fs_diriteminfo
-//         // populate that temp struct with the values listed below
+        // fd already malloced in testPopulateStorage
+        fd->dirEntryPosition = 0;
+        fd->dirp_fs = dirp;
+        return fd;
 
-    
-
-//         // copy over the name
-//         // strcpy(fd->dirp_fs.d_name, tempBuffer[tempPath.index].name);
-//         // printf("fd->dirp_fs.d_name: %s\n", fd->dirp_fs.d_name);
-
-//         // // copy over the fileType
-//         // fd->dirp_fs.fileType = tempBuffer[tempPath.index].fileType;
-
-//         // struct fs_diriteminfo temp;
-//         // fd->dirp_fs.d_reclen = sizeof(temp);
-//         struct fs_diriteminfo *dirp = loadDir(tempBuffer[tempPath.index]);
-
-
-
-
-// //  4. set fd position to 0 
-// //    fd->dirEntryPosition=0;
-// //    fd->dirp=dirp; 
-//         // fd->dirEntryPosition = 0;
-//         // fd->dirp_fs = 
-//         //dirp->dirEntryPosition =0;
-        
-// //    
-// //  5. return a pointer to fdDir struct 
-
-//   return &dirp; 
-
-// }
+}
 
 
  // takes a pointer and returns a pointer to fs_diriteminfo struct 
@@ -826,50 +807,28 @@ return -1;
 
 
 
-//struct fs_diriteminfo *fs_readdir(fdDir *dirp){
-   // start from where we last left off, which was position 0 
-
-    
-    // for(int i = dirp->dirEntryPosition ; i < total_direcotory_entries; i++){
-        // if this directory is used, 
-    //     if DirectoryEntryUsed(dirp->dirp[i]){
-    //         // ii fs_diriteminfo 
-    //         // copy the name from our directory entry to the struct 
-    //         strcpy(fd->dirp->fs_diriteminfo.d_name, fd->dirp[i].name);
-    //         fd-dirp->fs_diriteminfo.fileType= typedef(fd->dirp[i]);
-    //         fd->position =i+1;
-
-    //         return (fd->dirp->fs_diriteminfo);
-    //     }
-    // // }
-    // return NULL
-
-
- //}
-
-//}
 
 // my version
-// struct fs_diriteminfo *fs_readdir(fdDir *dirp){
-//     //base case
-//     if(dirp ==NULL){
-//         return NULL;
-//     }
+struct fs_diriteminfo *fs_readdir(fdDir *dirp){
+    //base case
+    if(dirp ==NULL){
+        return NULL;
+    }
 
-//     for(int i = 0 ; i < MAXDE;i++){
-//         // DirectoryEntryUsed by checking the d_reclen length or dirEntryPosition
-//         if(dirp[i].d_reclen > 4){
-//              // copy the name from our directory entry to the struct 
-//             strcpy(dirp->dirp_fs.d_name,dirp[i].d_name);
-//             dirp->dirp_fs.fileType = FT_DIRECTORY;
-//             dirp->dirEntryPosition =i+1;
+    for(int i = 0 ; i < MAXDE;i++){
+        // DirectoryEntryUsed by checking the d_reclen length or dirEntryPosition
+        if(dirp[i].d_reclen > 4){
+             // copy the name from our directory entry to the struct 
+            strcpy(dirp->dirp_fs->d_name,dirp[i].d_name);
+            dirp->dirp_fs->fileType = FT_DIRECTORY;
+            dirp->dirEntryPosition =i+1;
 
-//           return &dirp->dirp_fs;
-//     }
+          return dirp->dirp_fs;
+    }
+    }
+    return NULL;
 
-//     return NULL;
-
-// }
+}
 
 
 // free up memory here  we allocated in the open
