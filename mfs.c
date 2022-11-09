@@ -299,6 +299,7 @@ void testPopulateStorage ( const char * path){
 struct fdPathResult parsedPath(const char * path){
     
     // check if absolute or relative
+    printf("checking this path %s\n",path);
     char firstChar = path[0];
     int isAbsolute = 0;
     struct fdPathResult result;
@@ -342,13 +343,14 @@ struct fdPathResult parsedPath(const char * path){
         // starting from root, we go to next location, then next location 
         // until we get to end then finally we search for path.name
         
-        printf("currentDir: %s\n", currentDir);
-        if (strcmp(currentDir, "/") != 0){
-            strcat(currentDir, "/");
+        printf("Checkin currentDir: %s\n", currentDir);
+        if (strcmp(currentDir, "/" ) != 0 &&strlen(currentDir) >2){
+                    strcat(currentDir, "/");
         }
         strcat(currentDir, path);
+        //printf("checking path %s\n",path);
 
-        printf("currentDir: %s\n", currentDir);
+        printf("After currentDir: %s\n", currentDir);
         
         struct fdPathResult tempPath = parsedPath(currentDir);
 
@@ -594,6 +596,7 @@ char *fs_getcwd( const char *pathname, size_t size){
     // if (strlen(globalPath) > size){
     //     return NULL;
     // }
+    printf("checking globalPath%s\n",globalPath);
     return globalPath;
 }
 
