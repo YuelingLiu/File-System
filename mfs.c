@@ -300,6 +300,7 @@ void testPopulateStorage ( const char * path){
 struct fdPathResult parsedPath(const char * path){
     
     // check if absolute or relative
+    printf("checking this path %s\n",path);
     char firstChar = path[0];
     int isAbsolute = 0;
     struct fdPathResult result;
@@ -343,6 +344,8 @@ struct fdPathResult parsedPath(const char * path){
         // starting from root, we go to next location, then next location 
         // until we get to end then finally we search for path.name
         
+        
+     
         // this is an edge case such that if the currentDir is "/"
         // we dont want to add another "/" as that would set the 
         // currentDir to "//"
@@ -353,8 +356,9 @@ struct fdPathResult parsedPath(const char * path){
             strcat(currentDir, "/");
         }
         strcat(currentDir, path);
+        //printf("checking path %s\n",path);
 
-        printf("currentDir: %s\n", currentDir);
+        printf("After currentDir: %s\n", currentDir);
         
         struct fdPathResult tempPath = parsedPath(currentDir);
 
@@ -600,6 +604,7 @@ char *fs_getcwd( const char *pathname, size_t size){
     // if (strlen(globalPath) > size){
     //     return NULL;
     // }
+    printf("checking globalPath%s\n",globalPath);
     return globalPath;
 }
 
@@ -802,6 +807,7 @@ fdDir * fs_opendir(const char *pathname){
 
 
 
+<<<<<<< HEAD
 // struct fs_diriteminfo *fs_readdir(fdDir *dirPtr){
 //    // start from where we last left off, which was position 0 
 
@@ -824,28 +830,30 @@ fdDir * fs_opendir(const char *pathname){
 //  }
 
 // }
+=======
+>>>>>>> 35a7f151a52d1de4995751ce703e9e7479dc8fa3
 
 // my version
-// struct fs_diriteminfo *fs_readdir(fdDir *dirp){
-//     //base case
-//     if(dirp ==NULL){
-//         return NULL;
-//     }
+struct fs_diriteminfo *fs_readdir(fdDir *dirp){
+    //base case
+    if(dirp ==NULL){
+        return NULL;
+    }
 
-//     for(int i = 0 ; i < MAXDE;i++){
-//         // DirectoryEntryUsed by checking the d_reclen length or dirEntryPosition
-//         if(dirp[i].d_reclen > 4){
-//              // copy the name from our directory entry to the struct 
-//             strcpy(dirp->dirp_fs.d_name,dirp[i].d_name);
-//             dirp->dirp_fs.fileType = FT_DIRECTORY;
-//             dirp->dirEntryPosition =i+1;
+    for(int i = 0 ; i < MAXDE;i++){
+        // DirectoryEntryUsed by checking the d_reclen length or dirEntryPosition
+        if(dirp[i].d_reclen > 4){
+             // copy the name from our directory entry to the struct 
+            strcpy(dirp->dirp_fs->d_name,dirp[i].d_name);
+            dirp->dirp_fs->fileType = FT_DIRECTORY;
+            dirp->dirEntryPosition =i+1;
 
-//           return &dirp->dirp_fs;
-//     }
+          return dirp->dirp_fs;
+    }
+    }
+    return NULL;
 
-//     return NULL;
-
-// }
+}
 
 
 // free up memory here  we allocated in the open
