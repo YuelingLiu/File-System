@@ -63,7 +63,7 @@ typedef struct
 
 
 
- 
+extern DirectoryEntry *tempBuffer; 
 
 struct fdPathResult{
 	int dirPtr;					// pointer to the directory 
