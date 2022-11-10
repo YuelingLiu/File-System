@@ -635,16 +635,25 @@ int fs_setcwd(char *pathname){
     }
     //If not absolute path, must append paramter to CWD
     if(pathname[0]!='/'){
-        //If cwd IS NOT root, append slash first
+        //If cwd IS NOT root and cwd doesn't already end in slash, append slash first
         if (strcmp(globalPath, "/") != 0){
             strcat(globalPath, "/");
         }
         strcat(globalPath, pathname);
+        //If last char is a slash, get rid of it
+        if (globalPath[strlen(globalPath)-1] == '/'){
+            globalPath[strlen(globalPath)-1] = '\0';
+        }
+        
         return 0;
     }
     //For absolute path, set parameter as CWD
     else {
         strcpy(globalPath, pathname);
+        //If last char is a slash, get rid of it
+        if (globalPath[strlen(globalPath)-1] == '/'){
+            globalPath[strlen(globalPath)-1] = '\0';
+        }
         return 0;
     }
 }
