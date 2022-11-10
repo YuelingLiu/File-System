@@ -304,10 +304,12 @@ struct fdPathResult parsedPath(const char * path){
     // check if absolute or relative
     printf("checking this path %s\n",path);
     char firstChar = path[0];
+    printf("firstChar: %c\n", firstChar);
     int isAbsolute = 0;
     struct fdPathResult result;
     // confirm if the path is relative to absolute
-    if (strcmp(&firstChar, "/") == 0)
+    //if (strcmp(&firstChar, "/") == 0)
+    if (firstChar == '/')
     {
         isAbsolute = 1;
         // in the case that the path is just the root
@@ -337,7 +339,9 @@ struct fdPathResult parsedPath(const char * path){
     */
     if(isAbsolute == 0){
         // grab in global current directory variable which is the absolute location
-        char * currentDir = fs_getcwd(path,strlen(path));
+        //char * currentDir = fs_getcwd(path,strlen(path));
+        char currentDir[4096];
+        strncpy(currentDir, globalPath, 4096);
         
         
         
@@ -607,6 +611,7 @@ char *fs_getcwd( const char *pathname, size_t size){
     //     return NULL;
     // }
     printf("checking globalPath%s\n",globalPath);
+    strncpy(pathname, globalPath, size);
     return globalPath;
 }
 

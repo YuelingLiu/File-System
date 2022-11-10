@@ -172,7 +172,9 @@ int initFileSystem (uint64_t numberOfBlocks, uint64_t blockSize) {
         // test for getcwd
         int size = strlen("/banana2");
         printf("before getcwd\n");
-        char * retPath = fs_getcwd("/banana2", size);
+        char retPath[size+1];
+        fs_getcwd(retPath, size);
+        printf("retPath: %s\n", retPath);
         printf("after getcwd\n");
 
         // test for isfile
@@ -217,7 +219,7 @@ int initFileSystem (uint64_t numberOfBlocks, uint64_t blockSize) {
             printf("Error Writing with LBAwrite, exiting program\n");
 		    exit(-1);
         }
-        return 1;
+        return 0;
     }
     else {
 		// volume has already been formatted so no changes to the vcb
