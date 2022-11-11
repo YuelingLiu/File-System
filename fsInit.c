@@ -89,10 +89,22 @@ int initRootDE(int blockSize, int FSSize){
     directoryEntries[1].fileType = FT_DIRECTORY;
     directoryEntries[1].numOfDE = MAXDE;
 
+    // DELETE THIS LATER
+    strcpy(directoryEntries[2].name, "banana");
+    directoryEntries[2].size = MAXDE * sizeof(DirectoryEntry);
+    directoryEntries[2].location = 1000;
+    directoryEntries[2].fileType = FT_DIRECTORY;
+    directoryEntries[2].numOfDE = MAXDE;
+
+    // DELETE THIS TOO
+    strcpy(directoryEntries[3].name, "banana2");
+    directoryEntries[3].size = MAXDE * sizeof(DirectoryEntry);
+    directoryEntries[3].location = 2000;
+    directoryEntries[3].fileType = FT_DIRECTORY;
+    directoryEntries[3].numOfDE = MAXDE;
 
 
     LBAwrite(directoryEntries, blocksNeeded, locOfRoot);
-
 
 
     LBAwrite(freeSpaceMap, 5, 1);

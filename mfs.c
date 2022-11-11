@@ -40,7 +40,7 @@
 struct fdPathResult globalTemp;
 //DirectoryEntry *tempBuffer;
 fdDir *fd;
-char globalPath[MAXLENGTH] = "/banana2";
+char globalPath[MAXLENGTH] = "/";
 char finalPath[MAXLENGTH] = "/";
 struct fs_diriteminfo *retTempDir;
 
@@ -301,6 +301,7 @@ void testPopulateStorage ( const char * path){
 struct fdPathResult parsedPath(const char * path){
     
     // check if absolute or relative
+    printf("******************************************\n");
     printf("checking this path %s\n",path);
     char firstChar = path[0];
     int isAbsolute = 0;
@@ -357,9 +358,9 @@ struct fdPathResult parsedPath(const char * path){
             strcat(currentDir, "/");
         }
         strcat(currentDir, path);
-        //printf("checking path %s\n",path);
+        // printf("checking path %s\n",path);
 
-        printf("After currentDir: %s\n", currentDir);
+        // printf("After currentDir: %s\n", currentDir);
         
         struct fdPathResult tempPath = parsedPath(currentDir);
 
@@ -368,16 +369,12 @@ struct fdPathResult parsedPath(const char * path){
         strcpy(result.lastArg, tempPath.lastArg);
         return result;    
         
-        
-        
-        
 
     }
 
     // for absolute path, we will parse the path starting from root
     if (isAbsolute == 1)
     {
-       
         // tokenizes path into tokens
         char *tokenArray[50];   // array of names to be tokenized
         char *finalPathArray[50]; // for edge cases of . and ..
@@ -389,48 +386,64 @@ struct fdPathResult parsedPath(const char * path){
         // loop to tokenize values
         char *token = strtok(str, s);
 
+        printf("globalPath before: %s\n", globalPath);
 
-        // if the token is . or .. we ignore and dont add them to path
+        // testing function
+        strcat(finalPath, "");
+        int counter = 0;
         while (token != NULL)
         {
+            // in the case that user enters in a weird input 
+            // ie /./../././banana2
+            if((strcmp(token,".") == 0)){ 
+        
+                // do nothing  
+            } else if ((strcmp(token,"..") == 0)){
+
+                // reduce counter so we can remove item in array
+                counter--; 
+                strcpy(finalPathArray[counter], "");       
+            }
+            else{
+
+                // add it to temp array
+                finalPathArray[counter] = token;
+                counter++;
+            }
+            
             tokenArray[tokenIndex++] = token;
-            // if ((strcmp(token,".") == 0) || (strcmp(token,"..") == 0)){
-            //     finalTokenArray[tokenIndex] = token;
-            // }
-            // printf("token: %s\n", token);
+            
             token = strtok(NULL, s);
         }
+          
         
-        // in the case that user enters in a weird input 
-        // ie /./../././banana2
+        // /banana/banana/banana
         strcpy(finalPath, "");
-        // for (size_t i = 0; i < tokenIndex; i++)
-        // { 
-        //     if((strcmp(tokenArray[i],".") == 0) || (strcmp(tokenArray[i],"..") == 0)){   
-        //     }else{
-        //         // strcat(finalPath, "/");
-        //         // strcat(finalPath, tokenArray[i]);
-        //         strcpy(finalPathArray[i],tokenArray[i]);
-        //         printf("finalPathArray[i]: %s\n", finalPathArray[i]);
-        //     }
-        // }
-        
-        
-        // strcpy(globalPath, finalPath);
-        // printf("globalPath******: %s\n", globalPath);
-       
-        
-         
-        // print tokens
-        for (size_t i = 0; i < tokenIndex; i++)
+        for (size_t i = 0; i < counter; i++)
         {
-            printf("tokenArray[i]: %s\n", tokenArray[i]);
+            strcat(finalPath, "/");
+            strcat(finalPath,finalPathArray[i]);
         }
+
+        // print tokens
 
 
         while (token = strtok(NULL, "/")){
             tokenArray[tokenIndex++] = token;
         }
+
+         
+        
+        
+        //printf("counter: %d\n", counter);
+        
+        //******************************************
+        strcpy(globalPath, finalPath);
+        printf("globalPath after: %s\n", globalPath);
+        printf("****************************\n");
+
+
+
         // end of tokenizer
 
 
@@ -665,6 +678,7 @@ int fs_setcwd(char *pathname){
             strcat(globalPath, "/");
         }
         strcat(globalPath, pathname);
+        printf("globalPath: %s\n", globalPath);
         //If last char is a slash, get rid of it
         if (globalPath[strlen(globalPath)-1] == '/'){
             globalPath[strlen(globalPath)-1] = '\0';
