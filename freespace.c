@@ -46,7 +46,7 @@ int allocContBlocks(uint8_t *freeSpaceMap, size_t fssize, int num){
                 // once freeBlockCounter is equal to userInput, we have found the space
                 // starting at (byteIndex * 8) + firstBitOffset;
                 if (freeBlockCounter == num){
-                    for (int i = firstBitOffset; i < firstBitOffset + freeBlockCounter; i++){
+                    for (int i = (byteIndex * 8)+firstBitOffset; i < (byteIndex * 8)+firstBitOffset + freeBlockCounter; i++){
                         setBitOne(freeSpaceMap, i); // mark the bits as used
                     }
                     return (byteIndex * 8) + firstBitOffset;
