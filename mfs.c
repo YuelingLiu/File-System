@@ -38,9 +38,9 @@
 #define MAXDE 50
 #define MAXLENGTH 256 
 struct fdPathResult globalTemp;
-DirectoryEntry *tempBuffer;
+//DirectoryEntry *tempBuffer;
 fdDir *fd;
-char globalPath[MAXLENGTH];
+char globalPath[MAXLENGTH] = "/";
 fs_diriteminfo *retTempDir;
 
 
@@ -49,51 +49,49 @@ fs_diriteminfo *retTempDir;
 
 
 
-// int fs_rmdir(const char *pathname)
-// {
-//     struct fdPathResult path = parsedPath(pathname);
-//     if (path.dirPtr == -1 && path.index == -1)
-//     {
-//         return -1;
-//     }
-//     int dirBlocks = blocksNeededForDir(MAXDE);
+int fs_rmdir(const char *pathname)
+{
+    struct fdPathResult path = parsedPath(pathname);
+    if (path.index == -1)
+    {
+        return -1;
+    }
+    int dirBlocks = blocksNeededForDir(MAXDE);
 
-//     // Gain access to the directory we want to remove by reading in its parent directory
-//     DirectoryEntry parentDir[MAXDE];
-//     LBAread(parentDir, dirBlocks, path.dirPtr);
+    // Gain access to the directory we want to remove by reading in its parent directory
+    DirectoryEntry parentDir[MAXDE];
+    LBAread(parentDir, dirBlocks, path.dirPtr);
 
-//     // Read in the directory we want to remove
-//     DirectoryEntry dirToRemove[MAXDE];
-//     LBAread(dirToRemove, dirBlocks, parentDir[path.index].location);
+    // Read in the directory we want to remove
+    DirectoryEntry dirToRemove[MAXDE];
+    LBAread(dirToRemove, dirBlocks, parentDir[path.index].location);
 
-//     // Loop through dirToRemove, checking that each DE except "." and ".." is known free state
-//     for (int i = 2; i < MAXDE; i++)
-//     {
-//         if (strcmp(dirToRemove[i].name, "") != 0)
-//         {
-//             return -1;
-//         }
-//     }
+    // Loop through dirToRemove, checking that each DE except "." and ".." is known free state
+    for (int i = 2; i < MAXDE; i++)
+    {
+        if (strcmp(dirToRemove[i].name, "") != 0)
+        {
+            return -1;
+        }
+    }
 
-//     // Mark blocks as free
-//     uint8_t *freeSpaceMap = malloc(getFreespaceSize(vcb->numBlocks, vcb->blockSize));
-//     LBAread(freeSpaceMap, 5, vcb->locOfFreespace);
-//     for (int i = parentDir[path.index].location; i < parentDir[path.index].location + dirBlocks; i++)
-//     {
-//         setBitZero(freeSpaceMap, i);
-//     }
+    // Mark blocks as free
+    LBAread(freeSpaceMap, 5, vcb->locOfFreespace);
+    for (int i = parentDir[path.index].location; i < parentDir[path.index].location + dirBlocks; i++)
+    {
+        setBitZero(freeSpaceMap, i);
+    }
 
-//     // Set dirToRemove's DE to known free state
-//     strcpy(parentDir[path.index].name, "");
+    // Set dirToRemove's DE to known free state
+    strcpy(parentDir[path.index].name, "");
+    printf("parentDir[path.index].name: %s\n", parentDir[path.index].name);
 
-//     // Write freespace and parentDir back to disk, free malloc
-//     LBAwrite(freeSpaceMap, 5, vcb->locOfFreespace);
-//     LBAwrite(parentDir, dirBlocks, path.dirPtr);
-//     free(freeSpaceMap);
-//     freeSpaceMap = NULL;
+    // Write freespace and parentDir back to disk, free malloc
+    LBAwrite(freeSpaceMap, 5, vcb->locOfFreespace);
+    LBAwrite(parentDir, dirBlocks, path.dirPtr);
 
-//     return 0;
-//      }
+    return 0;
+     }
 //      int fs_delete(char *filename)
 //      {
 //     struct fdPathResult path = parsedPath(filename);
@@ -304,11 +302,9 @@ struct fdPathResult parsedPath(const char * path){
     // check if absolute or relative
     printf("checking this path %s\n",path);
     char firstChar = path[0];
-    printf("firstChar: %c\n", firstChar);
     int isAbsolute = 0;
     struct fdPathResult result;
     // confirm if the path is relative to absolute
-    //if (strcmp(&firstChar, "/") == 0)
     if (firstChar == '/')
     {
         isAbsolute = 1;
@@ -464,7 +460,11 @@ struct fdPathResult parsedPath(const char * path){
                 if (j == numberofDE -1)
                 {
                     printf("no directory with the name: %s\n", tokenArray[i]);
-                    globalTemp.dirPtr = tempBuffer[i-1].location;
+                    if (i > 0){
+                        globalTemp.dirPtr = tempBuffer[i-1].location;
+                    }
+                    else
+                        globalTemp.dirPtr = tempBuffer[0].location;
                     globalTemp.index = -1;
                     result.dirPtr = globalTemp.dirPtr;
                     result.index = globalTemp.index;
@@ -495,6 +495,7 @@ struct fdPathResult parsedPath(const char * path){
      
      
     }
+    printf("about to free inside parsepath\n");
     free(tempBuffer);
     tempBuffer = NULL;
     
@@ -618,14 +619,43 @@ char *fs_getcwd( const char *pathname, size_t size){
 
 // Linux chdir 
 
+// int fs_setcwd(char *pathname){
+//     // check if the pathname starts in the root direcotry 
+//     if(pathname[0]!='/'){
+//         return -1;
+//     }
+//     strcpy(globalPath, pathname);
+//     return 0;
+
+// }
 int fs_setcwd(char *pathname){
-    // check if the pathname starts in the root direcotry 
-    if(pathname[0]!='/'){
+    struct fdPathResult path = parsedPath(pathname);
+    if (path.index == -1){
         return -1;
     }
-    strcpy(globalPath, pathname);
-    return 0;
-
+    //If not absolute path, must append paramter to CWD
+    if(pathname[0]!='/'){
+        //If cwd IS NOT root and cwd doesn't already end in slash, append slash first
+        if (strcmp(globalPath, "/") != 0){
+            strcat(globalPath, "/");
+        }
+        strcat(globalPath, pathname);
+        //If last char is a slash, get rid of it
+        if (globalPath[strlen(globalPath)-1] == '/'){
+            globalPath[strlen(globalPath)-1] = '\0';
+        }
+        
+        return 0;
+    }
+    //For absolute path, set parameter as CWD
+    else {
+        strcpy(globalPath, pathname);
+        //If last char is a slash, get rid of it
+        if (globalPath[strlen(globalPath)-1] == '/'){
+            globalPath[strlen(globalPath)-1] = '\0';
+        }
+        return 0;
+    }
 }
 
 // swtcwd version 2
@@ -752,6 +782,7 @@ while (i < MAXDE){
         newDir[1].fileType = FT_DIRECTORY;
         newDir[1].location = path.dirPtr;
 
+        LBAwrite(tempBuffer, blocksNeededForDir(MAXDE), path.dirPtr);
         LBAwrite(newDir, blocksNeededForDir(MAXDE), locOfNewDir);
         LBAwrite(freeSpaceMap, 5, 1);
         
