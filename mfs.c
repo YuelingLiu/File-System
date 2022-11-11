@@ -40,7 +40,7 @@
 struct fdPathResult globalTemp;
 // DirectoryEntry *tempBuffer;
 fdDir *fd;
-char globalPath[MAXLENGTH] = "/banana2";
+char globalPath[MAXLENGTH] = "/";
 char finalPath[MAXLENGTH] = "/";
 struct fs_diriteminfo *retTempDir;
 
@@ -391,44 +391,44 @@ struct fdPathResult parsedPath(const char *path)
         int counter = counterBegin;
         int arrayCounter = 0;
 
-        printf("globalPath: %s\n", globalPath);
-        printf("transfering to finalPathArray\n");
-        for (size_t i = 0; i < tokenIndex; i++)
-        {
-            if ((strcmp(tokenArray[i], ".") == 0))
-            {
-                // do nothing
-            }
-            else if ((strcmp(tokenArray[i], "..") == 0))
-            {   
-                // reduce counter so we can remove item in array
-                finalPathArray[counter] = "";
-                counter--;
+        // printf("globalPath: %s\n", globalPath);
+        // printf("transfering to finalPathArray\n");
+        // for (size_t i = 0; i < tokenIndex; i++)
+        // {
+        //     if ((strcmp(tokenArray[i], ".") == 0))
+        //     {
+        //         // do nothing
+        //     }
+        //     else if ((strcmp(tokenArray[i], "..") == 0))
+        //     {   
+        //         // reduce counter so we can remove item in array
+        //         finalPathArray[counter] = "";
+        //         counter--;
                 
-            }
-            else
-            {   
-                // add it to temp array
-                finalPathArray[counter] = tokenArray[i];
-                printf("after adding to path array\n");
-                counter++;
-            }
-        }
+        //     }
+        //     else
+        //     {   
+        //         // add it to temp array
+        //         finalPathArray[counter] = tokenArray[i];
+        //         printf("after adding to path array\n");
+        //         counter++;
+        //     }
+        // }
         
             
 
         
 
         // /banana/banana/banana
-        strcpy(finalPath, "");
-        printf("after finalPath asdfasd""\n");
+        // strcpy(finalPath, "");
+        // printf("after finalPath asdfasd""\n");
         
-        for (size_t i = counterBegin; i < counter; i++)
-        {
-            strcat(finalPath, "/");
-            strcat(finalPath, finalPathArray[i]);
-        }
-        printf("finalPath: %s\n", finalPath);
+        // for (size_t i = counterBegin; i < counter; i++)
+        // {
+        //     strcat(finalPath, "/");
+        //     strcat(finalPath, finalPathArray[i]);
+        // }
+        // printf("finalPath: %s\n", finalPath);
 
         // print tokens
 
@@ -440,10 +440,10 @@ struct fdPathResult parsedPath(const char *path)
         // printf("counter: %d\n", counter);
 
         //******************************************
-        strcpy(globalPath, finalPath);
-        printf("globalPath after: %s\n", globalPath);
-        // /banana/./../banana2/./apple2/../apple3
-        printf("****************************\n");
+        // strcpy(globalPath, finalPath);
+        // printf("globalPath after: %s\n", globalPath);
+        // // /banana/./../banana2/./apple2/../apple3
+        // printf("****************************\n");
 
         // end of tokenizer
 
