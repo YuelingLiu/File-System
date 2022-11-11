@@ -63,7 +63,9 @@ typedef struct
 
 
 
-extern DirectoryEntry *tempBuffer; 
+extern DirectoryEntry *tempBuffer;
+extern fdDir* fd;
+extern fs_diriteminfo *retTempDir; 
 
 struct fdPathResult{
 	int dirPtr;					// pointer to the directory 

@@ -97,7 +97,7 @@ int displayFiles (fdDir * dirp, int flall, int fllong)
 	if (dirp == NULL)	//get out if error
 		return (-1);
 	
-	struct fs_diriteminfo * di;
+	fs_diriteminfo * di;
 	struct fs_stat statbuf;
 	
 	di = fs_readdir (dirp);
