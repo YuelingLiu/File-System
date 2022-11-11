@@ -40,8 +40,9 @@
 struct fdPathResult globalTemp;
 //DirectoryEntry *tempBuffer;
 fdDir *fd;
-char globalPath[MAXLENGTH] = "/";
-fs_diriteminfo *retTempDir;
+char globalPath[MAXLENGTH] = "/banana2";
+char finalPath[MAXLENGTH] = "/";
+struct fs_diriteminfo *retTempDir;
 
 
 
@@ -322,8 +323,6 @@ struct fdPathResult parsedPath(const char * path){
         // }
     }
 
-    
-
     // for a relative path, we need to grab the path first
     /* 
     relative path means you want to find the file/folder in the current directory
@@ -381,6 +380,7 @@ struct fdPathResult parsedPath(const char * path){
        
         // tokenizes path into tokens
         char *tokenArray[50];   // array of names to be tokenized
+        char *finalPathArray[50]; // for edge cases of . and ..
         const char s[2] = "/";  // delimiter
         int tokenIndex = 0;     // counter for number of tokens
         char str[strlen(path)]; // declare a string, str to be read of size strlen(path)
@@ -389,13 +389,38 @@ struct fdPathResult parsedPath(const char * path){
         // loop to tokenize values
         char *token = strtok(str, s);
 
+
+        // if the token is . or .. we ignore and dont add them to path
         while (token != NULL)
         {
             tokenArray[tokenIndex++] = token;
+            // if ((strcmp(token,".") == 0) || (strcmp(token,"..") == 0)){
+            //     finalTokenArray[tokenIndex] = token;
+            // }
             // printf("token: %s\n", token);
             token = strtok(NULL, s);
         }
         
+        // in the case that user enters in a weird input 
+        // ie /./../././banana2
+        strcpy(finalPath, "");
+        // for (size_t i = 0; i < tokenIndex; i++)
+        // { 
+        //     if((strcmp(tokenArray[i],".") == 0) || (strcmp(tokenArray[i],"..") == 0)){   
+        //     }else{
+        //         // strcat(finalPath, "/");
+        //         // strcat(finalPath, tokenArray[i]);
+        //         strcpy(finalPathArray[i],tokenArray[i]);
+        //         printf("finalPathArray[i]: %s\n", finalPathArray[i]);
+        //     }
+        // }
+        
+        
+        // strcpy(globalPath, finalPath);
+        // printf("globalPath******: %s\n", globalPath);
+       
+        
+         
         // print tokens
         for (size_t i = 0; i < tokenIndex; i++)
         {
@@ -606,7 +631,7 @@ int fs_isDir(char *pathname) {
 
 
 //getcwd version 2
-char *fs_getcwd( const char *pathname, size_t size){
+char *fs_getcwd( char *pathname, size_t size){
     // why does it need these parameters?
     // if (strlen(globalPath) > size){
     //     return NULL;
@@ -649,7 +674,8 @@ int fs_setcwd(char *pathname){
     }
     //For absolute path, set parameter as CWD
     else {
-        strcpy(globalPath, pathname);
+        // **************************************************
+        //strcpy(globalPath, pathname);
         //If last char is a slash, get rid of it
         if (globalPath[strlen(globalPath)-1] == '/'){
             globalPath[strlen(globalPath)-1] = '\0';
@@ -834,36 +860,37 @@ fdDir * fs_opendir(const char *pathname){
 
 
 
-fs_diriteminfo *fs_readdir(fdDir *fd){
-   // start from where we last left off, which was position 0 
+// struct fs_diriteminfo *fs_readdir(fdDir *fd){
+//    // start from where we last left off, which was position 0 
 
    
-   LBAread(tempBuffer, MAXDE, fd->directoryStartLocation);
+//    LBAread(tempBuffer, MAXDE, fd->directoryStartLocation);
 
-    for(int i = fd->dirEntryPosition ; i < MAXDE; i++){
-        //if this directory is used, 
-        //if DirectoryEntryUsed(dirp->dirp[i]){
-        if (strcmp(tempBuffer[i].name, "") != 0){
+//     for(int i = fd->dirEntryPosition ; i < MAXDE; i++){
+//         //if this directory is used, 
+//         //if DirectoryEntryUsed(dirp->dirp[i]){
+//         if (strcmp(tempBuffer[i].name, "") != 0){
             
-            // ii fs_diriteminfo 
-            // copy the name from our directory entry to the struct 
-            strcpy(retTempDir->d_name, tempBuffer[i].name);
+//             // ii fs_diriteminfo 
+//             // copy the name from our directory entry to the struct 
+//             // NEED TO FIX THIS
+//             strcpy(retTempDir->d_name, tempBuffer[i].name);
 
-            //printf("retTempDir->d_name: %s\n", retTempDir->d_name);
-            // copy the fileType over to struct
-            retTempDir->fileType = tempBuffer[i].fileType;
+//             //printf("retTempDir->d_name: %s\n", retTempDir->d_name);
+//             // copy the fileType over to struct
+//             retTempDir.fileType = tempBuffer[i].fileType;
             
-            // iterate the directory entry position to read the next slot
-            fd->dirEntryPosition = i+1;
+//             // iterate the directory entry position to read the next slot
+//             fd->dirEntryPosition = i+1;
 
 
-            return retTempDir;
-        }
-    }
-    return NULL;
+//             return retTempDir;
+//         }
+//     }
+//     return NULL;
 
 
-}
+// }
 
 
 
