@@ -39,6 +39,8 @@ VCB* vcb;
 uint8_t *freeSpaceMap;
 
 DirectoryEntry *tempBuffer;
+fdDir *fd;
+fs_diriteminfo *retTempDir;
 
 // static array of directory entries with a number 50
 // DirectoryEntry directoryEntries[MAXDE];
@@ -89,19 +91,19 @@ int initRootDE(int blockSize, int FSSize){
     directoryEntries[1].fileType = FT_DIRECTORY;
     directoryEntries[1].numOfDE = MAXDE;
 
-    // DELETE THIS LATER
-    strcpy(directoryEntries[2].name, "banana");
-    directoryEntries[2].size = MAXDE * sizeof(DirectoryEntry);
-    directoryEntries[2].location = 1000;
-    directoryEntries[2].fileType = FT_DIRECTORY;
-    directoryEntries[2].numOfDE = MAXDE;
+    // // DELETE THIS LATER
+    // strcpy(directoryEntries[2].name, "banana");
+    // directoryEntries[2].size = MAXDE * sizeof(DirectoryEntry);
+    // directoryEntries[2].location = 1000;
+    // directoryEntries[2].fileType = FT_DIRECTORY;
+    // directoryEntries[2].numOfDE = MAXDE;
 
-    // DELETE THIS TOO
-    strcpy(directoryEntries[3].name, "banana2");
-    directoryEntries[3].size = MAXDE * sizeof(DirectoryEntry);
-    directoryEntries[3].location = 2000;
-    directoryEntries[3].fileType = FT_DIRECTORY;
-    directoryEntries[3].numOfDE = MAXDE;
+    // // DELETE THIS TOO
+    // strcpy(directoryEntries[3].name, "banana2");
+    // directoryEntries[3].size = MAXDE * sizeof(DirectoryEntry);
+    // directoryEntries[3].location = 2000;
+    // directoryEntries[3].fileType = FT_DIRECTORY;
+    // directoryEntries[3].numOfDE = MAXDE;
 
 
     LBAwrite(directoryEntries, blocksNeeded, locOfRoot);
@@ -125,8 +127,6 @@ int initFreespace(size_t fssize) {
     // block 1 is where freespace will be written
     LBAwrite(freeSpaceMap, 5, 1);
 
-    free(freeSpaceMap);
-    freeSpaceMap = NULL;
 
     return 1; // returning location of freespace to VCB
 }
@@ -234,6 +234,8 @@ int initFileSystem (uint64_t numberOfBlocks, uint64_t blockSize) {
 
         /* TEST CODE */
         tempBuffer = malloc(sizeof(DirectoryEntry) * MAXDE);
+        fd = malloc(sizeof(fdDir));
+        retTempDir = malloc(sizeof(fs_diriteminfo));
         
 		// after the values are populated into the VCB, write to storage.
         int writeReturn;

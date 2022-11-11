@@ -42,7 +42,7 @@ struct fdPathResult globalTemp;
 fdDir *fd;
 char globalPath[MAXLENGTH] = "/";
 char finalPath[MAXLENGTH] = "/";
-struct fs_diriteminfo *retTempDir;
+//struct fs_diriteminfo *retTempDir;
 
 int fs_rmdir(const char *pathname)
 {
@@ -71,7 +71,7 @@ int fs_rmdir(const char *pathname)
     }
 
     // Mark blocks as free
-    LBAread(freeSpaceMap, 5, vcb->locOfFreespace);
+    //LBAread(freeSpaceMap, 5, vcb->locOfFreespace);
     for (int i = parentDir[path.index].location; i < parentDir[path.index].location + dirBlocks; i++)
     {
         setBitZero(freeSpaceMap, i);
@@ -447,6 +447,35 @@ struct fdPathResult parsedPath(const char *path)
 
         // end of tokenizer
 
+
+        // /banana/banana/banana
+        // strcpy(finalPath, "");
+        // printf("after finalPath asdfasd""\n");
+        
+        // for (size_t i = counterBegin; i < counter; i++)
+        // {
+        //     strcat(finalPath, "/");
+        //     strcat(finalPath, finalPathArray[i]);
+        // }
+        // printf("finalPath: %s\n", finalPath);
+
+        // print tokens
+
+        // while (token = strtok(NULL, "/"))
+        // {
+        //     tokenArray[tokenIndex++] = token;
+        // }
+
+        // printf("counter: %d\n", counter);
+
+        //******************************************
+        // strcpy(globalPath, finalPath);
+        // printf("globalPath after: %s\n", globalPath);
+        // // /banana/./../banana2/./apple2/../apple3
+        // printf("****************************\n");
+
+        // end of tokenizer
+
         // im using tempBuffer instead of tempRoot
         // create a variable that changes for the loop to run
         // commented out bc location is made in the test above
@@ -782,15 +811,17 @@ int fs_mkdir(const char *pathname, mode_t mode)
             // Prepare freespace
             size_t fssize = getFreespaceSize(vcb->numBlocks, vcb->blockSize);
             // uint8_t *freeSpaceMap = malloc(fssize);
-            LBAread(freeSpaceMap, 5, vcb->locOfFreespace);
+            //LBAread(freeSpaceMap, 5, vcb->locOfFreespace);
             int locOfNewDir = allocContBlocks(freeSpaceMap, fssize, blocksNeededForDir(MAXDE));
 
             // Prepare DE of new directory
-            strcpy(tempBuffer[i].name, pathname);
+            strcpy(tempBuffer[i].name, path.lastArg);
             tempBuffer[i].size = MAXDE * sizeof(DirectoryEntry);
             tempBuffer[i].fileType = FT_DIRECTORY;
             tempBuffer[i].numOfDE = MAXDE;
             tempBuffer[i].location = locOfNewDir;
+        printf("tempBuffer[i].name: %s\n", tempBuffer[i].name);
+        printf("tempBuffer[i].location: %d\n", tempBuffer[i].location);
 
             // Prepare the new directory itself
             DirectoryEntry newDir[MAXDE];
@@ -811,7 +842,11 @@ int fs_mkdir(const char *pathname, mode_t mode)
 
             LBAwrite(tempBuffer, blocksNeededForDir(MAXDE), path.dirPtr);
             LBAwrite(newDir, blocksNeededForDir(MAXDE), locOfNewDir);
-            LBAwrite(freeSpaceMap, 5, 1);
+            int writeReturn;
+		if (writeReturn = LBAwrite(freeSpaceMap, 5, 1) != 5){
+            printf("Error Writing with LBAwrite, exiting program\n");
+		    exit(-1);
+        }
 
             return locOfNewDir;
         }
@@ -920,4 +955,15 @@ int fs_closedir(fdDir *dirp)
 {
     free(fd);
     fd = NULL;
+}
+
+int fs_stat(const char *path, struct fs_stat *buf){
+    struct fdPathResult result = parsedPath(path);
+    if (result.index == -1){
+        return -1;
+    }
+    LBAread(tempBuffer, blocksNeededForDir(MAXDE), result.dirPtr);
+    buf->st_size = tempBuffer[result.index].size;
+    buf->st_blocks = (tempBuffer[result.index].size + (vcb->blockSize - 1))/vcb->blockSize;
+    return 0;
 }
