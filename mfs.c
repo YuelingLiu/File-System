@@ -613,7 +613,7 @@ int fs_isDir(char *pathname)
         // current directory.
         if (strcmp(tempBuffer[i].name, tempPath.lastArg) == 0)
         {
-            printf("tempBuffer[i].name: %s\n", tempBuffer[i].name);
+            printf("tempBuffer[%d].name: %s\n",i, tempBuffer[i].name);
             if (tempBuffer[i].fileType == FT_DIRECTORY)
             {
                 return 1;
@@ -825,8 +825,8 @@ int fs_mkdir(const char *pathname, mode_t mode)
             tempBuffer[i].fileType = FT_DIRECTORY;
             tempBuffer[i].numOfDE = MAXDE;
             tempBuffer[i].location = locOfNewDir;
-        printf("tempBuffer[i].name: %s\n", tempBuffer[i].name);
-        printf("tempBuffer[i].location: %ld\n", tempBuffer[i].location);
+        printf("tempBuffer[%d].name: %s\n", i,tempBuffer[i].name);
+        printf("tempBuffer[%ld].location: %ld\n",i,tempBuffer[i].location);
 
             // Prepare the new directory itself
             DirectoryEntry newDir[MAXDE];
