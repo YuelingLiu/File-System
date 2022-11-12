@@ -39,7 +39,7 @@
 #define MAXLENGTH 256
 struct fdPathResult globalTemp;
 // DirectoryEntry *tempBuffer;
-fdDir *fd;
+//fdDir *fd;
 char globalPath[MAXLENGTH] = "/";
 char finalPath[MAXLENGTH] = "/";
 //struct fs_diriteminfo *retTempDir;
@@ -670,12 +670,12 @@ char *fs_getcwd(char *pathname, size_t size)
 //  /banana/./../banana2/./apple2/../apple3
 int fs_setcwd(char *pathname)
 {
+    printf("globalPath before ParsedPath: %s\n", globalPath);
     struct fdPathResult path = parsedPath(pathname);
-    strcpy(pathname, globalPath);
-    printf("after parsedpath in setcwd\n");
-    printf("path.index: %d\n", path.index);
-    printf("path.dirPtr: %d\n", path.dirPtr);
-    printf("globalPath: %s\n", globalPath);
+    printf("globalPath after ParsedPath: %s\n", globalPath);
+
+    //strcpy(pathname, globalPath);
+    
 
     // global path is set inside parsedPath
     if (path.index == -1)
@@ -683,7 +683,14 @@ int fs_setcwd(char *pathname)
         return -1;
     }
     else
-    {
+    {   
+        if(strlen(globalPath) == 1){
+            strcat(globalPath, pathname);
+        } 
+        else {
+            strcat(globalPath, "/");
+            strcat(globalPath, pathname);
+        }  
         printf("else inside setcwd\n");
         return 0;
     }
@@ -821,7 +828,7 @@ int fs_mkdir(const char *pathname, mode_t mode)
             tempBuffer[i].numOfDE = MAXDE;
             tempBuffer[i].location = locOfNewDir;
         printf("tempBuffer[i].name: %s\n", tempBuffer[i].name);
-        printf("tempBuffer[i].location: %d\n", tempBuffer[i].location);
+        printf("tempBuffer[i].location: %ld\n", tempBuffer[i].location);
 
             // Prepare the new directory itself
             DirectoryEntry newDir[MAXDE];
