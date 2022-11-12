@@ -364,14 +364,11 @@ struct fdPathResult parsedPath(const char *path)
         // loop to tokenize values
         char *token = strtok(str, s);
 
-        printf("globalPath before: %s\n", globalPath);
-
         // testing function
         
         while (token != NULL)
         {
             tokenArray[tokenIndex++] = token;
-
             token = strtok(NULL, s);
         }
 
@@ -380,37 +377,37 @@ struct fdPathResult parsedPath(const char *path)
             printf("tokenIndex: %s\n", tokenArray[i]);
         }
         
-
-        
         // in the case that user enters in a weird input
             // ie /./../././banana2
-            
-        
         
         int counterBegin = tokenIndex -1;
         int counter = counterBegin;
         int arrayCounter = 0;
+        bool dotFlag = 0;
 
         // printf("globalPath: %s\n", globalPath);
         // printf("transfering to finalPathArray\n");
+
+        printf("path: %s\n", path);
+
+
         // for (size_t i = 0; i < tokenIndex; i++)
         // {
         //     if ((strcmp(tokenArray[i], ".") == 0))
         //     {
-        //         // do nothing
+        //         dotFlag = 1;
         //     }
         //     else if ((strcmp(tokenArray[i], "..") == 0))
         //     {   
         //         // reduce counter so we can remove item in array
+        //         dotFlag = 1;
         //         finalPathArray[counter] = "";
-        //         counter--;
-                
+        //         counter--;    
         //     }
         //     else
         //     {   
         //         // add it to temp array
         //         finalPathArray[counter] = tokenArray[i];
-        //         printf("after adding to path array\n");
         //         counter++;
         //     }
         // }
@@ -678,6 +675,7 @@ int fs_setcwd(char *pathname)
     }
     else
     {   
+        // case that global path is just "/"
         if(strlen(globalPath) == 1){
             // concatenate to globalPath
             strcat(globalPath, pathname);
@@ -693,7 +691,7 @@ int fs_setcwd(char *pathname)
         return 0;
     }
 
-    // If not absolute path, must append paramter to CWD
+    // // If not absolute path, must append paramter to CWD
     //  if(pathname[0]!='/'){
     //      //If cwd IS NOT root and cwd doesn't already end in slash, append slash first
     //      if (strcmp(globalPath, "/") != 0){
