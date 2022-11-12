@@ -55,17 +55,17 @@ typedef struct
 	unsigned short  d_reclen;		/*length of this record */
 	unsigned short	dirEntryPosition;	/*which directory entry position, like file pos */
 	uint64_t	directoryStartLocation;		/*Starting LBA of directory */
-	//intptr_t  dirp; // I added this directory pointer
+	//DirectoryEntry*  dir; // I added this directory pointer
 	char d_name[256];               
-	struct fs_diriteminfo *dirp_fs; // This a nested struct pointer that points to fs_diriteminfo
+	fs_diriteminfo *dirp_fs; // This a nested struct pointer that points to fs_diriteminfo
 	//fileInfo * GetFileInfo (char * fname);
 	} fdDir;
 
 
 
 extern DirectoryEntry *tempBuffer;
-extern fdDir* fd;
-extern fs_diriteminfo *retTempDir; 
+//extern fdDir* fd;
+//extern fs_diriteminfo *retTempDir; 
 
 struct fdPathResult{
 	int dirPtr;					// pointer to the directory 

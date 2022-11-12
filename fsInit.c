@@ -39,8 +39,8 @@ VCB* vcb;
 uint8_t *freeSpaceMap;
 
 DirectoryEntry *tempBuffer;
-fdDir *fd;
-fs_diriteminfo *retTempDir;
+//fdDir *fd;
+//fs_diriteminfo *retTempDir;
 
 // static array of directory entries with a number 50
 // DirectoryEntry directoryEntries[MAXDE];
@@ -234,8 +234,8 @@ int initFileSystem (uint64_t numberOfBlocks, uint64_t blockSize) {
 
         /* TEST CODE */
         tempBuffer = malloc(sizeof(DirectoryEntry) * MAXDE);
-        fd = malloc(sizeof(fdDir));
-        retTempDir = malloc(sizeof(fs_diriteminfo));
+        //fd = malloc(sizeof(fdDir));
+        //retTempDir = malloc(sizeof(fs_diriteminfo));
         
 		// after the values are populated into the VCB, write to storage.
         int writeReturn;

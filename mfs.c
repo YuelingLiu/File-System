@@ -148,8 +148,8 @@ void testPopulateStorage(const char *path)
     // layer 4 pear
 
     // move these two out into initfilesystem
-    fd = malloc(sizeof(fdDir));
-    retTempDir = malloc(sizeof(fs_diriteminfo));
+    // fd = malloc(sizeof(fdDir));
+    // retTempDir = malloc(sizeof(fs_diriteminfo));
 
     tempBuffer = malloc(sizeof(DirectoryEntry) * MAXDE);
     // remove volatile and test
@@ -610,7 +610,7 @@ int fs_isDir(char *pathname)
         // current directory.
         if (strcmp(tempBuffer[i].name, tempPath.lastArg) == 0)
         {
-            printf("tempBuffer[i].name: %s\n", tempBuffer[i].name);
+            printf("tempBuffer[%d].name: %s\n",i, tempBuffer[i].name);
             if (tempBuffer[i].fileType == FT_DIRECTORY)
             {
                 return 1;
@@ -823,8 +823,8 @@ int fs_mkdir(const char *pathname, mode_t mode)
             tempBuffer[i].fileType = FT_DIRECTORY;
             tempBuffer[i].numOfDE = MAXDE;
             tempBuffer[i].location = locOfNewDir;
-        printf("tempBuffer[i].name: %s\n", tempBuffer[i].name);
-        printf("tempBuffer[i].location: %ld\n", tempBuffer[i].location);
+        printf("tempBuffer[%d].name: %s\n", i,tempBuffer[i].name);
+        printf("tempBuffer[%ld].location: %ld\n",i,tempBuffer[i].location);
 
             // Prepare the new directory itself
             DirectoryEntry newDir[MAXDE];
@@ -867,7 +867,7 @@ fdDir *fs_opendir(const char *pathname)
     struct fdPathResult tempPath = parsedPath(pathname);
 
     // 2. check the last element to see if it is a directory
-    LBAread(tempBuffer, MAXDE, tempPath.dirPtr);
+    LBAread(tempBuffer, blocksNeededForDir(MAXDE), tempPath.dirPtr);
     // printf("tempBuffer[tempPath.index].fileType: %d\n", tempBuffer[tempPath.index].fileType);
 
     //      a: yes if last Arg type  IS directory
@@ -879,13 +879,17 @@ fdDir *fs_opendir(const char *pathname)
     }
 
     // 3.  Load this directory
-
+    
     // load directory into starting location for LBAread
+    fdDir* fd = malloc(sizeof(fdDir));
     fd->directoryStartLocation = tempBuffer[tempPath.index].location;
+    
+
     printf("fd->directoryStartLocation: %ld\n", fd->directoryStartLocation);
 
-    // fd already malloced in testPopulateStorage
+    
     fd->dirEntryPosition = 0;
+    fd->dirp_fs = malloc(sizeof(fs_diriteminfo));
     return fd;
 }
 
@@ -895,34 +899,34 @@ fdDir *fs_opendir(const char *pathname)
 // returns a pointer to fs_diriteminfo struct
 // return null when Error occurs
 
-// struct fs_diriteminfo *fs_readdir(fdDir *fd){
-//    // start from where we last left off, which was position 0
+struct fs_diriteminfo *fs_readdir(fdDir *fd){
+   // start from where we last left off, which was position 0
 
-//    LBAread(tempBuffer, MAXDE, fd->directoryStartLocation);
+   LBAread(tempBuffer, blocksNeededForDir(MAXDE), fd->directoryStartLocation);
 
-//     for(int i = fd->dirEntryPosition ; i < MAXDE; i++){
-//         //if this directory is used,
-//         //if DirectoryEntryUsed(dirp->dirp[i]){
-//         if (strcmp(tempBuffer[i].name, "") != 0){
+    for(int i = fd->dirEntryPosition ; i < MAXDE; i++){
+        //if this directory is used,
+        //if DirectoryEntryUsed(dirp->dirp[i]){
+        if (strcmp(tempBuffer[i].name, "") != 0){
 
-//             // ii fs_diriteminfo
-//             // copy the name from our directory entry to the struct
-//             // NEED TO FIX THIS
-//             strcpy(retTempDir->d_name, tempBuffer[i].name);
+            // ii fs_diriteminfo
+            // copy the name from our directory entry to the struct
+            // NEED TO FIX THIS
+            strcpy(fd->dirp_fs->d_name, tempBuffer[i].name);
 
-//             //printf("retTempDir->d_name: %s\n", retTempDir->d_name);
-//             // copy the fileType over to struct
-//             retTempDir.fileType = tempBuffer[i].fileType;
+            //printf("retTempDir->d_name: %s\n", retTempDir->d_name);
+            // copy the fileType over to struct
+            fd->dirp_fs->fileType = tempBuffer[i].fileType;
 
-//             // iterate the directory entry position to read the next slot
-//             fd->dirEntryPosition = i+1;
+            // iterate the directory entry position to read the next slot
+            fd->dirEntryPosition = i+1;
 
-//             return retTempDir;
-//         }
-//     }
-//     return NULL;
+            return fd->dirp_fs;
+        }
+    }
+    return NULL;
 
-// }
+}
 
 /* open dir opens up a folder for you to iterate through
 we have to use the directory entry value of dirPtr inside of
@@ -954,8 +958,9 @@ so readdir can iterate through that directory entry
 // }
 
 // free up memory here  we allocated in the open
-int fs_closedir(fdDir *dirp)
+int fs_closedir(fdDir *fd)
 {
+    free(fd->dirp_fs);
     free(fd);
     fd = NULL;
 }
