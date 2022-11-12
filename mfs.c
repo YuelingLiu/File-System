@@ -610,7 +610,6 @@ int fs_isDir(char *pathname)
         // current directory.
         if (strcmp(tempBuffer[i].name, tempPath.lastArg) == 0)
         {
-            printf("tempBuffer[%d].name: %s\n",i, tempBuffer[i].name);
             if (tempBuffer[i].fileType == FT_DIRECTORY)
             {
                 return 1;
@@ -668,9 +667,12 @@ char *fs_getcwd(char *pathname, size_t size)
 int fs_setcwd(char *pathname)
 {
     struct fdPathResult path = parsedPath(pathname);
+    printf("///////////////////////////////\n");
+    printf("inside setcwd after parsedPath\n");
 
     if (path.index == -1)
     {
+        printf("path.index is -1 \n");
         return -1;
     }
     else
@@ -688,6 +690,7 @@ int fs_setcwd(char *pathname)
             strcat(globalPath, pathname);
             strcpy(pathname, globalPath);
         }  
+        printf("inside setcwd before return 0\n");
         return 0;
     }
 
@@ -824,7 +827,6 @@ int fs_mkdir(const char *pathname, mode_t mode)
             tempBuffer[i].numOfDE = MAXDE;
             tempBuffer[i].location = locOfNewDir;
         printf("tempBuffer[%d].name: %s\n", i,tempBuffer[i].name);
-        printf("tempBuffer[%ld].location: %ld\n",i,tempBuffer[i].location);
 
             // Prepare the new directory itself
             DirectoryEntry newDir[MAXDE];
@@ -899,7 +901,7 @@ fdDir *fs_opendir(const char *pathname)
 // returns a pointer to fs_diriteminfo struct
 // return null when Error occurs
 
-struct fs_diriteminfo *fs_readdir(fdDir *fd){
+fs_diriteminfo *fs_readdir(fdDir *fd){
    // start from where we last left off, which was position 0
 
    LBAread(tempBuffer, blocksNeededForDir(MAXDE), fd->directoryStartLocation);
@@ -921,7 +923,9 @@ struct fs_diriteminfo *fs_readdir(fdDir *fd){
             // iterate the directory entry position to read the next slot
             fd->dirEntryPosition = i+1;
 
+            //return fd->dirp_fs;
             return fd->dirp_fs;
+
         }
     }
     return NULL;

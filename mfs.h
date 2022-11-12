@@ -79,7 +79,7 @@ int fs_rmdir(const char *pathname);
 
 // Directory iteration functions
 fdDir * fs_opendir(const char *pathname);
-struct fs_diriteminfo *fs_readdir(fdDir *dirp);
+fs_diriteminfo *fs_readdir(fdDir *dirp);
 int fs_closedir(fdDir *dirp);
 
 // Misc directory functions
