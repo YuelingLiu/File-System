@@ -670,14 +670,8 @@ char *fs_getcwd(char *pathname, size_t size)
 //  /banana/./../banana2/./apple2/../apple3
 int fs_setcwd(char *pathname)
 {
-    printf("globalPath before ParsedPath: %s\n", globalPath);
     struct fdPathResult path = parsedPath(pathname);
-    printf("globalPath after ParsedPath: %s\n", globalPath);
 
-    //strcpy(pathname, globalPath);
-    
-
-    // global path is set inside parsedPath
     if (path.index == -1)
     {
         return -1;
@@ -685,13 +679,17 @@ int fs_setcwd(char *pathname)
     else
     {   
         if(strlen(globalPath) == 1){
+            // concatenate to globalPath
             strcat(globalPath, pathname);
+            // copy concatenated global path to pathname buffer
+            strcpy(pathname, globalPath);
         } 
         else {
+            // same as above except if the global path starts with root
             strcat(globalPath, "/");
             strcat(globalPath, pathname);
+            strcpy(pathname, globalPath);
         }  
-        printf("else inside setcwd\n");
         return 0;
     }
 
