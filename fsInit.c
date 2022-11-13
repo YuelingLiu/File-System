@@ -146,6 +146,8 @@ int initFileSystem (uint64_t numberOfBlocks, uint64_t blockSize) {
 	vcb = malloc(blockSize);
 	// buffer and number of block, reading from the beginning
 
+    tempBuffer = malloc(sizeof(DirectoryEntry) * MAXDE);
+
     int initialRead;
 	if (initialRead = LBAread(vcb, 1, 0) != 1){
 		printf("Error reading with LBAread, exiting program\n");
@@ -156,7 +158,7 @@ int initFileSystem (uint64_t numberOfBlocks, uint64_t blockSize) {
     // in your structure and see if it matches.
 
     // temp to get the code to work
-    vcb->signature = 12;
+    
 
     if (vcb->signature != MAGICNUM) {
         vcb->signature = MAGICNUM;
@@ -233,7 +235,7 @@ int initFileSystem (uint64_t numberOfBlocks, uint64_t blockSize) {
 
 
         /* TEST CODE */
-        tempBuffer = malloc(sizeof(DirectoryEntry) * MAXDE);
+        //tempBuffer = malloc(sizeof(DirectoryEntry) * MAXDE);
         //fd = malloc(sizeof(fdDir));
         //retTempDir = malloc(sizeof(fs_diriteminfo));
         
