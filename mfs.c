@@ -283,9 +283,9 @@ void testPopulateStorage(const char *path)
 
 struct fdPathResult parsedPath(const char *path)
 {
-
+    printf("0*****************************************\n");
     // check if absolute or relative
-    printf("******************************************\n");
+    
     printf("checking this path %s\n", path);
     char firstChar = path[0];
     int isAbsolute = 0;
@@ -476,18 +476,26 @@ struct fdPathResult parsedPath(const char *path)
         // im using tempBuffer instead of tempRoot
         // create a variable that changes for the loop to run
         // commented out bc location is made in the test above
+        printf("2*****************************************\n");
         int location = vcb->locOfRoot;
 
         // assign the last value in tokenArray to result last arg
         // save last arg
-        strcpy(globalTemp.lastArg, tokenArray[tokenIndex - 1]);
-
+        printf("3*****************************************\n");
+        printf("tokenArray[tokenIndex -1]: %s\n", tokenArray[tokenIndex]);
+        printf("tokenIndex: %d\n", tokenIndex);
+        if (tokenIndex > 0){
+            strcpy(globalTemp.lastArg, tokenArray[tokenIndex - 1]);
+        }
+        printf("4*****************************************\n");
 
         int numberofDE = MAXDE;
         // loop through all of the tokens in root
         for (size_t i = 0; i < tokenIndex; i++)
         {
+            printf("5*****************************************\n");
             LBAread(tempBuffer, blocksNeededForDir(numberofDE), location);
+            printf("6*****************************************\n");
             int j = 0;
 
             // loop through the directory entries for name comparison
@@ -559,8 +567,8 @@ struct fdPathResult parsedPath(const char *path)
 
         printf("about to free inside parsepath\n");
         
-        //tempBuffer = NULL;
-        //free(tempBuffer);
+        // tempBuffer = NULL;
+        // free(tempBuffer);
 
         return result;
     }
@@ -656,7 +664,6 @@ char *fs_getcwd(char *pathname, size_t size)
     // if (strlen(globalPath) > size){
     //     return NULL;
     // }
-    printf("checking globalPath%s\n", globalPath);
     strncpy(pathname, globalPath, size);
     return globalPath;
 }
@@ -665,7 +672,7 @@ char *fs_getcwd(char *pathname, size_t size)
 
 //  /banana/./../banana2/./apple2/../apple3
 int fs_setcwd(char *pathname)
-{
+{   
     struct fdPathResult path = parsedPath(pathname);
     printf("///////////////////////////////\n");
     printf("inside setcwd after parsedPath\n");
@@ -801,6 +808,7 @@ int fs_mkdir(const char *pathname, mode_t mode)
 
     // we have the pointer to the directory of where we want
     // to make the path.lastArg
+    printf("inside mkdir*****************************************\n");
     LBAread(tempBuffer, blocksNeededForDir(MAXDE), path.dirPtr);
 
     // DirectoryEntry parentOfCurrentDir[MAXDE];
@@ -829,7 +837,9 @@ int fs_mkdir(const char *pathname, mode_t mode)
         printf("tempBuffer[%d].name: %s\n", i,tempBuffer[i].name);
 
             // Prepare the new directory itself
-            DirectoryEntry newDir[MAXDE];
+            printf("inside mkdir before newDir*****************************************\n");
+
+            DirectoryEntry newDir[MAXDE];                     
 
             // initialize each directory entry of NEW DIR to be in a known free state
             for (int j = 0; j < MAXDE; j++)
@@ -840,20 +850,25 @@ int fs_mkdir(const char *pathname, mode_t mode)
             strcpy(newDir[0].name, ".");
             newDir[0].fileType = FT_DIRECTORY;
             newDir[0].location = locOfNewDir;
+            printf("after strcpy\n");
             // set the dot dot
             strcpy(newDir[1].name, "..");
             newDir[1].fileType = FT_DIRECTORY;
             newDir[1].location = path.dirPtr;
+            printf("afterstrcpy2\n");
 
             LBAwrite(tempBuffer, blocksNeededForDir(MAXDE), path.dirPtr);
             LBAwrite(newDir, blocksNeededForDir(MAXDE), locOfNewDir);
             int writeReturn;
-		if (writeReturn = LBAwrite(freeSpaceMap, 5, 1) != 5){
-            printf("Error Writing with LBAwrite, exiting program\n");
-		    exit(-1);
-        }
-
-            return locOfNewDir;
+            printf("after LBAwrite\n");
+            if (writeReturn = LBAwrite(freeSpaceMap, 5, 1) != 5){
+                printf("Error Writing with LBAwrite, exiting program\n");
+                exit(-1);
+            }
+            printf("before locofNEWdir\n");
+            printf("locOfNewDir: %d\n", locOfNewDir);
+            // return locOfNewDir;
+            return 0;
         }
         i++;
     }
