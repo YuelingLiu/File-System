@@ -33,7 +33,7 @@ int allocContBlocks(uint8_t *freeSpaceMap, size_t fssize, int num){
         // if there are zeroes then we have to traverse to find the first zero
         printf("inside alloccontBlocks\n");
         // ***************************RIGHT HERE*************************
-        printf("freeSpaceMap[byteIndex]: %s\n", freeSpaceMap[byteIndex]);
+        printf("freeSpaceMap[byteIndex]: %d\n", freeSpaceMap[byteIndex]);
         if (freeSpaceMap[byteIndex] != 255){
             printf("after freespacemap\n");
             // traverse through the byte until we find the first zero
