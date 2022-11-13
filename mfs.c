@@ -359,7 +359,7 @@ struct fdPathResult parsedPath(const char *path)
         char *tokenArray[50];     // array of names to be tokenized
         char *finalPathArray[50]; // for edge cases of . and ..
         const char s[2] = "/";    // delimiter
-        int tokenIndex = 0;       // counter for number of tokens
+        int tokenIndex = 1;       // counter for number of tokens
         char str[strlen(path)];   // declare a string, str to be read of size strlen(path)
         strcpy(str, path);        // copy path into str
         
@@ -371,16 +371,14 @@ struct fdPathResult parsedPath(const char *path)
         char *token = strtok(str, s);
 
         // testing function
-        
+        tokenArray[0] = "/";
         while (token != NULL)
         {
             tokenArray[tokenIndex++] = token;
             token = strtok(NULL, s);
         }
 
-        if (tokenIndex == 1){
-            tokenArray[0] == "/";
-        }
+       
 
 
         for (size_t i = 0; i < tokenIndex; i++)
@@ -508,8 +506,16 @@ struct fdPathResult parsedPath(const char *path)
         // }
 
         int numberofDE = MAXDE;
+        size_t i;
+        if (tokenIndex == 1){
+            i = 1;
+        }
+        else {
+            i = 0;
+        }
+        
         // loop through all of the tokens in root
-        for (size_t i = 1; i < tokenIndex; i++)
+        for (i = 0; i < tokenIndex; i++)
         {
             printf("5*****************************************\n");
             printf("location: %d\n", location);
@@ -851,6 +857,7 @@ int fs_mkdir(const char *pathname, mode_t mode)
     // to make the path.lastArg
     printf("inside mkdir*****************************************\n");
     LBAread(tempBuffer, blocksNeededForDir(MAXDE), path.dirPtr);
+    printf("inside mkdir afteR LBAread\n");
 
     // DirectoryEntry parentOfCurrentDir[MAXDE];
     // LBAread(parentOfCurrentDir, dirBlocks, path.dirPtr);
@@ -858,16 +865,21 @@ int fs_mkdir(const char *pathname, mode_t mode)
     // DirectoryEntry currentDir[MAXDE];
     // LBAread(currentDir, dirBlocks, parentOfCurrentDir[path.index].location);
 
+    printf("tempBuffer[i].name: %s\n", tempBuffer[2].name);
+
     int i = 2; // starting dir index of NOT "." or ".."
     while (i < MAXDE)
     {
         if (strcmp(tempBuffer[i].name, "") == 0)
         { // Upon finding first available DE slot
             // Prepare freespace
+            printf("fssize\n");
             size_t fssize = getFreespaceSize(vcb->numBlocks, vcb->blockSize);
             // uint8_t *freeSpaceMap = malloc(fssize);
             //LBAread(freeSpaceMap, 5, vcb->locOfFreespace);
+            printf("after fssize\n");
             int locOfNewDir = allocContBlocks(freeSpaceMap, fssize, blocksNeededForDir(MAXDE));
+            printf("after locofnewdir\n");
 
             // Prepare DE of new directory
             strcpy(tempBuffer[i].name, path.lastArg);

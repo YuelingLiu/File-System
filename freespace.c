@@ -23,7 +23,6 @@ int getFreespaceSize(int numberOfBlocks, int blockSize){
 int allocContBlocks(uint8_t *freeSpaceMap, size_t fssize, int num){
     // count how many contiguous free blocks there are starting from the first free one
     int freeBlockCounter = 0;
-
     // amount of used blocks inside the byte before the first free one
     int firstBitOffset = 0;
 
@@ -32,12 +31,15 @@ int allocContBlocks(uint8_t *freeSpaceMap, size_t fssize, int num){
         // check to confirm that it's not all 1s
         // if all bytes are 1111111 then that means there is no space
         // if there are zeroes then we have to traverse to find the first zero
+        printf("inside alloccontBlocks\n");
+
+        printf("freeSpaceMap[byteIndex]: %s\n", freeSpaceMap[byteIndex]);
         if (freeSpaceMap[byteIndex] != 255){
+            printf("after freespacemap\n");
             // traverse through the byte until we find the first zero
             while(getBit(freeSpaceMap, (byteIndex * 8) + firstBitOffset) == 1){
                 firstBitOffset++;
             }
-
             // after we found the first zero, traverse until we reach amount requested
             // or encounter a 1
             while(getBit(freeSpaceMap, (byteIndex * 8) + firstBitOffset + freeBlockCounter) == 0){
@@ -49,6 +51,8 @@ int allocContBlocks(uint8_t *freeSpaceMap, size_t fssize, int num){
                     for (int i = (byteIndex * 8)+firstBitOffset; i < (byteIndex * 8)+firstBitOffset + freeBlockCounter; i++){
                         setBitOne(freeSpaceMap, i); // mark the bits as used
                     }
+                    
+
                     return (byteIndex * 8) + firstBitOffset;
                 }
             }
