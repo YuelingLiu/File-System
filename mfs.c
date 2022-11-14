@@ -884,10 +884,12 @@ int fs_mkdir(const char *pathname, mode_t mode)
             strcpy(newDir[0].name, ".");
             newDir[0].fileType = FT_DIRECTORY;
             newDir[0].location = locOfNewDir;
+            newDir[0].numOfDE = MAXDE;
             // set the dot dot
             strcpy(newDir[1].name, "..");
             newDir[1].fileType = FT_DIRECTORY;
             newDir[1].location = path.dirPtr;
+            newDir[1].numOfDE = tempBuffer[0].numOfDE;
 
             LBAwrite(tempBuffer, blocksNeededForDir(MAXDE), path.dirPtr);
             LBAwrite(newDir, blocksNeededForDir(MAXDE), locOfNewDir);
