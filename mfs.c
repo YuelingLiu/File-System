@@ -494,6 +494,7 @@ struct fdPathResult parsedPath(const char *path)
         // loop through all of the tokens in root
         for (int i = 0; i < tokenIndex; i++)
         {
+            printf("starting for loop iteration i = %d\n", i);
             LBAread(tempBuffer, blocksNeededForDir(numberofDE), location);
             
             int j = 0;
@@ -501,6 +502,7 @@ struct fdPathResult parsedPath(const char *path)
             // loop through the directory entries for name comparison
             while (j < numberofDE)
             { 
+                printf("starting while loop iteration j = %d\n", j);
                 if (strcmp(tempBuffer[j].name, tokenArray[i]) == 0)
                 {
                     // works up to here 100%
@@ -528,8 +530,9 @@ struct fdPathResult parsedPath(const char *path)
                 }
                 j++;
                 // grabbing result
-                if (i == tokenIndex - 1)
+                if (i == tokenIndex - 1) //This executes on final token
                 {
+                    printf("grabbing result, setting globalTempt index to %d\n", j);
                     globalTemp.index = j;
                     //globalTemp.dirPtr = tempBuffer[i].location;
                     
@@ -543,19 +546,25 @@ struct fdPathResult parsedPath(const char *path)
                     printf("no directory with the name: %s\n", tokenArray[i]);
                     if (i > 0)
                     {
-                        //globalTemp.dirPtr = tempBuffer[i - 1].location;
+                        printf("setting dirPtr to tempBuffer[0].location: %d\n",tempBuffer[0].location);
+                        globalTemp.dirPtr = tempBuffer[0].location;
                     }
                     else{
-                    // i changed the i from 0 in tempBuffer[0].location
-                        globalTemp.dirPtr = tempBuffer[i].location;
-                        globalTemp.index = -1;
-                        result.dirPtr = globalTemp.dirPtr;
-                        result.index = globalTemp.index;
-                        strcpy(result.lastArg, globalTemp.lastArg);
+                    // This condition triggers only when directory is missing AT ROOT
+                        
+                        printf("setting dirPtr to locOfRoot\n");
+                        globalTemp.dirPtr = vcb->locOfRoot;
                     }
-                    // free(tempBuffer);
-                    // tempBuffer = NULL;
+                    globalTemp.index = -1;
+                    result.dirPtr = globalTemp.dirPtr;
+                    result.index = globalTemp.index;
+                    strcpy(result.lastArg, globalTemp.lastArg);
                     
+                    
+                    
+                    printf("returning from for loop\n");
+                    printf("result.dirPtr: %d\n", result.dirPtr);
+                    printf("result.index: %d\n", result.index);
                     return result;
                     // break;
                 }
@@ -573,7 +582,7 @@ struct fdPathResult parsedPath(const char *path)
             // }
         }
         
-
+        //This executes when result is found
         result.dirPtr = globalTemp.dirPtr;
         result.index = globalTemp.index;
         strcpy(result.lastArg, globalTemp.lastArg);
@@ -583,11 +592,11 @@ struct fdPathResult parsedPath(const char *path)
             result.index = 0;
             strcpy(result.lastArg, "/");
         }
-        printf("about to free inside parsepath\n");
+        printf("returning outside for loop\n");
+        printf("result.dirPtr: %d\n", result.dirPtr);
+        printf("result.index: %d\n", result.index);
         
         
-        //free(tempBuffer);
-        //tempBuffer = NULL;
         
 
         return result;
@@ -898,7 +907,7 @@ int fs_mkdir(const char *pathname, mode_t mode)
 //
 fdDir *fs_opendir(const char *pathname)
 {
-    printf("works inside of opendir\n");
+    printf("Entering opendir\n");
     // 1. parse the pathname, make sure path is valid and find the last element
     struct fdPathResult tempPath = parsedPath(pathname);
     printf("tempPath***pathname: %s\n", pathname);
@@ -913,7 +922,7 @@ fdDir *fs_opendir(const char *pathname)
     //      b: no -> fail return null it is not a directory
     if (tempBuffer[tempPath.index].fileType != FT_DIRECTORY)
     {
-        printf("return NULL\n");
+        printf("return NULL from opendir\n");
         return NULL;
     }
 
@@ -929,6 +938,7 @@ fdDir *fs_opendir(const char *pathname)
     
     fd->dirEntryPosition = 0;
     fd->dirp_fs = malloc(sizeof(fs_diriteminfo));
+    printf("return from opendir\n");
     return fd;
 }
 
@@ -940,7 +950,7 @@ fdDir *fs_opendir(const char *pathname)
 
 fs_diriteminfo *fs_readdir(fdDir *fd){
    // start from where we last left off, which was position 0
-
+    printf("Entering readdir\n");
    LBAread(tempBuffer, blocksNeededForDir(MAXDE), fd->directoryStartLocation);
 
     for(int i = fd->dirEntryPosition ; i < MAXDE; i++){
@@ -961,10 +971,12 @@ fs_diriteminfo *fs_readdir(fdDir *fd){
             fd->dirEntryPosition = i+1;
 
             //return fd->dirp_fs;
+            printf("Returning from readdir\n");
             return fd->dirp_fs;
 
         }
     }
+    printf("Returning NULL from readdir\n");
     return NULL;
 
 }
