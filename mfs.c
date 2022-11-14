@@ -514,7 +514,7 @@ struct fdPathResult parsedPath(const char *path)
                     printf("tokenArray[i]: %s\n", tokenArray[i]);
                 
                     location = tempBuffer[j].location;
-                    globalTemp.dirPtr = location;
+                    globalTemp.dirPtr = tempBuffer[0].location;
                     // printf("location: %d\n", location);
                     numberofDE = tempBuffer[j].numOfDE;
 
