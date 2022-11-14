@@ -686,7 +686,6 @@ void processcommand (char * cmd)
 		}
 #endif		
 	cmdv[cmdc] = 0;		//just be safe - null terminate array of arguments
-	printf("dispatchcount: %d\n", dispatchcount);
 	for (i = 0; i < dispatchcount; i++)
 		{
 		if (strcmp(dispatchTable[i].command, cmdv[0]) == 0)
