@@ -249,6 +249,8 @@ int initFileSystem (uint64_t numberOfBlocks, uint64_t blockSize) {
     }
     else {
 		// volume has already been formatted so no changes to the vcb
+        freeSpaceMap = calloc(5, 512);
+        LBAread(freeSpaceMap, 5, 1);
         return 0;
     }
 
