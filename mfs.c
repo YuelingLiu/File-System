@@ -41,7 +41,7 @@ struct fdPathResult globalTemp;
 // DirectoryEntry *tempBuffer;
 //fdDir *fd;
 char globalPath[MAXLENGTH] = "/";
-char finalPath[MAXLENGTH] = "/";
+
 //struct fs_diriteminfo *retTempDir;
 
 int fs_rmdir(const char *pathname)
@@ -295,6 +295,7 @@ struct fdPathResult parsedPath(const char *path)
     // check if absolute or relative
     
     printf("checking this path %s\n", path);
+    char finalPath[MAXLENGTH] = "";
     char firstChar = path[0];
     // tempBuffer = malloc(sizeof(DirectoryEntry) * MAXDE);
     int isAbsolute = 0;
@@ -365,6 +366,7 @@ struct fdPathResult parsedPath(const char *path)
         // tokenizes path into tokens
         char *tokenArray[50];     // array of names to be tokenized
         char *finalPathArray[50]; // for edge cases of . and ..
+        bool tokenFlag = 0;       // flag for . and ..
         const char s[2] = "/";    // delimiter
         int tokenIndex = 0;       // counter for number of tokens
         char str[strlen(path)];   // declare a string, str to be read of size strlen(path)
@@ -386,57 +388,57 @@ struct fdPathResult parsedPath(const char *path)
         // token printer
         for (size_t i = 0; i < tokenIndex; i++)
         {
-            printf("tokenArray[i]: %s\n", tokenArray[i]);
+            printf("tokenArray[i]***********: %s\n", tokenArray[i]);
+            if ( (strcmp(tokenArray[i],".") == 0)  || (strcmp(tokenArray[i],"..") == 0)){
+                tokenFlag = 1;
+                printf("WTFF***************\n");
+            }
         }
         
-        // in the case that user enters in a weird input
-            // ie /./../././banana2
-        // was trying to work on this but parsepath crapped out 
-        // this is to fix the situation in the case that we get
-        // dot and dot dot
-        int counterBegin = tokenIndex -1;
-        int counter = counterBegin;
-        int arrayCounter = 0;
-        bool dotFlag = 0;
+        // if there are . or .. we want to remove that from the global path
+        if(tokenFlag == 1){
+            int counter = 0;
+            for (size_t i = 0; i < tokenIndex; i++)
+            {
+            if ((strcmp(tokenArray[i], ".") == 0))
+            {
+                // do nothing
+            }
+            else if ((strcmp(tokenArray[i], "..") == 0))
+            {   
+                // reduce counter so we can remove item in array
+                finalPathArray[counter] = "";
+                counter--;    
+            }
+            else
+            {   
+                // add it to temp array
+                finalPathArray[counter] = tokenArray[i];
+                counter++;
+            }
+            }
+            // for (size_t i = 0; i < counter; i++){
+            //     printf("finalPathArray[i]: %s\n", finalPathArray[i]);
+            // }
+            
+            for (size_t i = 0; i < counter; i++){
+                strcat(finalPath, "/");
+                strcat(finalPath, finalPathArray[i]);
+            }
+            
+            printf("finalPath************: %s\n", finalPath);
+            
+            strncpy(globalPath, finalPath,sizeof(finalPath));
+                    
+            tokenFlag = 0;
 
-        printf("path: %s\n", path);
-
-
-        // for (size_t i = 0; i < tokenIndex; i++)
-        // {
-        //     if ((strcmp(tokenArray[i], ".") == 0))
-        //     {
-        //         dotFlag = 1;
-        //     }
-        //     else if ((strcmp(tokenArray[i], "..") == 0))
-        //     {   
-        //         // reduce counter so we can remove item in array
-        //         dotFlag = 1;
-        //         finalPathArray[counter] = "";
-        //         counter--;    
-        //     }
-        //     else
-        //     {   
-        //         // add it to temp array
-        //         finalPathArray[counter] = tokenArray[i];
-        //         counter++;
-        //     }
-        // }
-        
+        }
             
 
         
 
-        // /banana/banana/banana
-        // strcpy(finalPath, "");
-        // printf("after finalPath asdfasd""\n");
         
-        // for (size_t i = counterBegin; i < counter; i++)
-        // {
-        //     strcat(finalPath, "/");
-        //     strcat(finalPath, finalPathArray[i]);
-        // }
-        // printf("finalPath: %s\n", finalPath);
+        
 
         // print tokens
 
@@ -702,6 +704,7 @@ char *fs_getcwd(char *pathname, size_t size)
     //     return NULL;
     // }
     
+    // this causes a stack smashing detection crash
     strncpy(pathname, globalPath, size);
     return globalPath;
 }
@@ -712,8 +715,6 @@ char *fs_getcwd(char *pathname, size_t size)
 int fs_setcwd(char *pathname)
 {   
     struct fdPathResult path = parsedPath(pathname);
-    printf("///////////////////////////////\n");
-    printf("inside setcwd after parsedPath\n");
 
     if (path.index == -1)
     {
