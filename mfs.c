@@ -54,24 +54,12 @@ int fs_rmdir(const char *pathname)
     int dirBlocks = blocksNeededForDir(MAXDE);
 
     // Gain access to the directory we want to remove by reading in its parent directory
-    // DirectoryEntry parentDir[MAXDE];
-    // LBAread(parentDir, dirBlocks, path.dirPtr);
-    // printf("*******path.dirPtr: %d\n", path.dirPtr);
-    // printf("*******parentDir[0].name: %s\n", parentDir[0].name);
-    // printf("*******parentDir[1].name: %s\n", parentDir[1].name);
-    // printf("*******parentDir[2].name: %s\n", parentDir[2].name);
-
-    // Read in the directory we want to remove
-    // DirectoryEntry dirToRemove[MAXDE];
-    // LBAread(dirToRemove, dirBlocks, parentDir[path.index].location);
-    // printf("dirToRemove[0].name: %s\n", dirToRemove[0].name);
-    // printf("dirToRemove[1].name: %s\n", dirToRemove[1].name);
-    // printf("dirToRemove[2].name: %s\n", dirToRemove[2].name);
-
     DirectoryEntry * parentDir = calloc (dirBlocks, vcb->blockSize);
     printf("parentDir: %p\n", parentDir);
     printf("tempBuffer: %p\n", tempBuffer);
     LBAread(parentDir, dirBlocks, path.dirPtr);
+    
+    // Read in the directory we want to remove
     DirectoryEntry * dirToRemove = calloc (dirBlocks, vcb->blockSize);
     LBAread(dirToRemove, dirBlocks, parentDir[path.index].location);
     
@@ -120,7 +108,7 @@ int fs_delete(char *filename)
     int dirBlocks = blocksNeededForDir(MAXDE);
 
     // Gain access to the file we want to remove by reading in its parent directory
-    DirectoryEntry parentDir[MAXDE];
+    DirectoryEntry * parentDir = calloc (dirBlocks, vcb->blockSize);
     LBAread(parentDir, dirBlocks, path.dirPtr);
 
     // Get number of blocks being used by file
@@ -144,6 +132,7 @@ int fs_delete(char *filename)
     LBAwrite(freeSpaceMap, 5, vcb->locOfFreespace);
     LBAwrite(parentDir, dirBlocks, path.dirPtr);
 
+    free(parentDir);
     return 0;
 }
 
