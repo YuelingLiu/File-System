@@ -87,46 +87,42 @@ int fs_rmdir(const char *pathname)
 
     return 0;
 }
-//      int fs_delete(char *filename)
-//      {
-//     struct fdPathResult path = parsedPath(filename);
-//     if (path.dirPtr == -1 && path.index == -1)
-//     {
-//         return -1;
-//     }
-//     int dirBlocks = blocksNeededForDir(MAXDE);
+int fs_delete(char *filename)
+     {
+    struct fdPathResult path = parsedPath(filename);
+    if (path.dirPtr == -1 && path.index == -1)
+    {
+        return -1;
+    }
+    int dirBlocks = blocksNeededForDir(MAXDE);
 
-//     // Gain access to the file we want to remove by reading in its parent directory
-//     DirectoryEntry parentDir[MAXDE];
-//     LBAread(parentDir, dirBlocks, path.dirPtr);
+    // Gain access to the file we want to remove by reading in its parent directory
+    DirectoryEntry parentDir[MAXDE];
+    LBAread(parentDir, dirBlocks, path.dirPtr);
 
-//     // Get number of blocks being used by file
-//     int fileBlocks = (parentDir[path.index].size + (vcb->blockSize - 1)) / vcb->blockSize;
+    // Get number of blocks being used by file
+    int fileBlocks = (parentDir[path.index].size + (vcb->blockSize - 1)) / vcb->blockSize;
 
-//     // Mark blocks as free
-//     uint8_t *freeSpaceMap = malloc(getFreespaceSize(vcb->numBlocks, vcb->blockSize));
-//     LBAread(freeSpaceMap, 5, vcb->locOfFreespace);
-//     for (int i = parentDir[path.index].location; i < parentDir[path.index].location + fileBlocks; i++)
-//     {
-//         setBitZero(freeSpaceMap, i);
-//     }
+    // Mark blocks as free
+    for (int i = parentDir[path.index].location; i < parentDir[path.index].location + fileBlocks; i++)
+    {
+        setBitZero(freeSpaceMap, i);
+    }
 
-//     // Set file's DE to known free state
-//     strcpy(parentDir[path.index].name, "");
+    // Set file's DE to known free state
+    strcpy(parentDir[path.index].name, "");
 
-//     // Write freespace and parentDir back to disk, free malloc
+    // Write freespace and parentDir back to disk
 
-//     // do we have to change the fileType to FT_REGFILE?
+    // do we have to change the fileType to FT_REGFILE?
 
-//     //Write freespace and parentDir back to disk, free malloc
+    //Write freespace and parentDir back to disk
 
-//     LBAwrite(freeSpaceMap, 5, vcb->locOfFreespace);
-//     LBAwrite(parentDir, dirBlocks, path.dirPtr);
-//     free(freeSpaceMap);
-//     freeSpaceMap = NULL;
+    LBAwrite(freeSpaceMap, 5, vcb->locOfFreespace);
+    LBAwrite(parentDir, dirBlocks, path.dirPtr);
 
-//     return 0;
-// }
+    return 0;
+}
 
 // used as a test function to populate storage for parse path to run
 void testPopulateStorage(const char *path)
