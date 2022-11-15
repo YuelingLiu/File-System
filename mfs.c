@@ -54,24 +54,40 @@ int fs_rmdir(const char *pathname)
     int dirBlocks = blocksNeededForDir(MAXDE);
 
     // Gain access to the directory we want to remove by reading in its parent directory
-    DirectoryEntry parentDir[MAXDE];
-    LBAread(parentDir, dirBlocks, path.dirPtr);
+    // DirectoryEntry parentDir[MAXDE];
+    // LBAread(parentDir, dirBlocks, path.dirPtr);
+    // printf("*******path.dirPtr: %d\n", path.dirPtr);
+    // printf("*******parentDir[0].name: %s\n", parentDir[0].name);
+    // printf("*******parentDir[1].name: %s\n", parentDir[1].name);
+    // printf("*******parentDir[2].name: %s\n", parentDir[2].name);
 
     // Read in the directory we want to remove
-    DirectoryEntry dirToRemove[MAXDE];
-    LBAread(dirToRemove, dirBlocks, parentDir[path.index].location);
+    // DirectoryEntry dirToRemove[MAXDE];
+    // LBAread(dirToRemove, dirBlocks, parentDir[path.index].location);
+    // printf("dirToRemove[0].name: %s\n", dirToRemove[0].name);
+    // printf("dirToRemove[1].name: %s\n", dirToRemove[1].name);
+    // printf("dirToRemove[2].name: %s\n", dirToRemove[2].name);
 
+    DirectoryEntry * parentDir = calloc (dirBlocks, vcb->blockSize);
+    printf("parentDir: %p\n", parentDir);
+    printf("tempBuffer: %p\n", tempBuffer);
+    LBAread(parentDir, dirBlocks, path.dirPtr);
+    DirectoryEntry * dirToRemove = calloc (dirBlocks, vcb->blockSize);
+    LBAread(dirToRemove, dirBlocks, parentDir[path.index].location);
+    
     // Loop through dirToRemove, checking that each DE except "." and ".." is known free state
     for (int i = 2; i < MAXDE; i++)
     {
         if (strcmp(dirToRemove[i].name, "") != 0)
         {
+            printf("can not remove directory because it is not empty.\n");
+            printf("***************dirToRemove[i].name: %s\n", dirToRemove[i].name);
             return -1;
         }
     }
 
     // Mark blocks as free
-    //LBAread(freeSpaceMap, 5, vcb->locOfFreespace);
+    LBAread(freeSpaceMap, 5, vcb->locOfFreespace);
     for (int i = parentDir[path.index].location; i < parentDir[path.index].location + dirBlocks; i++)
     {
         setBitZero(freeSpaceMap, i);
@@ -79,11 +95,18 @@ int fs_rmdir(const char *pathname)
 
     // Set dirToRemove's DE to known free state
     strcpy(parentDir[path.index].name, "");
+    parentDir[path.index].size = 0;
+    parentDir[path.index].location = 0;
+    parentDir[path.index].fileType = 0;
+    parentDir[path.index].numOfDE = 0;
     printf("parentDir[path.index].name: %s\n", parentDir[path.index].name);
 
     // Write freespace and parentDir back to disk, free malloc
     LBAwrite(freeSpaceMap, 5, vcb->locOfFreespace);
     LBAwrite(parentDir, dirBlocks, path.dirPtr);
+
+    free(parentDir);
+    free(dirToRemove);
 
     return 0;
 }
@@ -542,7 +565,7 @@ struct fdPathResult parsedPath(const char *path)
                     printf("no directory with the name: %s\n", tokenArray[i]);
                     if (i > 0)
                     {
-                        printf("setting dirPtr to tempBuffer[0].location: %d\n",tempBuffer[0].location);
+                       // printf("setting dirPtr to tempBuffer[0].location: %d\n",tempBuffer[0].location);
                         globalTemp.dirPtr = tempBuffer[0].location;
                     }
                     else{
@@ -634,7 +657,7 @@ int fs_isDir(char *pathname)
     struct fdPathResult tempPath = parsedPath(pathname);
     // dirPtr, index, lastArg
     // LBAread (tempBuffer, MAXDE, dirPtr);
-    LBAread(tempBuffer, MAXDE, tempPath.dirPtr);
+    LBAread(tempBuffer, blocksNeededForDir(MAXDE), tempPath.dirPtr);
 
     // iterate through tempBuffer to strcpy(tempbuffer[i].name, lastArg) == 0
     for (size_t i = 0; i < MAXDE; i++)

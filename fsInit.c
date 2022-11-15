@@ -94,7 +94,7 @@ int initRootDE(int blockSize, int FSSize){
     // // DELETE THIS LATER
     // strcpy(directoryEntries[2].name, "banana");
     // directoryEntries[2].size = MAXDE * sizeof(DirectoryEntry);
-    // directoryEntries[2].location = 1000;
+    // directoryEntries[2].location = 60;
     // directoryEntries[2].fileType = FT_DIRECTORY;
     // directoryEntries[2].numOfDE = MAXDE;
 
