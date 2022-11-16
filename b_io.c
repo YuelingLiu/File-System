@@ -41,6 +41,7 @@ typedef struct b_fcb
 	int index;		//holds the current position in the buffer
 	int chunkNumber; //n-th (from 0) 512 byte chunk of the file
 	int buflen;		//holds how many valid bytes are in the buffer
+	int mode; //O_RDONLY, O_WRONLY, or O_RDWR
 	} b_fcb;
 	
 b_fcb fcbArray[MAXFCBS];
@@ -89,16 +90,33 @@ b_io_fd b_open (char * filename, int flags)
 	returnFd = b_getFCB();				// get our own file descriptor
 										// check for error - all used FCB's
 
+	//Set to read mode, write mode, or read/write mode
+	if ((flags & O_RDONLY) == O_RDONLY){
+		fcbArray[returnFd].mode = O_RDONLY;
+	}
+	else if ((flags & O_WRONLY) == O_WRONLY){
+		fcbArray[returnFd].mode = O_WRONLY;
+	}
+	else if ((flags & O_RDWR) == O_RDWR){
+		fcbArray[returnFd].mode = O_RDWR;
+	}
+	
 	//Case O_CREAT: Must create file first!
 	if ((flags & O_CREAT) == O_CREAT){
 		makeNewFile(filename);
 
 	}
+	
 	fcbArray[returnFd].fi = GetFileInfo(filename);
 	fcbArray[returnFd].localBuff = calloc(1, B_CHUNK_SIZE);
 	fcbArray[returnFd].index = 0;
 	fcbArray[returnFd].chunkNumber = 0;
 	fcbArray[returnFd].buflen = 0;
+
+	//Case O_APPEND: TODO
+	if ((flags & O_APPEND) == O_CREAT){
+		//set index, chunkNumber, etc. to end of file
+	}
 	
 	return (returnFd);						// all set
 	}
