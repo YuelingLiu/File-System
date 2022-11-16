@@ -731,7 +731,8 @@ int fs_mkdir(const char *pathname, mode_t mode)
 
             // Prepare the new directory itself
 
-            DirectoryEntry newDir[MAXDE];                     
+            //DirectoryEntry newDir[MAXDE];
+            DirectoryEntry* newDir = calloc(blocksNeededForDir(MAXDE), vcb->blockSize);                     
 
             // initialize each directory entry of NEW DIR to be in a known free state
             for (int j = 0; j < MAXDE; j++)
@@ -756,6 +757,7 @@ int fs_mkdir(const char *pathname, mode_t mode)
                 printf("Error Writing with LBAwrite, exiting program\n");
                 exit(-1);
             }
+            free(newDir);
             return locOfNewDir;
         }
         i++;

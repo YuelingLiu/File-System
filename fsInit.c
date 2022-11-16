@@ -61,7 +61,8 @@ int initRootDE(int blockSize, int FSSize){
     int blocksNeeded = (bytesNeeded + (blockSize - 1)) / blockSize;
 
 	// 5. Now we have a pointer to an array of directory entries.
-	DirectoryEntry directoryEntries[MAXDE];
+	//DirectoryEntry directoryEntries[MAXDE];
+    DirectoryEntry* directoryEntries = calloc(blocksNeeded, blockSize);
 
 	// loop through and initialize each directory entry structure to be in a known free state
 	for(int i = 0 ; i < MAXDE; i++){
@@ -111,7 +112,7 @@ int initRootDE(int blockSize, int FSSize){
 
     LBAwrite(freeSpaceMap, 5, 1);
 
-
+    free(directoryEntries);
     return locOfRoot;
 }
 
