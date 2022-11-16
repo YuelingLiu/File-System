@@ -520,7 +520,7 @@ void fs_pathReconstruction (){
     printf("tokenIndex: %d\n", tokenIndex);
     printf("tokenArray[0]: %s\n", tokenArray[0]);
     // if there are . or .. we want to remove that from the global path
-    if(tokenFlag == 1 && tokenIndex > 2){
+    if(tokenFlag == 1 && tokenIndex > 1){
         int counter = 0;
         for (size_t i = 0; i < tokenIndex; i++)
         {
@@ -532,7 +532,10 @@ void fs_pathReconstruction (){
         {   
             // reduce counter so we can remove item in array
             finalPathArray[counter] = "";
-            counter--;    
+            counter--;
+            if(counter == 0){
+                strcat(finalPath, "/");
+            }    
         }
         else
         {   
