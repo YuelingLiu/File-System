@@ -1,19 +1,19 @@
 /**************************************************************
- * Class: CSC-415-03 Fall 2022
- * Name: Tommy Truong, Yueling Liu, Steve Betts, Nicholas Hamada
- * Student ID: 913660519, 922272361, 921898143, 918602131
- * GitHub Name: kpcrocks
- * Group Name: dev/null
- * Project: Basic File System
- *
- * File: mfs.c
- *
- * Description:
- *	This is the file system interface.
- *	This is the interface needed by the driver to interact with
- *	your filesystem.
- *
- **************************************************************/
+* Class: CSC-415-03 Fall 2022
+* Name: Tommy Truong, Yueling Liu, Steve Betts, Nicholas Hamada
+* Student IDs: 913660519, 922272361, 921898143, 918602131
+* GitHub Name: kpcrocks
+* Group Name: dev/null
+* Project: Basic File System
+*
+* File: mfs.c
+*
+* Description:
+*	This is the file system interface.
+*	This is the interface needed by the driver to interact with
+*	your filesystem.
+*
+**************************************************************/
 
 // #include "mfs.h"
 // #include "VCB.h"
