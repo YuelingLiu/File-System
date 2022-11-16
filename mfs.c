@@ -40,6 +40,7 @@
 struct fdPathResult globalTemp;
 // DirectoryEntry *tempBuffer;
 //fdDir *fd;
+//Make this extern so that its available everywhere
 char globalPath[MAXLENGTH] = "/";
 
 //struct fs_diriteminfo *retTempDir;

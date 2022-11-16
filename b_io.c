@@ -20,9 +20,17 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include "b_io.h"
+#include "fsLow.h"
+#include "mfs.h"
+#include "VCB.h"
+#include "DE.h"
+#include "freespace.h"
+#include "files.h"
 
 #define MAXFCBS 20
 #define B_CHUNK_SIZE 512
+
+
 
 typedef struct b_fcb
 	{
@@ -134,6 +142,7 @@ int b_write (b_io_fd fd, char * buffer, int count)
 //  |             |                                                |        |
 //  | Part1       |  Part 2                                        | Part3  |
 //  +-------------+------------------------------------------------+--------+
+//When we LBA read, use getBlockN() function
 int b_read (b_io_fd fd, char * buffer, int count)
 	{
 

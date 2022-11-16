@@ -62,7 +62,7 @@ typedef struct
 	} fdDir;
 
 
-
+extern char globalPath;
 extern DirectoryEntry *tempBuffer;
 //extern fdDir* fd;
 //extern fs_diriteminfo *retTempDir; 
