@@ -472,7 +472,7 @@ char *fs_getcwd(char *pathname, size_t size)
     // if (strlen(globalPath) > size){
     //     return NULL;
     // }
-    printf("pathname inside of getcwd: %s\n", pathname);
+    //printf("pathname inside of getcwd: %s\n", pathname);
     printf("globalPath inside of getcwd: %s\n", globalPath);
     // this causes a stack smashing detection crash
     strncpy(pathname, globalPath, size);
@@ -510,17 +510,24 @@ void fs_pathReconstruction (){
 
     /* TEST CODE */
     // token printer
+  
     for (size_t i = 0; i < tokenIndex; i++)
     {
         printf("tokenArray[i]***********: %s\n", tokenArray[i]);
         if ( (strcmp(tokenArray[i],".") == 0)  || (strcmp(tokenArray[i],"..") == 0)){
             tokenFlag = 1;
         }
+       
     }
     printf("tokenIndex: %d\n", tokenIndex);
     printf("tokenArray[0]: %s\n", tokenArray[0]);
     // if there are . or .. we want to remove that from the global path
+
+    if(tokenIndex ==1 && strcmp(tokenArray[0],"..")==0){
+        strcpy(globalPath,"/"); 
+    }
     if(tokenFlag == 1 && tokenIndex > 1){
+        //if(tokenIndex==1){
         int counter = 0;
         for (size_t i = 0; i < tokenIndex; i++)
         {
@@ -528,6 +535,7 @@ void fs_pathReconstruction (){
         {
             // do nothing
         }
+      
         else if ((strcmp(tokenArray[i], "..") == 0))
         {   
             // reduce counter so we can remove item in array
@@ -535,6 +543,8 @@ void fs_pathReconstruction (){
             counter--;
             if(counter == 0){
                 strcat(finalPath, "/");
+                //tokenFlag=0;
+               // break;
             }    
         }
         else
@@ -547,12 +557,14 @@ void fs_pathReconstruction (){
         
         for (size_t i = 0; i < counter; i++){
             strcat(finalPath, "/");
+           
             strcat(finalPath, finalPathArray[i]);
         }
         
         printf("finalPath************: %s\n", finalPath);
         
         strcpy(globalPath, finalPath);
+        printf("globalPath in reconstruction %s\n",globalPath);
                 
         //tokenFlag = 0;
 
@@ -579,19 +591,21 @@ int fs_setcwd(char *pathname)
             // copy concatenated global path to pathname buffer
             strcpy(pathname, globalPath);
         } 
+    
         else {
             // same as above except if the global path starts with root
             strcat(globalPath, "/");
             strcat(globalPath, pathname);
             strcpy(pathname, globalPath);
-        }  
+      }  
         printf("inside setcwd before return 0\n");
         fs_pathReconstruction();
         
 
         return 0;
-    }
-
+    
+}
+}
     // // If not absolute path, must append paramter to CWD
     //  if(pathname[0]!='/'){
     //      //If cwd IS NOT root and cwd doesn't already end in slash, append slash first
@@ -615,7 +629,7 @@ int fs_setcwd(char *pathname)
     //     }
     //     return 0;
     // }
-}
+
 
 // swtcwd version 2
 // int fs_setcwd(char *pathname){
