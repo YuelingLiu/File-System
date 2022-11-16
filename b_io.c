@@ -35,8 +35,11 @@
 typedef struct b_fcb
 	{
 	/** TODO add al the information you need in the file control block **/
-	char * buf;		//holds the open file buffer
+	fileInfo* fi;
+	
+	char * localBuff;		//holds the open file buffer
 	int index;		//holds the current position in the buffer
+	int chunkNumber; //n-th (from 0) 512 byte chunk of the file
 	int buflen;		//holds how many valid bytes are in the buffer
 	} b_fcb;
 	
@@ -50,7 +53,7 @@ void b_init ()
 	//init fcbArray to all free
 	for (int i = 0; i < MAXFCBS; i++)
 		{
-		fcbArray[i].buf = NULL; //indicates a free fcbArray
+		fcbArray[i].fi = NULL; //indicates a free fcbArray
 		}
 		
 	startup = 1;
@@ -61,8 +64,9 @@ b_io_fd b_getFCB ()
 	{
 	for (int i = 0; i < MAXFCBS; i++)
 		{
-		if (fcbArray[i].buff == NULL)
+		if (fcbArray[i].fi == NULL)
 			{
+			fcbArray[i].fi = (fileInfo *)-2;
 			return i;		//Not thread safe (But do not worry about it for this assignment)
 			}
 		}
@@ -84,6 +88,17 @@ b_io_fd b_open (char * filename, int flags)
 	
 	returnFd = b_getFCB();				// get our own file descriptor
 										// check for error - all used FCB's
+
+	//Case O_CREAT: Must create file first!
+	if ((flags & O_CREAT) == O_CREAT){
+		makeNewFile(filename);
+
+	}
+	fcbArray[returnFd].fi = GetFileInfo(filename);
+	fcbArray[returnFd].localBuff = calloc(1, B_CHUNK_SIZE);
+	fcbArray[returnFd].index = 0;
+	fcbArray[returnFd].chunkNumber = 0;
+	fcbArray[returnFd].buflen = 0;
 	
 	return (returnFd);						// all set
 	}
@@ -160,5 +175,7 @@ int b_read (b_io_fd fd, char * buffer, int count)
 // Interface to Close the file	
 int b_close (b_io_fd fd)
 	{
+		fcbArray[fd].fi = NULL;
+		free(fcbArray[fd].localBuff);
 
 	}

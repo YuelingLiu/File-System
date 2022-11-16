@@ -28,9 +28,49 @@ int createIndexBlock(){
     //Index block is exactly 512 bytes in size, enough to hold 64 location integers
     int* indexBlock = calloc(1, INDEXBLOCKSIZE);
     int blockLocation = allocSingleBlock(freeSpaceMap, getFreespaceSize(vcb->numBlocks, vcb->blockSize));
+    for (int i = 0; i < 64; i++){
+        indexBlock[i] = -1;
+    }
     LBAwrite(indexBlock, 1, blockLocation);
     free(indexBlock);
     return blockLocation;
+}
+
+int makeNewFile(const char* pathname){
+    struct fdPathResult path = parsedPath(pathname);
+
+    // if the file already exists we dont need to make another
+    if (path.index != -1)
+    {
+        return -1;
+    }
+    //Load directory where new file is to be located
+    DirectoryEntry* directory = calloc(blocksNeededForDir(50), vcb->blockSize);
+    LBAread(directory, blocksNeededForDir(50), path.dirPtr);
+
+    int i = 2; // starting dir index of NOT "." or ".."
+    while (i < 50){
+        if (strcmp(directory[i].name, "") == 0){ // Upon finding first available DE slot
+            
+            //Prepare index block of new file
+            int locOfIndexBlock = createIndexBlock();
+
+            // Prepare DE of new file
+            strcpy(directory[i].name, path.lastArg);
+            directory[i].size = 0;
+            directory[i].fileType = FT_REGFILE;
+            directory[i].numOfDE = 0;
+            directory[i].location = locOfIndexBlock;
+
+            //Write directory containing new file back to disk
+            LBAwrite(directory, blocksNeededForDir(50), path.dirPtr);
+            free(directory);
+            return locOfIndexBlock;
+        }
+    }
+    printf("Cannot make new file, directory is full\n");
+    free(directory);
+    return -1;
 }
 
 int getBlockN(int n, DirectoryEntry* de){
