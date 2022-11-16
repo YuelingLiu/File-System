@@ -98,6 +98,7 @@ int fs_rmdir(const char *pathname)
 
     return 0;
 }
+
 int fs_delete(char *filename)
      {
     struct fdPathResult path = parsedPath(filename);
@@ -136,166 +137,13 @@ int fs_delete(char *filename)
     return 0;
 }
 
-// used as a test function to populate storage for parse path to run
-void testPopulateStorage(const char *path)
-{
-    // **************************************************
-    //*********************************************
-    // gotta figure this out
-    printf("before\n");
-    strcpy(globalPath, "/banana2");
-    printf("after\n");
-    /* TEST CODE */
-
-    // LBAread and LBAwrite in storage so i have something to test and confirm the function works
-    // EVERYTHING WORKS
-    // 3 layers
-    // Layer 1 ROOT
-    // Layer 2 banana
-    // layer 3 apple
-    // layer 4 pear
-
-    // move these two out into initfilesystem
-    // fd = malloc(sizeof(fdDir));
-    // retTempDir = malloc(sizeof(fs_diriteminfo));
-
-    //tempBuffer = malloc(sizeof(DirectoryEntry) * MAXDE);
-    // remove volatile and test
-    volatile int location = vcb->locOfRoot;
-    volatile int numberofDE = MAXDE;
-
-    // load in root
-    LBAread(tempBuffer, blocksNeededForDir(numberofDE), location);
-
-    // add in directory after ..
-    // ***** we need to populate the rest of the data for the struct
-    // ***** also need to mark free space map
-    strcpy(tempBuffer[2].name, "banana");
-    tempBuffer[2].fileType = FT_DIRECTORY;
-    tempBuffer[2].numOfDE = 30;
-    tempBuffer[2].location = 1000;
-
-    // add another directory
-    strcpy(tempBuffer[3].name, "banana2");
-    tempBuffer[3].fileType = FT_DIRECTORY;
-    tempBuffer[3].numOfDE = 40;
-    tempBuffer[3].location = 2000;
-
-    LBAwrite(tempBuffer, blocksNeededForDir(numberofDE), location);
-    // testing
-    LBAread(tempBuffer, 12, 0);
-    // testing
-
-    // success. I am able to create directories inside the root
-    // root = . .. banana banana2
-    LBAread(tempBuffer, blocksNeededForDir(numberofDE), location);
-    // printf("root: %s\n", tempBuffer[3].name);
-    // printf("tempBuffer[3].numOfDE: %d\n", tempBuffer[3].numOfDE);
-
-    // update values
-    numberofDE = tempBuffer[3].numOfDE;
-    location = tempBuffer[3].location;
-
-    // read in banana2
-    LBAread(tempBuffer, blocksNeededForDir(numberofDE), location);
-
-    // fill in banana2
-    // need to use directoryEntries because new folder does not have any inside
-    // root already had directory entries populated
-    DirectoryEntry directoryEntries[numberofDE];
-
-    // set the dot
-    strcpy(directoryEntries[0].name, ".");
-    directoryEntries[0].location = location;
-    directoryEntries[0].fileType = FT_DIRECTORY;
-
-    // set the dot dot
-    strcpy(directoryEntries[1].name, "..");
-    directoryEntries[1].location = location;
-    directoryEntries[1].fileType = FT_DIRECTORY;
-
-    // set apple
-    strcpy(directoryEntries[2].name, "apple");
-    directoryEntries[2].location = location;
-    directoryEntries[2].fileType = FT_DIRECTORY;
-    directoryEntries[2].numOfDE = 55;
-    directoryEntries[2].location = 3000;
-
-    // set apple2
-    strcpy(directoryEntries[3].name, "apple2");
-    directoryEntries[3].location = location;
-    directoryEntries[3].fileType = FT_DIRECTORY;
-    directoryEntries[3].numOfDE = 66;
-    directoryEntries[3].location = 4000;
-
-    // set apple47
-    strcpy(directoryEntries[25].name, "apple25");
-    directoryEntries[25].location = location;
-    directoryEntries[25].fileType = FT_DIRECTORY;
-
-    LBAwrite(directoryEntries, blocksNeededForDir(numberofDE), location);
-
-    // testing
-    LBAread(tempBuffer, 12, 0);
-    // printf("tempBuffer[0].name: %s\n", tempBuffer[0].name);
-
-    // success it prints out . and ..
-    LBAread(tempBuffer, blocksNeededForDir(numberofDE), location);
-    // printf("tempBuffer[0].name: %s\n", tempBuffer[2].name);
-
-    // -> root -> level 1 need to go down one more layer
-    // going into apple 2
-    location = directoryEntries[3].location;
-    numberofDE = directoryEntries[3].numOfDE;
-    // apple 2 is at directoryEntries[3]
-    LBAread(tempBuffer, blocksNeededForDir(numberofDE), location);
-
-    // fill in pear2
-    // need to use directoryEntries because new folder does not have any inside
-    // root already had directory entries populated
-
-    // set the dot
-    strcpy(directoryEntries[0].name, ".");
-    directoryEntries[0].location = location;
-    directoryEntries[0].fileType = FT_DIRECTORY;
-
-    // set the dot dot
-    strcpy(directoryEntries[1].name, "..");
-    directoryEntries[1].location = location;
-    directoryEntries[1].fileType = FT_DIRECTORY;
-
-    // set pear
-    strcpy(directoryEntries[2].name, "pear");
-    directoryEntries[2].location = location;
-    directoryEntries[2].fileType = FT_DIRECTORY;
-    directoryEntries[2].numOfDE = 77;
-    directoryEntries[2].location = 5000;
-
-    // set pear2
-    strcpy(directoryEntries[3].name, "pear2");
-    directoryEntries[3].location = location;
-    directoryEntries[3].fileType = FT_REGFILE;
-    directoryEntries[3].numOfDE = 88;
-    directoryEntries[3].location = 6000;
-
-    LBAwrite(directoryEntries, blocksNeededForDir(numberofDE), location);
-
-    LBAread(tempBuffer, 12, 0);
-    // printf("tlevel 2: %s\n", tempBuffer[0].name);
-
-    LBAread(tempBuffer, blocksNeededForDir(numberofDE), location);
-    // printf("tempBuffer[0].name: %s\n", tempBuffer[3].name);
-
-    /* TEST CODE */
-}
-
 //*parse
 struct fdPathResult parsedPath(const char *path)
 {
     // check if absolute or relative
     
     printf("checking this path %s\n", path);
-    char finalPath[MAXLENGTH] = "";
+    
     char firstChar = path[0];
     // tempBuffer = malloc(sizeof(DirectoryEntry) * MAXDE);
     int isAbsolute = 0;
@@ -365,8 +213,7 @@ struct fdPathResult parsedPath(const char *path)
     {
         // tokenizes path into tokens
         char *tokenArray[50];     // array of names to be tokenized
-        char *finalPathArray[50]; // for edge cases of . and ..
-        bool tokenFlag = 0;       // flag for . and ..
+        
         const char s[2] = "/";    // delimiter
         int tokenIndex = 0;       // counter for number of tokens
         char str[strlen(path)];   // declare a string, str to be read of size strlen(path)
@@ -385,106 +232,8 @@ struct fdPathResult parsedPath(const char *path)
             token = strtok(NULL, s);
         }
 
-        // token printer
-        for (size_t i = 0; i < tokenIndex; i++)
-        {
-            printf("tokenArray[i]***********: %s\n", tokenArray[i]);
-            if ( (strcmp(tokenArray[i],".") == 0)  || (strcmp(tokenArray[i],"..") == 0)){
-                tokenFlag = 1;
-                printf("WTFF***************\n");
-            }
-        }
         
-        // if there are . or .. we want to remove that from the global path
-        if(tokenFlag == 1){
-            int counter = 0;
-            for (size_t i = 0; i < tokenIndex; i++)
-            {
-            if ((strcmp(tokenArray[i], ".") == 0))
-            {
-                // do nothing
-            }
-            else if ((strcmp(tokenArray[i], "..") == 0))
-            {   
-                // reduce counter so we can remove item in array
-                finalPathArray[counter] = "";
-                counter--;    
-            }
-            else
-            {   
-                // add it to temp array
-                finalPathArray[counter] = tokenArray[i];
-                counter++;
-            }
-            }
-            // for (size_t i = 0; i < counter; i++){
-            //     printf("finalPathArray[i]: %s\n", finalPathArray[i]);
-            // }
             
-            for (size_t i = 0; i < counter; i++){
-                strcat(finalPath, "/");
-                strcat(finalPath, finalPathArray[i]);
-            }
-            
-            printf("finalPath************: %s\n", finalPath);
-            
-            strncpy(globalPath, finalPath,sizeof(finalPath));
-                    
-            tokenFlag = 0;
-
-        }
-            
-
-        
-
-        
-        
-
-        // print tokens
-
-        // while (token = strtok(NULL, "/"))
-        // {
-        //     tokenArray[tokenIndex++] = token;
-        // }
-
-        // printf("counter: %d\n", counter);
-
-        //******************************************
-        // strcpy(globalPath, finalPath);
-        // printf("globalPath after: %s\n", globalPath);
-        // // /banana/./../banana2/./apple2/../apple3
-        // printf("****************************\n");
-
-        // end of tokenizer
-
-
-        // /banana/banana/banana
-        // strcpy(finalPath, "");
-        // printf("after finalPath asdfasd""\n");
-        
-        // for (size_t i = counterBegin; i < counter; i++)
-        // {
-        //     strcat(finalPath, "/");
-        //     strcat(finalPath, finalPathArray[i]);
-        // }
-        // printf("finalPath: %s\n", finalPath);
-
-        // print tokens
-
-        // while (token = strtok(NULL, "/"))
-        // {
-        //     tokenArray[tokenIndex++] = token;
-        // }
-
-        // printf("counter: %d\n", counter);
-
-        //******************************************
-        // strcpy(globalPath, finalPath);
-        // printf("globalPath after: %s\n", globalPath);
-        // // /banana/./../banana2/./apple2/../apple3
-        // printf("****************************\n");
-
-        // end of tokenizer
 
         
         // create a variable that changes for the loop to run
@@ -493,6 +242,8 @@ struct fdPathResult parsedPath(const char *path)
 
         // assign the last value in tokenArray to result last arg
         // save last arg
+
+        printf("tokenIndex: %d\n", tokenIndex);
         if (tokenIndex > 0){
             strcpy(globalTemp.lastArg, tokenArray[tokenIndex - 1]);
         }
@@ -502,6 +253,7 @@ struct fdPathResult parsedPath(const char *path)
         
         // *loop
         // loop through all of the tokens in root
+        printf("before big loop in parsepath\n");
         for (int i = 0; i < tokenIndex; i++)
         {
             printf("starting for loop iteration i = %d\n", i);
@@ -571,7 +323,16 @@ struct fdPathResult parsedPath(const char *path)
                     strcpy(result.lastArg, globalTemp.lastArg);
                     
                     
-                    
+                    /* TEST CODE */
+                    // if(tokenFlag == 1){
+                    //     printf("globalPath**************: %s\n", globalPath);
+                    //     strcpy(globalPath, finalPath);
+                    //     printf("globalPath**************: %s\n", globalPath);
+                    // }
+
+
+
+                    /* TEST CODE */
                     printf("returning from for loop\n");
                     printf("result.dirPtr: %d\n", result.dirPtr);
                     printf("result.index: %d\n", result.index);
@@ -606,7 +367,15 @@ struct fdPathResult parsedPath(const char *path)
         printf("result.dirPtr: %d\n", result.dirPtr);
         printf("result.index: %d\n", result.index);
         
-        
+        /* TEST CODE */
+        // if(tokenFlag == 1){
+        //     printf("globalPath**************: %s\n", globalPath);
+        //     strcpy(globalPath, finalPath);
+        //     printf("globalPath**************: %s\n", globalPath);
+        // }
+
+
+        /* TEST CODE */
         
 
         return result;
@@ -703,18 +472,95 @@ char *fs_getcwd(char *pathname, size_t size)
     // if (strlen(globalPath) > size){
     //     return NULL;
     // }
-    
+    printf("pathname inside of getcwd: %s\n", pathname);
+    printf("globalPath inside of getcwd: %s\n", globalPath);
     // this causes a stack smashing detection crash
     strncpy(pathname, globalPath, size);
     return globalPath;
 }
 
 // Linux chdir
+void fs_pathReconstruction (){
+    // tokenizes path into tokens
+    char *tokenArray[50];     // array of names to be tokenized
+    const char s[2] = "/";    // delimiter
+    int tokenIndex = 0;       // counter for number of tokens
+    char str[strlen(globalPath)];   // declare a string, str to be read of size strlen(path)
+    strcpy(str, globalPath);        // copy path into str
+    
+    // banana/apple/pear/../../apple
 
-//  /banana/./../banana2/./apple2/../apple3
+    // loop to tokenize values
+    char *token = strtok(str, s);
+
+    // tokenizes the values and inserts into tokenArray
+    //tokenArray[0] = "/";
+    while (token != NULL)
+    {
+        tokenArray[tokenIndex++] = token;
+        token = strtok(NULL, s);
+    }
+
+
+
+    char finalPath[MAXLENGTH] = "";
+    char *finalPathArray[50]; // for edge cases of . and ..
+    bool tokenFlag = 0;       // flag for . and ..
+    //struct fdPathResult path = parsedPath(pathname);
+
+    /* TEST CODE */
+    // token printer
+    for (size_t i = 0; i < tokenIndex; i++)
+    {
+        printf("tokenArray[i]***********: %s\n", tokenArray[i]);
+        if ( (strcmp(tokenArray[i],".") == 0)  || (strcmp(tokenArray[i],"..") == 0)){
+            tokenFlag = 1;
+        }
+    }
+    printf("tokenIndex: %d\n", tokenIndex);
+    printf("tokenArray[0]: %s\n", tokenArray[0]);
+    // if there are . or .. we want to remove that from the global path
+    if(tokenFlag == 1 && tokenIndex > 2){
+        int counter = 0;
+        for (size_t i = 0; i < tokenIndex; i++)
+        {
+        if ((strcmp(tokenArray[i], ".") == 0))
+        {
+            // do nothing
+        }
+        else if ((strcmp(tokenArray[i], "..") == 0))
+        {   
+            // reduce counter so we can remove item in array
+            finalPathArray[counter] = "";
+            counter--;    
+        }
+        else
+        {   
+            // add it to temp array
+            finalPathArray[counter] = tokenArray[i];
+            counter++;
+        }
+        }
+        
+        for (size_t i = 0; i < counter; i++){
+            strcat(finalPath, "/");
+            strcat(finalPath, finalPathArray[i]);
+        }
+        
+        printf("finalPath************: %s\n", finalPath);
+        
+        strcpy(globalPath, finalPath);
+                
+        //tokenFlag = 0;
+
+    }
+}
+ // banana/apple/pear/../../apple
 int fs_setcwd(char *pathname)
 {   
     struct fdPathResult path = parsedPath(pathname);
+    printf("globalPath******(): %s\n", globalPath);
+    //fs_pathReconstruction(pathname);
 
     if (path.index == -1)
     {
@@ -737,6 +583,9 @@ int fs_setcwd(char *pathname)
             strcpy(pathname, globalPath);
         }  
         printf("inside setcwd before return 0\n");
+        fs_pathReconstruction();
+        
+
         return 0;
     }
 
