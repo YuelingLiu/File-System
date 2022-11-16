@@ -10,9 +10,6 @@
 *
 * Description: This is the header file for the volume control block.
 *
-* Make sure to set the #defined on the CMDxxxx_ON from 0 to 1 
-* when you are ready to test that feature
-*
 **************************************************************/
 
 #ifndef VCB_H
