@@ -22,6 +22,8 @@
 
 
 #include <dirent.h>
+#define MAXDE 50
+#define MAXLENGTH 256
 #define FT_REGFILE	DT_REG
 #define FT_DIRECTORY DT_DIR
 #define FT_LINK	DT_LNK
@@ -62,7 +64,7 @@ typedef struct
 	} fdDir;
 
 
-extern char globalPath;
+extern char globalPath[MAXLENGTH];
 extern DirectoryEntry *tempBuffer;
 //extern fdDir* fd;
 //extern fs_diriteminfo *retTempDir; 

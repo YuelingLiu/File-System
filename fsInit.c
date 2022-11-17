@@ -173,7 +173,6 @@ int initFileSystem (uint64_t numberOfBlocks, uint64_t blockSize) {
         // testPopulateStorage("/");
         
         // struct fdPathResult tempPath = parsedPath("/apple2/pear2");
-        
 
         // printf("result.index: %d\n", tempPath.index);
         // printf("result.dirPtr: %d\n", tempPath.dirPtr);

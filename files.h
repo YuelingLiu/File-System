@@ -14,3 +14,4 @@ int makeNewFile(const char* pathname);
 int makeFileChunk(int indexLoc, int index);
 	
 int getBlockN(int n, fileInfo* fi);
+

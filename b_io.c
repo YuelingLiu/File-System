@@ -27,9 +27,6 @@
 #include "freespace.h"
 #include "files.h"
 
-#define MAXFCBS 20
-#define B_CHUNK_SIZE 512
-
 
 
 typedef struct b_fcb
@@ -142,6 +139,13 @@ int b_seek (b_io_fd fd, off_t offset, int whence)
 
 
 // Interface to write function	
+
+/* 
+write() writes up to count bytes from the buffer starting at buf
+to the file referred to by the file descriptor fd.
+
+On success, the number of bytes written is returned.
+*/
 int b_write (b_io_fd fd, char * buffer, int count)
 	{
 	if (startup == 0) b_init();  //Initialize our system
@@ -156,19 +160,33 @@ int b_write (b_io_fd fd, char * buffer, int count)
 		return (-1); //Invalid mode: cannot write to readonly file
 	}
 
-	//Decrement count every time we write 512 byte chunk 
-	while (count > 0){
-		int locN = getBlockN(fcbArray[fd].chunkNumber, fcbArray[fd].fi);
-		//Case 1: chunk is already allocated and/or partially filled
-		//Must fill this chunk before writing it back and moving on
-		if ( locN != -1) {
-			LBAread(fcbArray[fd].localBuff, 1, locN);
-			memcpy(fcbArray[fd].localBuff + fcbArray[fd].index, buffer, B_CHUNK_SIZE - fcbArray[fd].index);
+	printf("*****************************************\n");
+	printf("Start of b_write\n");
+	
+	//*variables
+	int finalCount = count;			// numBytes to be processed
+	int arrayBlock;					// index in array IndexBlock
+	int fileChunk;					// the 512 file chunk to be written to
+	int fileChunkOffset;			// the offset in the 512 file chunk: save point
 
-		}
+	//Decrement count every time we write 512 byte chunk 
+
+	// while (count > 0){
+	// 	int locN = getBlockN(fcbArray[fd].chunkNumber, fcbArray[fd].fi);
+	// 	//Case 1: chunk is already allocated and/or partially filled
+	// 	//Must fill this chunk before writing it back and moving on
+	// 	if ( locN != -1) {
+	// 		LBAread(fcbArray[fd].localBuff, 1, locN);
+	// 		memcpy(fcbArray[fd].localBuff + fcbArray[fd].index, buffer, B_CHUNK_SIZE - fcbArray[fd].index);
+
+	// 	}
+	// }
+	
+	// *while loop for if the **USER COUNT > B_CHUNKSIZE**
+	while(count > B_CHUNK_SIZE){
+		finalCount -= (B_CHUNK_SIZE - fileChunkOffset);
+		LBAread()
 	}
-	
-	
 	
 	
 	//If chunk is not yet allocated (-1 address in index block)

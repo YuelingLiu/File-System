@@ -16,6 +16,10 @@
 #define _B_IO_H
 #include <fcntl.h>
 
+#define MAXFCBS 20
+#define B_CHUNK_SIZE 512
+char processBuffer[B_CHUNK_SIZE];
+
 typedef int b_io_fd;
 
 b_io_fd b_open (char * filename, int flags);
