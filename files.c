@@ -14,8 +14,7 @@
 #include "files.h"
 #include "mfs.h"
 
-#define INDEXBLOCKSIZE 512
-#define INTSIZE 8
+
 
 //Duplicate of asmt5 get file info
 //This function should find file by calling parsepath
@@ -36,6 +35,8 @@ int createIndexBlock(){
     return blockLocation;
 }
 
+//Given a path/filename of a new file, this function creates 
+//a directory entry and index block for the new file
 int makeNewFile(const char* pathname){
     struct fdPathResult path = parsedPath(pathname);
 
@@ -73,19 +74,39 @@ int makeNewFile(const char* pathname){
     return -1;
 }
 
-int getBlockN(int n, DirectoryEntry* de){
-    if (de->fileType != FT_REGFILE){
-        return -1;
-    }
+//Given the location of a file's index block and an index inside that block,
+//this function allocates a new chunk and saves its location to that index
+//also returns the location of the new chunk
+int makeFileChunk(int indexBlockLoc, int index){
+    
+    int* indexBlock = calloc(1, INDEXBLOCKSIZE);
+    LBAread(indexBlock, 1, indexBlockLoc);
+
+    int locOfNewChunk = allocSingleBlock(freeSpaceMap, getFreespaceSize(vcb->numBlocks, vcb->blockSize));
+    
+    indexBlock[index] = locOfNewChunk;
+    LBAwrite(indexBlock, 1, indexBlockLoc);
+
+    return locOfNewChunk;
+
+}
+
+//Returns the location of the nth block of a file
+//represented by fileInfo* fi
+int getBlockN(int n, fileInfo* fi){
     
     int blockNumber = n / (INDEXBLOCKSIZE/INTSIZE);
     int indexInBlock = n % (INDEXBLOCKSIZE/INTSIZE);
     int* temp = calloc(1, INDEXBLOCKSIZE);
-    LBAread(temp, 1, de->location);
+    LBAread(temp, 1, fi->location);
     int i = 0;
     int next;
     while (i < blockNumber){
         next = temp[63];
+        if (next == -1){
+            printf("Index block for chunk n doesn't exist!\n");
+            return 0;
+        }
         LBAread(temp, 1, next);
     }
     int locN = temp[indexInBlock];

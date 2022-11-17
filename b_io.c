@@ -40,6 +40,7 @@ typedef struct b_fcb
 	char * localBuff;		//holds the open file buffer
 	int index;		//holds the current position in the buffer
 	int chunkNumber; //n-th (from 0) 512 byte chunk of the file
+	int currentIndexBlockLoc;
 	int buflen;		//holds how many valid bytes are in the buffer
 	int mode; //O_RDONLY, O_WRONLY, or O_RDWR
 	} b_fcb;
@@ -111,6 +112,7 @@ b_io_fd b_open (char * filename, int flags)
 	fcbArray[returnFd].localBuff = calloc(1, B_CHUNK_SIZE);
 	fcbArray[returnFd].index = 0;
 	fcbArray[returnFd].chunkNumber = 0;
+	fcbArray[returnFd].currentIndexBlockLoc = fcbArray[returnFd].fi->location;
 	fcbArray[returnFd].buflen = 0;
 
 	//Case O_APPEND: TODO
@@ -150,7 +152,32 @@ int b_write (b_io_fd fd, char * buffer, int count)
 		return (-1); 					//invalid file descriptor
 		}
 		
-		
+	if (fcbArray[fd].mode == O_RDONLY){
+		return (-1); //Invalid mode: cannot write to readonly file
+	}
+
+	//Decrement count every time we write 512 byte chunk 
+	while (count > 0){
+		int locN = getBlockN(fcbArray[fd].chunkNumber, fcbArray[fd].fi);
+		//Case 1: chunk is already allocated and/or partially filled
+		//Must fill this chunk before writing it back and moving on
+		if ( locN != -1) {
+			LBAread(fcbArray[fd].localBuff, 1, locN);
+			memcpy(fcbArray[fd].localBuff + fcbArray[fd].index, buffer, B_CHUNK_SIZE - fcbArray[fd].index);
+
+		}
+	}
+	
+	
+	
+	
+	//If chunk is not yet allocated (-1 address in index block)
+	// 
+	
+		//int indexInIndexBlock = fcbArray[fd].chunkNumber % (INDEXBLOCKSIZE/INTSIZE);
+		//makeFileChunk(fcbArray[fd].currentIndexBlockLoc, indexInIndexBlock);
+
+	
 	return (0); //Change this
 	}
 
