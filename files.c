@@ -91,6 +91,52 @@ int makeFileChunk(int indexBlockLoc, int index){
 
 }
 
+//Similar to above function, but given an amount of bytes to be written to a file,
+//this function will request a variable number of chunks and assign to given IB.
+//If an IB is filled, a new IB will be created and chained to previous IB
+int initializeWritableChunks(int indexBlockLoc, int count){
+    //Based on count, figure out how many total chunks need to be added
+    int numChunks = 1;
+    while ((numChunks*512) < count){
+        //If not enough to cover the count, add twice as many chunks!
+        numChunks += numChunks * 2;
+    }
+    
+    //Load given index block
+    int* indexBlock = calloc(1, INDEXBLOCKSIZE);
+    LBAread(indexBlock, 1, indexBlockLoc);
+
+    //Prepare variables needed to track progress through index blocks
+    int IBIndex = 0;
+    int currentBlockLoc = indexBlockLoc;
+
+    //Set tracker to first unused index
+    while (indexBlock[IBIndex] != (-1) && IBIndex < 63){
+        IBIndex++;
+    }
+    //Until no more chunks left to be written, alloc free block/chunk and assign to index block
+    while (numChunks > 0){
+        //If tracker is at last index of Index Block, then we need to create a new Index Block
+        if (IBIndex == 63){
+            indexBlock[IBIndex] = createIndexBlock();
+            LBAwrite(indexBlock, 1, currentBlockLoc);
+            
+            //Transition to working with new block
+            currentBlockLoc = indexBlock[IBIndex];
+            LBAread(indexBlock, 1, currentBlockLoc);
+            IBIndex = 0;
+        }
+        
+        indexBlock[IBIndex] = allocSingleBlock(freeSpaceMap, getFreespaceSize(vcb->numBlocks, vcb->blockSize));
+        IBIndex++;
+        numChunks--;
+    }
+    LBAwrite(indexBlock, 1, currentBlockLoc);
+    //Return location of most recent IB added
+    return currentBlockLoc;
+
+}
+
 //Returns the location of the nth block of a file
 //represented by fileInfo* fi
 int getBlockN(int n, fileInfo* fi){
