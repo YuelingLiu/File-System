@@ -28,21 +28,9 @@
 #include "files.h"
 
 
-
-typedef struct b_fcb
-	{
-	/** TODO add al the information you need in the file control block **/
-	fileInfo* fi;
-	
-	char * localBuff;		//holds the open file buffer
-	int index;		//holds the current position in the buffer
-	int chunkNumber; //n-th (from 0) 512 byte chunk of the file
-	int currentIndexBlockLoc;
-	int buflen;		//holds how many valid bytes are in the buffer
-	int mode; //O_RDONLY, O_WRONLY, or O_RDWR
-	} b_fcb;
 	
 b_fcb fcbArray[MAXFCBS];
+
 
 int startup = 0;	//Indicates that this has not been initialized
 
@@ -141,7 +129,7 @@ int b_seek (b_io_fd fd, off_t offset, int whence)
 // Interface to write function	
 
 /* 
-write() writes up to count bytes from the buffer starting at buf
+*write() writes up to count bytes from the buffer starting at buf
 to the file referred to by the file descriptor fd.
 
 On success, the number of bytes written is returned.
@@ -165,9 +153,6 @@ int b_write (b_io_fd fd, char * buffer, int count)
 	
 	//*variables
 	int finalCount = count;			// numBytes to be processed
-	int arrayBlock;					// index in array IndexBlock
-	int fileChunk;					// the 512 file chunk to be written to
-	int fileChunkOffset;			// the offset in the 512 file chunk: save point
 
 	//Decrement count every time we write 512 byte chunk 
 
@@ -184,8 +169,24 @@ int b_write (b_io_fd fd, char * buffer, int count)
 	
 	// *while loop for if the **USER COUNT > B_CHUNKSIZE**
 	while(count > B_CHUNK_SIZE){
-		finalCount -= (B_CHUNK_SIZE - fileChunkOffset);
-		LBAread()
+		// first grab the remainder of fileChunkOffset and write to it
+		// else, if fileChunkOffset is 0, finalCount will decrement 512 chunks at a time
+		finalCount -= (B_CHUNK_SIZE - fcbArray->index);
+		
+		// load the fileChunk from ArrayBlockLoc
+		LBAread(fcbArray->localBuff, 1, fcbArray->fi->location);
+
+		// copy from user buffer to process buffer
+		memcpy(fcbArray->localBuff, buffer, (B_CHUNK_SIZE - fcbArray->index));
+
+		// write localBuff to storage
+		LBAwrite(fcbArray->localBuff, 1, fcbArray->fi->location);
+
+		// assign FCO to 0 so the next loop iteration grabs 512 chunks
+		fcbArray->index = 0;
+
+		// iterate through the ArrayBlock and load in the next location
+		fcbArray->chunkNumber++;
 	}
 	
 	
@@ -196,6 +197,18 @@ int b_write (b_io_fd fd, char * buffer, int count)
 		//makeFileChunk(fcbArray[fd].currentIndexBlockLoc, indexInIndexBlock);
 
 	
+	// *base case in the case that the other previous if statements dont run
+	LBAread(fcbArray->localBuff, 1, fcbArray->fi->location);
+	fcbArray->index += count;
+
+	memcpy(fcbArray->localBuff, buffer, count);
+	LBAwrite(fcbArray->localBuff, 1, fcbArray->fi->location);
+
+
+
+
+
+
 	return (0); //Change this
 	}
 

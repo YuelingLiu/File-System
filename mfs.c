@@ -8,7 +8,7 @@
  *
  * Description:
  *	This is the file system interface.
- *	This is the interface needed by the driver to interact with
+ *	This is the interface needed by the driver to interact fith
  *	your filesystem.
  *
  **************************************************************/
