@@ -12,6 +12,7 @@ fileInfo * GetFileInfo (char * fname);
 int createIndexBlock();  
 int makeNewFile(const char* pathname);
 int makeFileChunk(int indexLoc, int index);
+int initializeWritableChunks(int indexBlockLoc, int count);
 	
 int getBlockN(int n, fileInfo* fi);
 
