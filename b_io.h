@@ -15,6 +15,21 @@
 #ifndef _B_IO_H
 #define _B_IO_H
 #include <fcntl.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>			// for malloc
+#include <string.h>			// for memcpy
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include "b_io.h"
+#include "fsLow.h"
+#include "mfs.h"
+#include "VCB.h"
+#include "DE.h"
+#include "freespace.h"
+#include "files.h"
+
 
 #define MAXFCBS 20
 #define B_CHUNK_SIZE 512
@@ -36,7 +51,7 @@ typedef struct b_fcb
 	int mode; 					//O_RDONLY, O_WRONLY, or O_RDWR
 	} b_fcb;
 
-b_io_fd b_open (char * filename, int flags);
+int b_open (char * filename, int flags);
 int b_read (b_io_fd fd, char * buffer, int count);
 int b_write (b_io_fd fd, char * buffer, int count);
 int b_seek (b_io_fd fd, off_t offset, int whence);

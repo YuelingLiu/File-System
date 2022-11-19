@@ -12,21 +12,8 @@
 *
 **************************************************************/
 
-#include <stdio.h>
-#include <unistd.h>
-#include <stdlib.h>			// for malloc
-#include <string.h>			// for memcpy
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include "b_io.h"
-#include "fsLow.h"
-#include "mfs.h"
-#include "VCB.h"
-#include "DE.h"
-#include "freespace.h"
-#include "files.h"
 
+#include "b_io.h"
 
 	
 b_fcb fcbArray[MAXFCBS];
@@ -63,9 +50,10 @@ b_io_fd b_getFCB ()
 // Interface to open a buffered file
 // Modification of interface for this assignment, flags match the Linux flags for open
 // O_RDONLY, O_WRONLY, or O_RDWR
-b_io_fd b_open (char * filename, int flags)
+int b_open (char * filename, int flags)
 	{
-	b_io_fd returnFd;
+	printf("printing inside of b_open\n");
+	int returnFd;
 
 	//*** TODO ***:  Modify to save or set any information needed
 	//

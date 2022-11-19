@@ -2,6 +2,7 @@
     "files.associations": {
         "unistd.h": "c",
         "mfs.h": "c",
-        "getopt.h": "c"
+        "getopt.h": "c",
+        "types.h": "c"
     }
 }

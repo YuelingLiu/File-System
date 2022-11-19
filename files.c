@@ -1,18 +1,5 @@
-#include <stdio.h>
-#include <unistd.h>
-#include <stdlib.h>			
-#include <string.h>			
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
 
-#include "b_io.h"
-#include "fsLow.h"
-#include "VCB.h"
-#include "DE.h"
-#include "freespace.h"
 #include "files.h"
-#include "mfs.h"
 
 
 
@@ -38,7 +25,10 @@ int createIndexBlock(){
 //Given a path/filename of a new file, this function creates 
 //a directory entry and index block for the new file
 int makeNewFile(const char* pathname){
+    printf("inside makeNewFile before parsed path\n");
     struct fdPathResult path = parsedPath(pathname);
+    printf("inside makeNewFile before parsed path\n");
+
 
     // if the file already exists we dont need to make another
     if (path.index != -1)

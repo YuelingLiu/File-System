@@ -24,9 +24,12 @@
 #include <readline/history.h>
 #include <getopt.h>
 #include <string.h>
+#include <fcntl.h>				// this is to use O_WRONLY and O_CREAT
 
 #include "fsLow.h"
 #include "mfs.h"
+
+
 
 
 #define PERMISSIONS (S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH)
@@ -46,7 +49,7 @@
 #define CMDCP2FS_ON	0
 #define CMDCD_ON	1
 #define CMDPWD_ON	1
-#define CMDTOUCH_ON	0
+#define CMDTOUCH_ON	1
 #define CMDCAT_ON	0
 
 
@@ -254,12 +257,12 @@ int cmd_touch (int argcnt, char *argvec[])
                         return (-1);
                 }
 
-
+		printf("before open in touch function\n");
         testfs_src_fd = b_open (src, O_WRONLY | O_CREAT);
         if (testfs_src_fd < 0)
 	    return (testfs_src_fd);	//return with error
 
-        b_close (testfs_src_fd);
+        //b_close (testfs_src_fd);
 #endif
         return 0;
         }
