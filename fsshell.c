@@ -261,12 +261,14 @@ int cmd_touch (int argcnt, char *argvec[])
 
         testfs_src_fd = b_open (src, O_WRONLY | O_CREAT);
 		/* test code */
+		
 		char buffer[20] = "testing";
+		delete_int = b_write(testfs_src_fd, buffer, strlen(buffer));
 		
 
-		delete_int = b_write(testfs_src_fd, buffer, 7);
-		printf("delete_int: %d\n", delete_int);
-
+		char buffer2[50] = "second write after the first";
+		delete_int = b_write(testfs_src_fd, buffer2, strlen(buffer2));
+		
 		printf("inside touch after write\n");
 		/* test code */
         if (testfs_src_fd < 0)
