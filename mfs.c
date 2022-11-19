@@ -37,11 +37,11 @@
 #include "DE.h"
 #include "freespace.h"
 
-#define MAXDE 50
-#define MAXLENGTH 256
+
 struct fdPathResult globalTemp;
 // DirectoryEntry *tempBuffer;
 //fdDir *fd;
+//Make this extern so that its available everywhere
 char globalPath[MAXLENGTH] = "/";
 
 //struct fs_diriteminfo *retTempDir;

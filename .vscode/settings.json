@@ -2,8 +2,6 @@
     "files.associations": {
         "unistd.h": "c",
         "mfs.h": "c",
-        "getopt.h": "c",
-        "string.h": "c",
-        "stdint.h": "c"
+        "getopt.h": "c"
     }
 }
