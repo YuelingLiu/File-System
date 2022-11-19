@@ -1,7 +1,9 @@
 /**************************************************************
-* Class:  CSC-415
-* Name: Professor Bierman
-* Student ID: N/A
+* Class: CSC-415-03 Fall 2022
+* Names: Tommy Truong, Yueling Liu, Steve Betts, Nicholas Hamada
+* Student IDs: 913660519, 922272361, 921898143, 918602131
+* GitHub Name: kpcrocks
+* Group Name: dev/null
 * Project: Basic File System
 *
 * File: mfs.h
@@ -12,6 +14,7 @@
 *	your filesystem.
 *
 **************************************************************/
+
 #ifndef _MFS_H
 #define _MFS_H
 #include <sys/types.h>
@@ -90,6 +93,7 @@ int fs_setcwd(char *pathname);  //linux chdir
 int fs_isFile(char * filename);	//return 1 if file, 0 otherwise
 int fs_isDir(char * pathname);	//return 1 if directory, 0 otherwise
 int fs_delete(char* filename);	//removes a file
+void fs_pathReconstruction (); // edge case for . and .. 
 
 
 // This is the structure that is filled in from a call to fs_stat
@@ -109,8 +113,6 @@ int fs_stat(const char *path, struct fs_stat *buf);
 
 struct fdPathResult parsedPath(const char * path);
 
-// test function
-void testPopulateStorage ( const char * path);
 
 #endif
 
