@@ -27,7 +27,7 @@ int createIndexBlock(){
 int makeNewFile(const char* pathname){
     printf("inside makeNewFile before parsed path\n");
     struct fdPathResult path = parsedPath(pathname);
-    printf("inside makeNewFile before parsed path\n");
+    printf("inside makeNewFile after parsed path\n");
 
 
     // if the file already exists we dont need to make another
@@ -39,10 +39,14 @@ int makeNewFile(const char* pathname){
     DirectoryEntry* directory = calloc(blocksNeededForDir(50), vcb->blockSize);
     LBAread(directory, blocksNeededForDir(50), path.dirPtr);
 
+    printf("inside makeNewfile after LBAread\n");
     int i = 2; // starting dir index of NOT "." or ".."
     while (i < 50){
+        printf("inside makenewfile after while loop\n");
         if (strcmp(directory[i].name, "") == 0){ // Upon finding first available DE slot
             
+            printf("inside makenewfile inside loop\n");
+
             //Prepare index block of new file
             int locOfIndexBlock = createIndexBlock();
 
@@ -58,6 +62,7 @@ int makeNewFile(const char* pathname){
             free(directory);
             return locOfIndexBlock;
         }
+        i++; // added this iterator to look for the next open slot
     }
     printf("Cannot make new file, directory is full\n");
     free(directory);
