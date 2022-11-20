@@ -32,8 +32,6 @@
 #define MAXDE 50
 
 
-
-
 //Extern global variables available to all files
 VCB* vcb;
 
@@ -170,76 +168,10 @@ int initFileSystem (uint64_t numberOfBlocks, uint64_t blockSize) {
         vcb->locOfRoot = initRootDE(blockSize, FSSize); // function to be implemented
 
         /* TEST CODE */
-
-        // testPopulateStorage("/");
         
-        // struct fdPathResult tempPath = parsedPath("/apple2/pear2");
-
-        // printf("result.index: %d\n", tempPath.index);
-        // printf("result.dirPtr: %d\n", tempPath.dirPtr);
-        // printf("result.lastArg: %s\n", tempPath.lastArg);
-
-        // // test for isDir
-        // int retisDir = fs_isDir("/banana2/apple2");
-        // if (retisDir == 1){
-        //     printf("the folder exists\n");
-        // }
-
-        // printf("FT_DIRECTORY: %d\n", FT_DIRECTORY);
-
-        // // test for getcwd
-        // int size = strlen("/banana2");
-        // printf("before getcwd\n");
-        // char retPath[size+1];
-        // fs_getcwd(retPath, size);
-        // printf("retPath: %s\n", retPath);
-        // printf("after getcwd\n");
-
-        // // test for isfile
-        // int retisFile = fs_isFile("/banana2/apple2/pear2");
-        // if (retisFile == 1){
-        //     printf("the file exists\n");
-        // }
-
-        
-        // // test for openDir
-        // fdDir *tempDir = fs_opendir("/banana2/apple25");
-        // printf("tempDir->dirEntryPosition: %d\n", tempDir->dirEntryPosition);
-
-        // printf("SANITY CHECK after opendir\n");
-
-        // // testing read dir
-        // fs_diriteminfo *returnItemInfo = fs_readdir(tempDir);
-        // printf("returnItemInfo.d_name: %s\n", returnItemInfo->d_name);
-
-        // returnItemInfo = fs_readdir(tempDir);
-        // printf("returnItemInfo.d_name: %s\n", returnItemInfo->d_name);
-
-        // returnItemInfo = fs_readdir(tempDir);
-        // printf("returnItemInfo.d_name: %s\n", returnItemInfo->d_name);
-
-        // returnItemInfo = fs_readdir(tempDir);
-        // printf("returnItemInfo.d_name: %s\n", returnItemInfo->d_name);
-        // // mode_t temp;
-        // // fs_mkdir("/banana2/grape", temp);
-        // // // mkdir works. gotta check free space somehow or assume it works
-        // // struct fdPathResult tempPath2 = parsedPath("/banana2/grape");
-        
-        // int temp = fs_closedir(tempDir);
-        // printf("temp: %d\n", temp);
-        
-        // int retRemove = fs_rmdir("/banana");
-        // printf("retRemove: %d\n", retRemove);
-        // tempPath = parsedPath("/banana");
-        // printf("result.index: %d\n", tempPath.index);
-        // printf("result.dirPtr: %d\n", tempPath.dirPtr);
-
 
         /* TEST CODE */
-        //tempBuffer = malloc(sizeof(DirectoryEntry) * MAXDE);
-        //fd = malloc(sizeof(fdDir));
-        //retTempDir = malloc(sizeof(fs_diriteminfo));
-        
+
 		// after the values are populated into the VCB, write to storage.
         int writeReturn;
 		if (writeReturn = LBAwrite(vcb, 1, 0) != 1){

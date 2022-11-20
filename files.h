@@ -1,3 +1,22 @@
+
+
+#include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>			
+#include <string.h>			
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
+//#include "b_io.h"
+#include "fsLow.h"
+#include "VCB.h"
+#include "DE.h"
+#include "freespace.h"
+#include "mfs.h"
+
+
+
 #define INDEXBLOCKSIZE 512
 #define INTSIZE 8
 

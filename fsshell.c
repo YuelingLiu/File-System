@@ -24,9 +24,13 @@
 #include <readline/history.h>
 #include <getopt.h>
 #include <string.h>
+#include <fcntl.h>				// this is to use O_WRONLY and O_CREAT
 
 #include "fsLow.h"
 #include "mfs.h"
+#include "b_io.h"
+
+
 
 
 #define PERMISSIONS (S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH)
@@ -46,7 +50,7 @@
 #define CMDCP2FS_ON	0
 #define CMDCD_ON	1
 #define CMDPWD_ON	1
-#define CMDTOUCH_ON	0
+#define CMDTOUCH_ON	1
 #define CMDCAT_ON	0
 
 
@@ -78,8 +82,8 @@ dispatch_t dispatchTable[] = {
 	{"mv", cmd_mv, "Moves a file - source dest"},
 	{"md", cmd_md, "Make a new directory"},
 	{"rm", cmd_rm, "Removes a file or directory"},
-        {"touch",cmd_touch, "Touches/Creates a file"},
-        {"cat", cmd_cat, "Limited version of cat that displace the file to the console"},
+	{"touch",cmd_touch, "Touches/Creates a file"},
+	{"cat", cmd_cat, "Limited version of cat that displace the file to the console"},
 	{"cp2l", cmd_cp2l, "Copies a file from the test file system to the linux file system"},
 	{"cp2fs", cmd_cp2fs, "Copies a file from the Linux file system to the test file system"},
 	{"cd", cmd_cd, "Changes directory"},
@@ -241,6 +245,7 @@ int cmd_touch (int argcnt, char *argvec[])
         {
 #if (CMDTOUCH_ON == 1)     
         int testfs_src_fd;
+		int delete_int;
         char * src;
 
         switch (argcnt)
@@ -254,12 +259,22 @@ int cmd_touch (int argcnt, char *argvec[])
                         return (-1);
                 }
 
-
         testfs_src_fd = b_open (src, O_WRONLY | O_CREAT);
+		/* test code */
+		
+		char buffer[20] = "testing";
+		delete_int = b_write(testfs_src_fd, buffer, strlen(buffer));
+		
+
+		char buffer2[50] = "second write after the first";
+		delete_int = b_write(testfs_src_fd, buffer2, strlen(buffer2));
+		
+		printf("inside touch after write\n");
+		/* test code */
         if (testfs_src_fd < 0)
 	    return (testfs_src_fd);	//return with error
 
-        b_close (testfs_src_fd);
+        //b_close (testfs_src_fd);
 #endif
         return 0;
         }

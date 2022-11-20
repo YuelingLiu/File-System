@@ -12,21 +12,8 @@
 *
 **************************************************************/
 
-#include <stdio.h>
-#include <unistd.h>
-#include <stdlib.h>			// for malloc
-#include <string.h>			// for memcpy
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include "b_io.h"
-#include "fsLow.h"
-#include "mfs.h"
-#include "VCB.h"
-#include "DE.h"
-#include "freespace.h"
-#include "files.h"
 
+#include "b_io.h"
 
 	
 b_fcb fcbArray[MAXFCBS];
@@ -63,9 +50,10 @@ b_io_fd b_getFCB ()
 // Interface to open a buffered file
 // Modification of interface for this assignment, flags match the Linux flags for open
 // O_RDONLY, O_WRONLY, or O_RDWR
-b_io_fd b_open (char * filename, int flags)
+int b_open (char * filename, int flags)
 	{
-	b_io_fd returnFd;
+	printf("printing inside of b_open\n");
+	int returnFd;
 
 	//*** TODO ***:  Modify to save or set any information needed
 	//
@@ -136,23 +124,33 @@ On success, the number of bytes written is returned.
 */
 int b_write (b_io_fd fd, char * buffer, int count)
 	{
+	printf("*****************************************\n");
+	printf("Start of b_write\n");
 	if (startup == 0) b_init();  //Initialize our system
+
+	printf("after first if\n");
 
 	// check that fd is between 0 and (MAXFCBS-1)
 	if ((fd < 0) || (fd >= MAXFCBS))
 		{
 		return (-1); 					//invalid file descriptor
 		}
-		
+	
+	printf("after second if\n");
+	fcbArray[fd].mode = O_WRONLY;
+	// where is fcbArray[fd].mode changed? *************
+
 	if (fcbArray[fd].mode == O_RDONLY){
 		return (-1); //Invalid mode: cannot write to readonly file
 	}
 
-	printf("*****************************************\n");
-	printf("Start of b_write\n");
+	printf("after third if\n");
+	
 	
 	//*variables
-	int finalCount = count;			// numBytes to be processed
+	int returnCount = count;
+	int tempCount = count;			// numBytes to be processed
+	printf("tempCount: %d\n", tempCount);
 
 	//Decrement count every time we write 512 byte chunk 
 
@@ -170,8 +168,8 @@ int b_write (b_io_fd fd, char * buffer, int count)
 	// *while loop for if the **USER COUNT > B_CHUNKSIZE**
 	while(count > B_CHUNK_SIZE){
 		// first grab the remainder of fileChunkOffset and write to it
-		// else, if fileChunkOffset is 0, finalCount will decrement 512 chunks at a time
-		finalCount -= (B_CHUNK_SIZE - fcbArray->index);
+		// else, if fileChunkOffset is 0, tempCount will decrement 512 chunks at a time
+		tempCount -= (B_CHUNK_SIZE - fcbArray->index);
 		
 		// load the fileChunk from ArrayBlockLoc
 		LBAread(fcbArray->localBuff, 1, fcbArray->fi->location);
@@ -203,13 +201,13 @@ int b_write (b_io_fd fd, char * buffer, int count)
 
 	memcpy(fcbArray->localBuff, buffer, count);
 	LBAwrite(fcbArray->localBuff, 1, fcbArray->fi->location);
+	printf("fcbArray->localBuff: %s\n", fcbArray->localBuff);
 
 
 
 
-
-
-	return (0); //Change this
+	printf("end of Write\n");
+	return (returnCount); 
 	}
 
 

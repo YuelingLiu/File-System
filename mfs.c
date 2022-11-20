@@ -15,27 +15,10 @@
 *
 **************************************************************/
 
-// #include "mfs.h"
-// #include "VCB.h"
-// #include <stdio.h>
-// #include <string.h>
-// #include <stdlib.h>
-// #include "DE.h"
-// #include "fsLow.h"
-//#include "fsInit.c"
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdint.h>
-#include <stdbool.h>
-#include <errno.h>
-#include "fsLow.h"
+
+
 #include "mfs.h"
-#include "VCB.h"
-#include "DE.h"
-#include "freespace.h"
+
 
 
 struct fdPathResult globalTemp;
