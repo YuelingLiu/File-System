@@ -380,7 +380,7 @@ int fs_isFile(char *filename)
 
     struct fdPathResult tempPath = parsedPath(filename);
 
-    LBAread(tempBuffer, MAXDE, tempPath.dirPtr);
+    LBAread(tempBuffer, blocksNeededForDir(MAXDE), tempPath.dirPtr);
 
     for (size_t i = 0; i < MAXDE; i++)
     {
