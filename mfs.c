@@ -40,8 +40,8 @@ int fs_rmdir(const char *pathname)
 
     // Gain access to the directory we want to remove by reading in its parent directory
     DirectoryEntry * parentDir = calloc (dirBlocks, vcb->blockSize);
-    printf("parentDir: %p\n", parentDir);
-    printf("tempBuffer: %p\n", tempBuffer);
+    //printf("parentDir: %p\n", parentDir);
+    //printf("tempBuffer: %p\n", tempBuffer);
     LBAread(parentDir, dirBlocks, path.dirPtr);
     
     // Read in the directory we want to remove
@@ -54,7 +54,7 @@ int fs_rmdir(const char *pathname)
         if (strcmp(dirToRemove[i].name, "") != 0)
         {
             printf("can not remove directory because it is not empty.\n");
-            printf("***************dirToRemove[i].name: %s\n", dirToRemove[i].name);
+            //printf("***************dirToRemove[i].name: %s\n", dirToRemove[i].name);
             return -1;
         }
     }
@@ -72,7 +72,7 @@ int fs_rmdir(const char *pathname)
     parentDir[path.index].location = 0;
     parentDir[path.index].fileType = 0;
     parentDir[path.index].numOfDE = 0;
-    printf("parentDir[path.index].name: %s\n", parentDir[path.index].name);
+    
 
     // Write freespace and parentDir back to disk, free malloc
     LBAwrite(freeSpaceMap, 5, vcb->locOfFreespace);
@@ -138,15 +138,7 @@ struct fdPathResult parsedPath(const char *path)
     {
         isAbsolute = 1;
         // in the case that the path is just the root
-        // if (strlen(path) == 1){
-        //     result.dirPtr = vcb->locOfRoot;
-
-        //     int size = strlen(path);
-        //     strcpy(result.lastArg, fs_getcwd(path,size));
-
-        //     // retrieve result.index
-
-        // }
+        
     }
 
     // for a relative path, we need to grab the path first
@@ -290,7 +282,7 @@ struct fdPathResult parsedPath(const char *path)
                 // in the case that we loop through the entire directory entries
                 if (j == numberofDE - 1)
                 {
-                    printf("no directory with the name: %s\n", tokenArray[i]);
+                    //printf("no directory with the name: %s\n", tokenArray[i]);
                     if (i > 0)
                     {
                        // printf("setting dirPtr to tempBuffer[0].location: %d\n",tempBuffer[0].location);
@@ -328,28 +320,15 @@ struct fdPathResult parsedPath(const char *path)
             result.index = 0;
             strcpy(result.lastArg, "/");
         }
-        //printf("returning outside for loop\n");
-        //printf("result.dirPtr: %d\n", result.dirPtr);
-        //printf("result.index: %d\n", result.index);
-        
-        /* TEST CODE */
-        // if(tokenFlag == 1){
-        //     printf("globalPath**************: %s\n", globalPath);
-        //     strcpy(globalPath, finalPath);
-        //     printf("globalPath**************: %s\n", globalPath);
-        // }
-
-
-        /* TEST CODE */
+       
         
 
         return result;
     }
-    // these arent ran bc after return
-    //printf("about to free inside parsepath\n");
-    // free(tempBuffer);
-    // tempBuffer = NULL;
+   
 }
+
+
 
 int fs_isFile(char *filename)
 {
@@ -360,7 +339,7 @@ int fs_isFile(char *filename)
 
     struct fdPathResult tempPath = parsedPath(filename);
 
-    LBAread(tempBuffer, MAXDE, tempPath.dirPtr);
+    LBAread(tempBuffer, blocksNeededForDir(MAXDE), tempPath.dirPtr);
 
     for (size_t i = 0; i < MAXDE; i++)
     {
@@ -400,11 +379,11 @@ int fs_isDir(char *pathname)
         // return 0
         if (i == MAXDE - 1)
         {
-            printf("file does not exist***\n");
+          
             return 0;
         }
     }
-    printf("file does not exist\n");
+    //printf("file does not exist\n");
     return 0;
 }
 
@@ -459,10 +438,8 @@ void fs_pathReconstruction (){
         }
        
     }
-    //printf("tokenIndex: %d\n", tokenIndex);
-    //printf("tokenArray[0]: %s\n", tokenArray[0]);
+    
     // if there are . or .. we want to remove that from the global path
-
     if(tokenIndex ==1 && strcmp(tokenArray[0],"..")==0){
         strcpy(globalPath,"/"); 
     }
@@ -569,15 +546,7 @@ int fs_mkdir(const char *pathname, mode_t mode)
         printf("file exists\n");
         return -1;
     }
-    //printf("path.index: %d\n", path.index);
-    //printf("path.dirPtr: %d\n", path.dirPtr);
-    //printf("path.lastArg: %s\n", path.lastArg);
-    // int tempSize = 10;
-    // char * tempCurrentDir = fs_getcwd(pathname ,tempSize);
-
-    // int dirBlocks = blocksNeededForDir(MAXDE);
-    // //calling parsepath on cwd returns dirPtr to PARENT of cwd, plus cwd's index
-    // //so we need to read PARENT of cwd first
+    
 
     // we have the pointer to the directory of where we want
     // to make the path.lastArg
