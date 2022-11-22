@@ -152,23 +152,12 @@ int b_write (b_io_fd fd, char * buffer, int count)
 	int tempCount = count;			// numBytes to be processed
 	printf("tempCount: %d\n", tempCount);
 
-	//Decrement count every time we write 512 byte chunk 
-
-	// while (count > 0){
-	// 	int locN = getBlockN(fcbArray[fd].chunkNumber, fcbArray[fd].fi);
-	// 	//Case 1: chunk is already allocated and/or partially filled
-	// 	//Must fill this chunk before writing it back and moving on
-	// 	if ( locN != -1) {
-	// 		LBAread(fcbArray[fd].localBuff, 1, locN);
-	// 		memcpy(fcbArray[fd].localBuff + fcbArray[fd].index, buffer, B_CHUNK_SIZE - fcbArray[fd].index);
-
-	// 	}
-	// }
 	
 	//Check if starting file chunk exists, if so grab it
 	//If not, allocate the chunks we'll need
 	int fileChunk = getBlockN(fcbArray[fd].chunkNumber, fcbArray[fd].fi);
-	if (fileChunk == (-1)){
+	//getBlockN returns -1 if chunk doesn't exist and 0 if index block doesn't exist
+	if (fileChunk == (-1) || fileChunk == 0){ 
 		initializeWritableChunks(fcbArray[fd].currentIndexBlockLoc, count); 
 		fileChunk = getBlockN(fcbArray[fd].chunkNumber, fcbArray[fd].fi);
 	}
@@ -183,6 +172,14 @@ int b_write (b_io_fd fd, char * buffer, int count)
 		tempCount -= (B_CHUNK_SIZE - fcbArray[fd].chunkOffset);
 		fcbArray[fd].chunkOffset = 0;
 		fcbArray[fd].chunkNumber += 1;
+
+		//After iterating chunk number, check for existence again?
+		fileChunk = getBlockN(fcbArray[fd].chunkNumber, fcbArray[fd].fi);
+		//getBlockN returns -1 if chunk doesn't exist and 0 if index block doesn't exist
+		if (fileChunk == (-1) || fileChunk == 0){ 
+			initializeWritableChunks(fcbArray[fd].currentIndexBlockLoc, count); 
+			fileChunk = getBlockN(fcbArray[fd].chunkNumber, fcbArray[fd].fi);
+		}
 	}
 	
 	
@@ -208,13 +205,7 @@ int b_write (b_io_fd fd, char * buffer, int count)
 		// iterate through the ArrayBlock and load in the next location
 		fcbArray->chunkNumber++;
 	}
-	
-	
-	//If chunk is not yet allocated (-1 address in index block)
-	// 
-	
-		//int indexInIndexBlock = fcbArray[fd].chunkNumber % (INDEXBLOCKSIZE/INTSIZE);
-		//makeFileChunk(fcbArray[fd].currentIndexBlockLoc, indexInIndexBlock);
+
 
 	
 	// *base case in the case that the other previous if statements dont run
@@ -227,7 +218,7 @@ int b_write (b_io_fd fd, char * buffer, int count)
 	printf("fcbArray->localBuff: %s\n", fcbArray[fd].localBuff);
 
 
-	fcbArray[fd].fi->fileSize += count;
+	//fcbArray[fd].fi->fileSize += count;
 
 	printf("end of Write\n");
 	return (returnCount); 

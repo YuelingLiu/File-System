@@ -154,8 +154,8 @@ int initializeWritableChunks(int indexBlockLoc, int count){
 //represented by fileInfo* fi
 int getBlockN(int n, fileInfo* fi){
     
-    int blockNumber = n / (INDEXBLOCKSIZE/INTSIZE);
-    int indexInBlock = n % (INDEXBLOCKSIZE/INTSIZE);
+    int blockNumber = n / ((INDEXBLOCKSIZE-INTSIZE)/INTSIZE);
+    int indexInBlock = n % ((INDEXBLOCKSIZE-INTSIZE)/INTSIZE);
     int* temp = calloc(1, INDEXBLOCKSIZE);
     LBAread(temp, 1, fi->location);
     int i = 0;

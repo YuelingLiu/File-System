@@ -18,7 +18,7 @@
 
 
 #define INDEXBLOCKSIZE 512
-#define INTSIZE 8
+#define INTSIZE 4
 
 typedef struct fileInfo {
 	char fileName[64];		//filename
