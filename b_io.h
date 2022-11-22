@@ -44,7 +44,7 @@ typedef struct b_fcb
 	fileInfo* fi;
 	
 	char * localBuff;			//holds the open file buffer
-	int index;					//holds the current position in the buffer
+	int chunkOffset;					//holds the current position in the buffer
 	int chunkNumber; 			//n-th (from 0) 512 byte chunk of the file
 	int currentIndexBlockLoc;
 	int buflen;					//holds how many valid bytes are in the buffer
