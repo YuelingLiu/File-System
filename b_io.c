@@ -65,6 +65,8 @@ int b_open (char * filename, int flags)
 										// check for error - all used FCB's
 
 	//Set to read mode, write mode, or read/write mode
+
+	// isnt this two && ???? *************************
 	if ((flags & O_RDONLY) == O_RDONLY){
 		fcbArray[returnFd].mode = O_RDONLY;
 	}
