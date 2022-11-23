@@ -98,10 +98,8 @@ int b_seek (b_io_fd fd, off_t offset, int whence) {
 		return (-1); // invalid file descriptor
 	}
 
-	// open file for read only
-	int f_return = b_open("jeep", O_RDONLY);
-
-	char tempBuffer[80];
+	int currentOffset = (fcbArray[fd].chunkNumber * 512) + fcbArray[fd].chunkOffset;		
+	int newOffset;			// adjust the new offset
 
 	printf("*********************************************\n");
 	printf("inside of seek function\n");
@@ -109,19 +107,39 @@ int b_seek (b_io_fd fd, off_t offset, int whence) {
 	// handle SEEK_SET
 	if (whence == SEEK_SET) {
 		// offset will be set at location offset from the beginning of the file
-		return  fcbArray[fd].offsetBookmark=offset;
+		int newOffset = offset;
+
+		// adjust the new offset to our file allocation system.
+		fcbArray[fd].chunkNumber = newOffset / B_CHUNK_SIZE;
+		fcbArray[fd].chunkOffset = newOffset % B_CHUNK_SIZE;
+		return newOffset;
 	}
 
 	// handle SEEK_CUR
 	if (whence == SEEK_CUR) {
-		// offset will be set from where the current offset is set PLUS passed in offset
-		return fcbArray[fd].offsetBookmark = fcbArray[fd].offsetBookmark+offset;
+		// offset will be set at location offset from the previous offset of the file
+		newOffset = currentOffset + offset;
+
+		// adjust the new offset to our file allocation system.
+		fcbArray[fd].chunkNumber = newOffset / B_CHUNK_SIZE;
+		fcbArray[fd].chunkOffset = newOffset % B_CHUNK_SIZE;
+		
+		return newOffset;
 	}
 
 	// handle SEEK_END
 	if (whence == SEEK_END){
 		// offset will be set from where the end of file (size) PLUS passed in offset
-		return fcbArray[fd].offsetBookmark = fcbArray[fd].fi->fileSize + offset;
+		newOffset = fcbArray[fd].fi->fileSize + offset;
+		
+		// adjust the new offset to our file allocation system.
+		fcbArray[fd].chunkNumber = newOffset / B_CHUNK_SIZE;
+		fcbArray[fd].chunkOffset = newOffset % B_CHUNK_SIZE;
+
+		printf("fcbArray[fd].chunkNumber: %d\n", fcbArray[fd].chunkNumber);
+		printf("fcbArray[fd].chunkOffset: %d\n", fcbArray[fd].chunkOffset);
+
+		return newOffset;
 	}
 
 	return (2); // Change this
