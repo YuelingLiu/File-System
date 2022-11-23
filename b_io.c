@@ -301,6 +301,10 @@ int b_read (b_io_fd fd, char * buffer, int count) {
 		return (-1); // invalid file descriptor
 	}
 
+	printf("************************************\n");
+	printf("STARTING THE READ FUNCTION\n");
+
+
 	return (0); // Change this
 }
 

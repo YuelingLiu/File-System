@@ -248,6 +248,7 @@ int cmd_touch (int argcnt, char *argvec[])
 		int delete_int;
 		int delete2;
 		int delete3;
+		int readDelete;
         char * src;
 
         switch (argcnt)
@@ -280,7 +281,7 @@ int cmd_touch (int argcnt, char *argvec[])
 
 
 
-		// still need to figure this out
+		
 		delete3 = b_seek(delete2, 600, SEEK_SET);
 		printf("For SEEK_SET : %d\n", delete3);
 		
@@ -291,7 +292,8 @@ int cmd_touch (int argcnt, char *argvec[])
 		printf("For SEEK_END : %d\n", delete3);
 
 		
-
+		// tests for read
+		
 
 
 		printf("inside touch after write\n");
