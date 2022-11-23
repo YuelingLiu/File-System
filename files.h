@@ -1,4 +1,16 @@
-
+/**************************************************************
+* Class: CSC-415-03 Fall 2022
+* Names: Tommy Truong, Yueling Liu, Steve Betts, Nicholas Hamada
+* Student IDs: 913660519, 922272361, 921898143, 918602131
+* GitHub Name: kpcrocks
+* Group Name: dev/null
+* Project: Basic File System
+*
+* File: files.h
+*
+* Description: This is a header file for file allocation functions.
+*
+**************************************************************/
 
 #include <stdio.h>
 #include <unistd.h>
@@ -18,7 +30,7 @@
 
 
 #define INDEXBLOCKSIZE 512
-#define INTSIZE 8
+#define INTSIZE 4
 
 typedef struct fileInfo {
 	char fileName[64];		//filename

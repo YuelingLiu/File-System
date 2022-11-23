@@ -44,11 +44,12 @@ typedef struct b_fcb
 	fileInfo* fi;
 	
 	char * localBuff;			//holds the open file buffer
-	int index;					//holds the current position in the buffer
+	int chunkOffset;					//holds the current position in the buffer
 	int chunkNumber; 			//n-th (from 0) 512 byte chunk of the file
 	int currentIndexBlockLoc;
 	int buflen;					//holds how many valid bytes are in the buffer
 	int mode; 					//O_RDONLY, O_WRONLY, or O_RDWR
+	int	offsetBookmark;				// this is the identifier where the offset is in the file
 	} b_fcb;
 
 int b_open (char * filename, int flags);

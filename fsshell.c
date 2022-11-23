@@ -51,7 +51,7 @@
 #define CMDCD_ON	1
 #define CMDPWD_ON	1
 #define CMDTOUCH_ON	1
-#define CMDCAT_ON	0
+#define CMDCAT_ON	1
 
 
 typedef struct dispatch_t
@@ -246,6 +246,8 @@ int cmd_touch (int argcnt, char *argvec[])
 #if (CMDTOUCH_ON == 1)     
         int testfs_src_fd;
 		int delete_int;
+		int delete2;
+		int delete3;
         char * src;
 
         switch (argcnt)
@@ -260,21 +262,11 @@ int cmd_touch (int argcnt, char *argvec[])
                 }
 
         testfs_src_fd = b_open (src, O_WRONLY | O_CREAT);
-		/* test code */
 		
-		char buffer[20] = "testing";
-		delete_int = b_write(testfs_src_fd, buffer, strlen(buffer));
-		
-
-		char buffer2[50] = "second write after the first";
-		delete_int = b_write(testfs_src_fd, buffer2, strlen(buffer2));
-		
-		printf("inside touch after write\n");
-		/* test code */
         if (testfs_src_fd < 0)
 	    return (testfs_src_fd);	//return with error
 
-        //b_close (testfs_src_fd);
+        b_close (testfs_src_fd);
 #endif
         return 0;
         }
