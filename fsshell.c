@@ -51,7 +51,7 @@
 #define CMDCD_ON	1
 #define CMDPWD_ON	1
 #define CMDTOUCH_ON	1
-#define CMDCAT_ON	0
+#define CMDCAT_ON	1
 
 
 typedef struct dispatch_t
@@ -246,6 +246,8 @@ int cmd_touch (int argcnt, char *argvec[])
 #if (CMDTOUCH_ON == 1)     
         int testfs_src_fd;
 		int delete_int;
+		int delete2;
+		int delete3;
         char * src;
 
         switch (argcnt)
@@ -261,14 +263,34 @@ int cmd_touch (int argcnt, char *argvec[])
 
         testfs_src_fd = b_open (src, O_WRONLY | O_CREAT);
 		/* test code */
-		
-		char buffer[20] = "testing";
-		delete_int = b_write(testfs_src_fd, buffer, strlen(buffer));
-		
 
-		char buffer2[50] = "second write after the first";
-		delete_int = b_write(testfs_src_fd, buffer2, strlen(buffer2));
+		// make a file called jeep
+		makeNewFile("/jeep");
+
+		// open the file and save the FD
+		delete2 = b_open("jeep", O_RDONLY);
+
+		// test buffer string of 34 characters 
+		char buffer123[150] = "testing this out if this works lol. lol lol lol ";
+
+		// write to jeep file strlen amount
+		delete_int = b_write(delete2, buffer123, strlen(buffer123));
+		printf("delete_int************: %d\n", delete_int);
+
+
+
+		// still need to figure this out
+		delete3 = b_seek(delete2, 10, SEEK_SET);
+		printf("For SEEK_SET : %d\n", delete3);
 		
+		delete3 = b_seek(delete2,15,SEEK_CUR);
+		printf("For SEEK_CUR : %d\n", delete3);
+
+		delete3 = b_seek(delete2,20,SEEK_END);
+		printf("For SEEK_END : %d\n", delete3);
+
+
+
 		printf("inside touch after write\n");
 		/* test code */
         if (testfs_src_fd < 0)

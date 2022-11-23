@@ -65,6 +65,8 @@ int b_open (char * filename, int flags)
 										// check for error - all used FCB's
 
 	//Set to read mode, write mode, or read/write mode
+
+	// isnt this two && ???? *************************
 	if ((flags & O_RDONLY) == O_RDONLY){
 		fcbArray[returnFd].mode = O_RDONLY;
 	}
@@ -83,7 +85,7 @@ int b_open (char * filename, int flags)
 	
 	fcbArray[returnFd].fi = GetFileInfo(filename);
 	fcbArray[returnFd].localBuff = calloc(1, B_CHUNK_SIZE);
-	fcbArray[returnFd].index = 0;
+	fcbArray[returnFd].chunkOffset = 0;
 	fcbArray[returnFd].chunkNumber = 0;
 	fcbArray[returnFd].currentIndexBlockLoc = fcbArray[returnFd].fi->location;
 	fcbArray[returnFd].buflen = 0;
@@ -108,8 +110,38 @@ int b_seek (b_io_fd fd, off_t offset, int whence)
 		return (-1); 					//invalid file descriptor
 		}
 		
+	// open file for read only
+	int f_return = b_open("jeep", O_RDONLY);
+
+	char tempBuffer[80];
+	
+
+	printf("*********************************************\n");
+	printf("inside of seek function\n");
+	
+	// handle SEEK_SET
+	if (whence == SEEK_SET){
+		// offset will be set at location offset from the beginning of the file
+		return  fcbArray[fd].offsetBookmark=offset;
+	}
+
+	// handle SEEK_CUR
+	if (whence == SEEK_CUR){
+		// offset will be set from where the current offset is set PLUS passed in offset
+		return fcbArray[fd].offsetBookmark = fcbArray[fd].offsetBookmark+offset;
+	}
+
+	// handle SEEK_END
+	if (whence == SEEK_END){
+		// offset will be set from where the end of file (size) PLUS passed in offset
+		return fcbArray[fd].offsetBookmark = fcbArray[fd].fi->fileSize + offset;
 		
-	return (0); //Change this
+	}
+
+
+
+
+	return (2); //Change this
 	}
 
 
@@ -150,62 +182,96 @@ int b_write (b_io_fd fd, char * buffer, int count)
 	//*variables
 	int returnCount = count;
 	int tempCount = count;			// numBytes to be processed
+	int writeCount = 0;
 	printf("tempCount: %d\n", tempCount);
 
-	//Decrement count every time we write 512 byte chunk 
-
-	// while (count > 0){
-	// 	int locN = getBlockN(fcbArray[fd].chunkNumber, fcbArray[fd].fi);
-	// 	//Case 1: chunk is already allocated and/or partially filled
-	// 	//Must fill this chunk before writing it back and moving on
-	// 	if ( locN != -1) {
-	// 		LBAread(fcbArray[fd].localBuff, 1, locN);
-	// 		memcpy(fcbArray[fd].localBuff + fcbArray[fd].index, buffer, B_CHUNK_SIZE - fcbArray[fd].index);
-
-	// 	}
-	// }
 	
-	// *while loop for if the **USER COUNT > B_CHUNKSIZE**
-	while(count > B_CHUNK_SIZE){
-		// first grab the remainder of fileChunkOffset and write to it
-		// else, if fileChunkOffset is 0, tempCount will decrement 512 chunks at a time
-		tempCount -= (B_CHUNK_SIZE - fcbArray->index);
+	//Check if starting file chunk exists, if so grab it
+	//If not, allocate the chunks we'll need
+	int fileChunk = getBlockN(fcbArray[fd].chunkNumber, fcbArray[fd].fi);
+	//getBlockN returns -1 if chunk doesn't exist and 0 if index block doesn't exist
+	if (fileChunk == (-1) || fileChunk == 0){ 
+		printf("failed first existence check\n");
+		initializeWritableChunks(fcbArray[fd].currentIndexBlockLoc, count); 
+		fileChunk = getBlockN(fcbArray[fd].chunkNumber, fcbArray[fd].fi);
+	}
+	
 		
-		// load the fileChunk from ArrayBlockLoc
-		LBAread(fcbArray->localBuff, 1, fcbArray->fi->location);
+	//If starting part-way through starting file chunk, we finish filling that chunk first
+	if (count > (B_CHUNK_SIZE - fcbArray[fd].chunkOffset) && fcbArray[fd].chunkOffset > 0){
+		printf("partial case because chunkOffset is: %d\n", fcbArray[fd].chunkOffset);
+		LBAread(fcbArray[fd].localBuff, 1, fileChunk);
+		memcpy(fcbArray[fd].localBuff + fcbArray[fd].chunkOffset, buffer, (B_CHUNK_SIZE - fcbArray[fd].chunkOffset));
+		printf("partial case writing to location: %d\n", fileChunk);
+		LBAwrite(fcbArray[fd].localBuff, 1, fileChunk);
+		printf("fcbArray->localBuff: %s\n", fcbArray[fd].localBuff);
 
-		// copy from user buffer to process buffer
-		memcpy(fcbArray->localBuff, buffer, (B_CHUNK_SIZE - fcbArray->index));
 
-		// write localBuff to storage
-		LBAwrite(fcbArray->localBuff, 1, fcbArray->fi->location);
+		writeCount += (B_CHUNK_SIZE - fcbArray[fd].chunkOffset);
+		tempCount -= (B_CHUNK_SIZE - fcbArray[fd].chunkOffset);
+		fcbArray[fd].chunkOffset = 0;
+		fcbArray[fd].chunkNumber += 1;
 
-		// assign FCO to 0 so the next loop iteration grabs 512 chunks
-		fcbArray->index = 0;
-
-		// iterate through the ArrayBlock and load in the next location
-		fcbArray->chunkNumber++;
+		//After iterating chunk number, check for existence again?
+		fileChunk = getBlockN(fcbArray[fd].chunkNumber, fcbArray[fd].fi);
+		//getBlockN returns -1 if chunk doesn't exist and 0 if index block doesn't exist
+		if (fileChunk == (-1) || fileChunk == 0){ 
+			printf("failed second existence check\n");
+			initializeWritableChunks(fcbArray[fd].currentIndexBlockLoc, count); 
+			fileChunk = getBlockN(fcbArray[fd].chunkNumber, fcbArray[fd].fi);
+		}
 	}
 	
 	
-	//If chunk is not yet allocated (-1 address in index block)
-	// 
 	
-		//int indexInIndexBlock = fcbArray[fd].chunkNumber % (INDEXBLOCKSIZE/INTSIZE);
-		//makeFileChunk(fcbArray[fd].currentIndexBlockLoc, indexInIndexBlock);
+	// *while loop for if the **USER COUNT > B_CHUNKSIZE**
+	while(tempCount > B_CHUNK_SIZE){
+		printf("In write while loop, tempCount %d\n", tempCount);
+		// first grab the remainder of fileChunkOffset and write to it
+		// else, if fileChunkOffset is 0, tempCount will decrement 512 chunks at a time
+		tempCount -= B_CHUNK_SIZE;
+
+		// load the fileChunk from ArrayBlockLoc
+		LBAread(fcbArray[fd].localBuff, 1, fileChunk);
+
+		// copy from user buffer to process buffer
+		memcpy(fcbArray[fd].localBuff, buffer + writeCount, B_CHUNK_SIZE);
+
+		// write localBuff to storage
+		printf("loop case writing to location: %d\n", fileChunk);
+		LBAwrite(fcbArray[fd].localBuff, 1, fileChunk);
+		printf("fcbArray->localBuff: %s\n", fcbArray[fd].localBuff);
+
+		// iterate through the ArrayBlock and load in the next location
+		fcbArray[fd].chunkNumber++;
+
+		// grab the next fileChunk
+		fileChunk = getBlockN(fcbArray[fd].chunkNumber, fcbArray[fd].fi);
+		printf("while loop, next fileChunk: %d\n", fileChunk);
+
+		writeCount += B_CHUNK_SIZE;
+	}
+
 
 	
 	// *base case in the case that the other previous if statements dont run
-	LBAread(fcbArray->localBuff, 1, fcbArray->fi->location);
-	fcbArray->index += count;
+	LBAread(fcbArray[fd].localBuff, 1, fileChunk);
+	fcbArray[fd].chunkOffset += tempCount;
 
-	memcpy(fcbArray->localBuff, buffer, count);
-	LBAwrite(fcbArray->localBuff, 1, fcbArray->fi->location);
-	printf("fcbArray->localBuff: %s\n", fcbArray->localBuff);
+	memcpy(fcbArray[fd].localBuff, buffer + writeCount, tempCount);
+	printf("base case writing to location: %d\n", fileChunk);
+	LBAwrite(fcbArray[fd].localBuff, 1, fileChunk);
+	printf("fcbArray->localBuff: %s\n", fcbArray[fd].localBuff);
 
+	writeCount += tempCount;
+	
+	//Calculate new file size
 
+	if (((fcbArray[fd].chunkNumber * 512) + fcbArray[fd].chunkOffset) > fcbArray[fd].fi->fileSize){
+		fcbArray[fd].fi->fileSize = ((fcbArray[fd].chunkNumber * 512) + fcbArray[fd].chunkOffset);
+	}
 
-
+	printf("new file size is: %d\n", fcbArray[fd].fi->fileSize);
 	printf("end of Write\n");
 	return (returnCount); 
 	}
@@ -249,6 +315,7 @@ int b_read (b_io_fd fd, char * buffer, int count)
 // Interface to Close the file	
 int b_close (b_io_fd fd)
 	{
+		free(fcbArray[fd].fi);
 		fcbArray[fd].fi = NULL;
 		free(fcbArray[fd].localBuff);
 

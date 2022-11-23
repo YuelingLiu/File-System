@@ -7,6 +7,21 @@
 //This function should find file by calling parsepath
 fileInfo * GetFileInfo (char * fname){
 //Copy info from file's DE into fileInfo struct, return ptr to struct
+    struct fdPathResult path = parsedPath(fname);
+    if (path.index == -1)
+    {
+        return NULL;
+    }
+    int dirBlocks = blocksNeededForDir(MAXDE);
+    DirectoryEntry* tempDir = calloc (dirBlocks, vcb->blockSize);
+    LBAread(tempDir, dirBlocks, path.dirPtr);
+
+    fileInfo* fi = malloc(sizeof(fileInfo));
+    strncpy(fi->fileName, tempDir[path.index].name, 64);
+    fi->fileSize = tempDir[path.index].size;
+    fi->location = tempDir[path.index].location;
+    free(tempDir);
+    return fi;
 }
 
 //Writes a new index block to disk and returns its disk location
@@ -14,11 +29,12 @@ int createIndexBlock(){
     //Index block is exactly 512 bytes in size, enough to hold 64 location integers
     int* indexBlock = calloc(1, INDEXBLOCKSIZE);
     int blockLocation = allocSingleBlock(freeSpaceMap, getFreespaceSize(vcb->numBlocks, vcb->blockSize));
-    for (int i = 0; i < 64; i++){
+    for (int i = 0; i < 128; i++){
         indexBlock[i] = -1;
     }
     LBAwrite(indexBlock, 1, blockLocation);
     free(indexBlock);
+    printf("*createIndexBlock* new index block at: %d\n", blockLocation);
     return blockLocation;
 }
 
@@ -112,7 +128,7 @@ int initializeWritableChunks(int indexBlockLoc, int count){
     //Until no more chunks left to be written, alloc free block/chunk and assign to index block
     while (numChunks > 0){
         //If tracker is at last index of Index Block, then we need to create a new Index Block
-        if (IBIndex == 63){
+        if (IBIndex == 127){
             indexBlock[IBIndex] = createIndexBlock();
             LBAwrite(indexBlock, 1, currentBlockLoc);
             
@@ -123,11 +139,13 @@ int initializeWritableChunks(int indexBlockLoc, int count){
         }
         
         indexBlock[IBIndex] = allocSingleBlock(freeSpaceMap, getFreespaceSize(vcb->numBlocks, vcb->blockSize));
+        printf("*initWritChunks* allocing new file chunk at: %d\n", indexBlock[IBIndex]);
         IBIndex++;
         numChunks--;
     }
     LBAwrite(indexBlock, 1, currentBlockLoc);
     //Return location of most recent IB added
+    free(indexBlock);
     return currentBlockLoc;
 
 }
@@ -136,14 +154,14 @@ int initializeWritableChunks(int indexBlockLoc, int count){
 //represented by fileInfo* fi
 int getBlockN(int n, fileInfo* fi){
     
-    int blockNumber = n / (INDEXBLOCKSIZE/INTSIZE);
-    int indexInBlock = n % (INDEXBLOCKSIZE/INTSIZE);
+    int blockNumber = n / ((INDEXBLOCKSIZE-INTSIZE)/INTSIZE);
+    int indexInBlock = n % ((INDEXBLOCKSIZE-INTSIZE)/INTSIZE);
     int* temp = calloc(1, INDEXBLOCKSIZE);
     LBAread(temp, 1, fi->location);
     int i = 0;
     int next;
     while (i < blockNumber){
-        next = temp[63];
+        next = temp[127];
         if (next == -1){
             printf("Index block for chunk n doesn't exist!\n");
             return 0;
