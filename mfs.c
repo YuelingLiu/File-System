@@ -84,6 +84,36 @@ int fs_rmdir(const char *pathname)
     return 0;
 }
 
+//FOR USE WITH FS_DELETE
+//Given location of starting index block, traverse and mark freespace bits
+//for each file chunk and index block as free.
+void markChunksFree(int indexBlockLoc){
+    setBitZero(freeSpaceMap, indexBlockLoc);
+    
+    int* temp = calloc(1, vcb->blockSize);
+    LBAread(temp, 1, indexBlockLoc);
+    int next;
+    int lastIndex = (vcb->blockSize/sizeof(int)) - 1;
+    //Loop until no more index blocks in chain to load
+    while(next != (-1)){
+        //Interate through indexes in index block
+        for (int i = 0; i < (vcb->blockSize/sizeof(int)); i++)
+        {
+            //If chunk is allocated, free it
+            if (temp[i] != -1){
+                setBitZero(freeSpaceMap, temp[i]);
+            }
+            
+        }
+        next = temp[lastIndex];
+        if (next != -1){
+            LBAread(temp, 1, next);
+        }
+
+    }
+    free(temp);
+}
+
 int fs_delete(char *filename)
      {
     struct fdPathResult path = parsedPath(filename);
@@ -97,14 +127,17 @@ int fs_delete(char *filename)
     DirectoryEntry * parentDir = calloc (dirBlocks, vcb->blockSize);
     LBAread(parentDir, dirBlocks, path.dirPtr);
 
-    // Get number of blocks being used by file
-    int fileBlocks = (parentDir[path.index].size + (vcb->blockSize - 1)) / vcb->blockSize;
+    //OLD VERSION
+    // // Get number of blocks being used by file
+    // int fileBlocks = (parentDir[path.index].size + (vcb->blockSize - 1)) / vcb->blockSize;
 
-    // Mark blocks as free
-    for (int i = parentDir[path.index].location; i < parentDir[path.index].location + fileBlocks; i++)
-    {
-        setBitZero(freeSpaceMap, i);
-    }
+    // // Mark blocks as free
+    // for (int i = parentDir[path.index].location; i < parentDir[path.index].location + fileBlocks; i++)
+    // {
+    //     setBitZero(freeSpaceMap, i);
+    // }
+    //NEW VERSION FOR INDEXED ALLOCATION
+    markChunksFree(parentDir[path.index].location);
 
     // Set file's DE to known free state
     strcpy(parentDir[path.index].name, "");

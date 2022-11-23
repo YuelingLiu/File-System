@@ -109,6 +109,9 @@ int fs_isDir(char * pathname);	//return 1 if directory, 0 otherwise
 int fs_delete(char* filename);	//removes a file
 void fs_pathReconstruction (); // edge case for . and .. 
 
+//FOR USE WITH FS_DELETE
+void markChunksFree(int indexLoc);
+
 
 // This is the structure that is filled in from a call to fs_stat
 struct fs_stat
