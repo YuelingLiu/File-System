@@ -226,7 +226,7 @@ int b_write (b_io_fd fd, char * buffer, int count)
 	
 	// *base case in the case that the other previous if statements dont run
 	LBAread(fcbArray[fd].localBuff, 1, fileChunk);
-	fcbArray[fd].chunkOffset += count;
+	fcbArray[fd].chunkOffset += tempCount;
 
 	memcpy(fcbArray[fd].localBuff, buffer + writeCount, tempCount);
 	printf("base case writing to location: %d\n", fileChunk);
@@ -234,8 +234,14 @@ int b_write (b_io_fd fd, char * buffer, int count)
 	printf("fcbArray->localBuff: %s\n", fcbArray[fd].localBuff);
 
 	writeCount += tempCount;
-	//fcbArray[fd].fi->fileSize += count;
+	
+	//Calculate new file size
 
+	if (((fcbArray[fd].chunkNumber * 512) + fcbArray[fd].chunkOffset) > fcbArray[fd].fi->fileSize){
+		fcbArray[fd].fi->fileSize = ((fcbArray[fd].chunkNumber * 512) + fcbArray[fd].chunkOffset);
+	}
+
+	printf("new file size is: %d\n", fcbArray[fd].fi->fileSize);
 	printf("end of Write\n");
 	return (returnCount); 
 	}
