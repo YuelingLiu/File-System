@@ -46,4 +46,5 @@ int makeFileChunk(int indexLoc, int index);
 int initializeWritableChunks(int indexBlockLoc, int count);
 	
 int getBlockN(int n, fileInfo* fi);
+int getIndexBlockLoc(int chunkNumber, fileInfo* fi);
 

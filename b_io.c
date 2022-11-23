@@ -112,6 +112,7 @@ int b_seek (b_io_fd fd, off_t offset, int whence) {
 		// adjust the new offset to our file allocation system.
 		fcbArray[fd].chunkNumber = newOffset / B_CHUNK_SIZE;
 		fcbArray[fd].chunkOffset = newOffset % B_CHUNK_SIZE;
+		fcbArray[fd].currentIndexBlockLoc = getIndexBlockLoc(fcbArray[fd].chunkNumber, fcbArray[fd].fi);
 		return newOffset;
 	}
 
@@ -123,6 +124,7 @@ int b_seek (b_io_fd fd, off_t offset, int whence) {
 		// adjust the new offset to our file allocation system.
 		fcbArray[fd].chunkNumber = newOffset / B_CHUNK_SIZE;
 		fcbArray[fd].chunkOffset = newOffset % B_CHUNK_SIZE;
+		fcbArray[fd].currentIndexBlockLoc = getIndexBlockLoc(fcbArray[fd].chunkNumber, fcbArray[fd].fi);
 
 		return newOffset;
 	}
@@ -135,6 +137,7 @@ int b_seek (b_io_fd fd, off_t offset, int whence) {
 		// adjust the new offset to our file allocation system.
 		fcbArray[fd].chunkNumber = newOffset / B_CHUNK_SIZE;
 		fcbArray[fd].chunkOffset = newOffset % B_CHUNK_SIZE;
+		fcbArray[fd].currentIndexBlockLoc = getIndexBlockLoc(fcbArray[fd].chunkNumber, fcbArray[fd].fi);
 
 		printf("fcbArray[fd].chunkNumber: %d\n", fcbArray[fd].chunkNumber);
 		printf("fcbArray[fd].chunkOffset: %d\n", fcbArray[fd].chunkOffset);
