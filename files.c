@@ -1,3 +1,16 @@
+/**************************************************************
+* Class: CSC-415-03 Fall 2022
+* Names: Tommy Truong, Yueling Liu, Steve Betts, Nicholas Hamada
+* Student IDs: 913660519, 922272361, 921898143, 918602131
+* GitHub Name: kpcrocks
+* Group Name: dev/null
+* Project: Basic File System
+*
+* File: files.c
+*
+* Description: This is a file for file allocation functions.
+*
+**************************************************************/
 
 #include "files.h"
 

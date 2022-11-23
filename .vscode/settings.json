@@ -3,6 +3,7 @@
         "unistd.h": "c",
         "mfs.h": "c",
         "getopt.h": "c",
-        "types.h": "c"
+        "types.h": "c",
+        "stdlib.h": "c"
     }
 }
