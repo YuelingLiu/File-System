@@ -271,7 +271,11 @@ int cmd_touch (int argcnt, char *argvec[])
 		delete2 = b_open("jeep", O_RDONLY);
 
 		// test buffer string of 34 characters 
+<<<<<<< HEAD
 		char buffer123[150] = "testing this out if this works lol. lol lol lol ";
+=======
+		char buffer123[50] = "testing this out if this works lol";
+>>>>>>> 4c8f98305fbe00ddf814f81515e07570183e3205
 
 		// write to jeep file strlen amount
 		delete_int = b_write(delete2, buffer123, strlen(buffer123));
@@ -280,6 +284,7 @@ int cmd_touch (int argcnt, char *argvec[])
 
 
 		// still need to figure this out
+<<<<<<< HEAD
 		delete3 = b_seek(delete2, 10, SEEK_SET);
 		printf("For SEEK_SET : %d\n", delete3);
 		
@@ -288,6 +293,10 @@ int cmd_touch (int argcnt, char *argvec[])
 
 		delete3 = b_seek(delete2,20,SEEK_END);
 		printf("For SEEK_END : %d\n", delete3);
+=======
+		delete3 = b_seek(delete2, 0, SEEK_END);
+		printf("delete3: %d\n", delete3);
+>>>>>>> 4c8f98305fbe00ddf814f81515e07570183e3205
 
 
 

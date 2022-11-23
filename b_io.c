@@ -135,10 +135,7 @@ int b_seek (b_io_fd fd, off_t offset, int whence)
 	if (whence == SEEK_END){
 		// offset will be set from where the end of file (size) PLUS passed in offset
 		return fcbArray[fd].offsetBookmark = fcbArray[fd].fi->fileSize + offset;
-		
 	}
-
-
 
 
 	return (2); //Change this
