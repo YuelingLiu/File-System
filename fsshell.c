@@ -51,7 +51,7 @@
 #define CMDCD_ON	1
 #define CMDPWD_ON	1
 #define CMDTOUCH_ON	1
-#define CMDCAT_ON	0
+#define CMDCAT_ON	1
 
 
 typedef struct dispatch_t
@@ -246,6 +246,8 @@ int cmd_touch (int argcnt, char *argvec[])
 #if (CMDTOUCH_ON == 1)     
         int testfs_src_fd;
 		int delete_int;
+		int delete2;
+		int delete3;
         char * src;
 
         switch (argcnt)
@@ -261,10 +263,26 @@ int cmd_touch (int argcnt, char *argvec[])
 
         testfs_src_fd = b_open (src, O_WRONLY | O_CREAT);
 		/* test code */
-		
-		delete_int = b_seek(testfs_src_fd, 0, SEEK_END);
 
-		printf("delete_int: %d\n", delete_int);
+		// make a file called jeep
+		makeNewFile("/jeep");
+
+		// open the file and save the FD
+		delete2 = b_open("jeep", O_RDONLY);
+
+		// test buffer string of 34 characters 
+		char buffer123[50] = "testing this out if this works lol";
+
+		// write to jeep file strlen amount
+		delete_int = b_write(delete2, buffer123, strlen(buffer123));
+		printf("delete_int************: %d\n", delete_int);
+
+
+
+		// still need to figure this out
+		delete3 = b_seek(delete2, 0, SEEK_END);
+		printf("delete3: %d\n", delete3);
+
 
 
 		printf("inside touch after write\n");

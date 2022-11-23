@@ -110,7 +110,34 @@ int b_seek (b_io_fd fd, off_t offset, int whence)
 		return (-1); 					//invalid file descriptor
 		}
 		
-		
+	// open file for read only
+	int f_return = b_open("jeep", O_RDONLY);
+
+	char tempBuffer[80];
+	
+
+	printf("*********************************************\n");
+	printf("inside of seek function\n");
+	
+	// handle SEEK_SET
+	if (whence == SEEK_SET){
+		// offset will be set at location offset from the beginning of the file
+	}
+
+	// handle SEEK_CUR
+	if (whence == SEEK_CUR){
+		// offset will be set from where the current offset is set PLUS passed in offset
+	}
+
+	// handle SEEK_END
+	if (whence == SEEK_END){
+		// offset will be set from where the end of file (size) PLUS passed in offset
+		f_return
+	}
+
+
+
+
 	return (2); //Change this
 	}
 
