@@ -249,7 +249,9 @@ int cmd_touch (int argcnt, char *argvec[])
 		int delete2;
 		int delete3;
 		int readDelete;
+		int openDelete;
         char * src;
+		char readBuffer[500];
 
         switch (argcnt)
                 {
@@ -267,17 +269,22 @@ int cmd_touch (int argcnt, char *argvec[])
 
 		// make a file called jeep
 		makeNewFile("/jeep");
+		makeNewFile("/Ihavenoidea");
 
 		// open the file and save the FD
 		delete2 = b_open("jeep", O_RDONLY);
+		openDelete = b_open("Ihavenoidea", O_RDONLY);
 
 		// test buffer string of 34 characters 
-		char buffer123[3000] = "testing this out if this works lol. lol lol lol adding more words to make this longer and test out a function lol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a function"; 
-		 
+		char buffer123[3000] = "it works testing this out if this works lol. lol lol lol adding more words to make this longer and test out a function lol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a function??????"; 
+		char buffer321[1000] = "I wish that I would have known, I was on your mind. I wish that I would have known, I was on your mind. I was on your mind . I was on your mind. I was on your mind. I was on your mind. I was on your mind dun dund und undnu dun dun dun dnu dun dun dund nud nud nud dnu duundn ddn dun dun dun dun dun dnudn udn ";
 
 		// write to jeep file strlen amount
 		delete_int = b_write(delete2, buffer123, strlen(buffer123));
 		printf("delete_int************: %d\n", delete_int);
+
+		delete_int = b_write(openDelete, buffer321, strlen(buffer321));
+		printf("delete_int*****@#@#***: %d\n", delete_int);
 
 
 
@@ -293,11 +300,16 @@ int cmd_touch (int argcnt, char *argvec[])
 
 		
 		// tests for read
+		// readDelete = b_read(delete2, readBuffer, 30);
+		readDelete = b_read(openDelete, readBuffer, 60);
+		// ** 
+		// localbuff stores bytes from write but location of new openDelete stores previous location
+
+
 		
-
-
-		printf("inside touch after write\n");
 		/* test code */
+
+
         if (testfs_src_fd < 0)
 	    return (testfs_src_fd);	//return with error
 

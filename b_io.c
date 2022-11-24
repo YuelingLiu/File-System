@@ -304,6 +304,56 @@ int b_read (b_io_fd fd, char * buffer, int count) {
 	printf("************************************\n");
 	printf("STARTING THE READ FUNCTION\n");
 
+	// store count number of bytes of file fd into buffer
+
+
+	// test for fun to make sure b_read works but not actual code
+	// ******************** START HERE STEVE ***********************
+	/* 
+
+	Inside fsshell line 271, I wrote 2 test files, jeep and ihavenoidea 
+	I used write to write the string into these files.
+
+	what ends up happening is that the following localBuff prints out
+	the localBuff that was inside of the write function
+
+	after calling LBAread, the location is set to 36 when it should have 
+	been changed inside of the FCB. so when you run touch banana youll see 
+	the first local buff printed FROM the write function and after LBAread, 
+	it prints from the incorrect location.  
+
+	I think the issue resides in makeNewFile and subsequently createIndexBlock
+	
+	*/
+
+	printf("before LBAread\n");
+	printf("fcbArray[fd].fi->location: %d\n", fcbArray[fd].fi->location);
+	printf("fcbArray[fd].localBuff: %s\n", fcbArray[fd].localBuff);
+	printf("fcbArray[fd].localBuff: %ld\n", strlen(fcbArray[fd].localBuff));
+	
+	LBAread(fcbArray[fd].localBuff, 1, fcbArray[fd].fi->location + 1);
+
+	printf("after LBAread\n");
+	printf("fcbArray[fd].localBuff: %s\n", fcbArray[fd].localBuff);
+	printf("fcbArray[fd].localBuff): %ld\n", strlen(fcbArray[fd].localBuff));
+
+
+
+	// Actual code *** IGNORE THIS FOR NOW, STEVE ***
+	// we want to print out from the file starting at the beginning
+	// lets say the file is 1557 bytes long
+	// b_read(file descriptor, readBuffer, 30);
+	// this function call wants 30 bytes so we first LBAread in the 
+	// first block, then export 30 bytes and leave a marker. 
+
+	// from assignment 5, the file descriptor was in an array of file descriptors
+	// maybe we need to implement an array that holds all the locations 
+
+	// for the first LBAread, we want from the beginning of fd's location
+
+	
+
+
 
 	return (0); // Change this
 }
