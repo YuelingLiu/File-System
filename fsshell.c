@@ -251,7 +251,7 @@ int cmd_touch (int argcnt, char *argvec[])
 		int readDelete;
 		int openDelete;
         char * src;
-		char readBuffer[500];
+		char readBuffer[5000];
 
         switch (argcnt)
                 {
@@ -264,47 +264,34 @@ int cmd_touch (int argcnt, char *argvec[])
                         return (-1);
                 }
 
-        testfs_src_fd = b_open (src, O_WRONLY | O_CREAT);
+        testfs_src_fd = b_open (src, O_RDWR | O_CREAT);
 		/* test code */
 
-		// make a file called jeep
-		makeNewFile("/jeep");
-		makeNewFile("/Ihavenoidea");
+		
 
-		// open the file and save the FD
-		delete2 = b_open("jeep", O_RDONLY);
-		openDelete = b_open("Ihavenoidea", O_RDONLY);
+		// test buffer string
+		char buffer123[3000] = "It was in July, 1805, and the speaker was the well-known Anna Pávlovna Schérer, maid of honor and favorite of the Empress Márya Fëdorovna. With these words she greeted Prince Vasíli Kurágin, a man of high rank and importance, who was the first to arrive at her reception. Anna Pávlovna had had a cough for some days. She was, as she said, suffering from la grippe; grippe being then a new word in St. Petersburg, used only by the elite. All her invitations without exception, written in French, and delivered by a scarlet-liveried footman that morning, ran as follows: Prince Vasíli always spoke languidly, like an actor repeating a stale part. Anna Pávlovna Schérer on the contrary, despite her forty years, overflowed with animation and impulsiveness. To be an enthusiast had become her social vocation and, sometimes even when she did not feel like it, she became enthusiastic in order not to disappoint the expectations of those who knew her. The subdued smile which, though it did not suit her faded features, always played round her lips expressed, as in a spoiled child, a continual consciousness of her charming defect, which she neither wished, nor could, nor considered it necessary, to correct."; 
 
-		// test buffer string of 34 characters 
-		char buffer123[3000] = "it works testing this out if this works lol. lol lol lol adding more words to make this longer and test out a function lol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a functionlol lol lol adding more words to make this longer and test out a function??????"; 
-		char buffer321[1000] = "I wish that I would have known, I was on your mind. I wish that I would have known, I was on your mind. I was on your mind . I was on your mind. I was on your mind. I was on your mind. I was on your mind dun dund und undnu dun dun dun dnu dun dun dund nud nud nud dnu duundn ddn dun dun dun dun dun dnudn udn ";
 
 		// write to jeep file strlen amount
-		delete_int = b_write(delete2, buffer123, strlen(buffer123));
+		delete_int = b_write(testfs_src_fd, buffer123, strlen(buffer123));
 		printf("delete_int************: %d\n", delete_int);
 
-		delete_int = b_write(openDelete, buffer321, strlen(buffer321));
-		printf("delete_int*****@#@#***: %d\n", delete_int);
 
-
-
-		
-		delete3 = b_seek(delete2, 600, SEEK_SET);
-		printf("For SEEK_SET : %d\n", delete3);
-		
-		delete3 = b_seek(delete2,700,SEEK_CUR);
-		printf("For SEEK_CUR : %d\n", delete3);
-
-		delete3 = b_seek(delete2,800,SEEK_END);
-		printf("For SEEK_END : %d\n", delete3);
-
+		//After write, seek back to beginning for reading
+		b_seek(testfs_src_fd, 0, SEEK_SET);
 		
 		// tests for read
 		// readDelete = b_read(delete2, readBuffer, 30);
-		readDelete = b_read(openDelete, readBuffer, 60);
+		b_read(testfs_src_fd, readBuffer, 60);
+		b_read(testfs_src_fd, readBuffer+60, 120);
+		b_read(testfs_src_fd, readBuffer+180, 240);
+		b_read(testfs_src_fd, readBuffer+420, 555);
+		b_read(testfs_src_fd, readBuffer+975, 240);
+
 		// ** 
 		// localbuff stores bytes from write but location of new openDelete stores previous location
-
+		printf("readBuffer: %s\n", readBuffer);
 
 		
 		/* test code */
@@ -313,7 +300,7 @@ int cmd_touch (int argcnt, char *argvec[])
         if (testfs_src_fd < 0)
 	    return (testfs_src_fd);	//return with error
 
-        //b_close (testfs_src_fd);
+        b_close (testfs_src_fd);
 #endif
         return 0;
         }
