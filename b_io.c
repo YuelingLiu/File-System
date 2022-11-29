@@ -115,7 +115,9 @@ int b_seek (b_io_fd fd, off_t offset, int whence) {
 		// adjust the new offset to our file allocation system.
 		fcbArray[fd].chunkNumber = newOffset / B_CHUNK_SIZE;
 		fcbArray[fd].chunkOffset = newOffset % B_CHUNK_SIZE;
-		fcbArray[fd].currentIndexBlockLoc = getIndexBlockLoc(fcbArray[fd].chunkNumber, fcbArray[fd].fi);
+/*--------------------------------------------100-------------------------------------------------*/
+		fcbArray[fd].currentIndexBlockLoc = getIndexBlockLoc(fcbArray[fd].chunkNumber, 
+			fcbArray[fd].fi);
 		return newOffset;
 	}
 
@@ -127,7 +129,9 @@ int b_seek (b_io_fd fd, off_t offset, int whence) {
 		// adjust the new offset to our file allocation system.
 		fcbArray[fd].chunkNumber = newOffset / B_CHUNK_SIZE;
 		fcbArray[fd].chunkOffset = newOffset % B_CHUNK_SIZE;
-		fcbArray[fd].currentIndexBlockLoc = getIndexBlockLoc(fcbArray[fd].chunkNumber, fcbArray[fd].fi);
+/*--------------------------------------------100-------------------------------------------------*/
+		fcbArray[fd].currentIndexBlockLoc = getIndexBlockLoc(fcbArray[fd].chunkNumber, 
+			fcbArray[fd].fi);
 
 		return newOffset;
 	}
@@ -140,7 +144,8 @@ int b_seek (b_io_fd fd, off_t offset, int whence) {
 		// adjust the new offset to our file allocation system.
 		fcbArray[fd].chunkNumber = newOffset / B_CHUNK_SIZE;
 		fcbArray[fd].chunkOffset = newOffset % B_CHUNK_SIZE;
-		fcbArray[fd].currentIndexBlockLoc = getIndexBlockLoc(fcbArray[fd].chunkNumber, fcbArray[fd].fi);
+		fcbArray[fd].currentIndexBlockLoc = getIndexBlockLoc(fcbArray[fd].chunkNumber, 
+			fcbArray[fd].fi);
 
 		printf("fcbArray[fd].chunkNumber: %d\n", fcbArray[fd].chunkNumber);
 		printf("fcbArray[fd].chunkOffset: %d\n", fcbArray[fd].chunkOffset);
@@ -315,8 +320,6 @@ int b_read (b_io_fd fd, char * buffer, int count) {
 	printf("************************************\n");
 	printf("STARTING THE READ FUNCTION\n");
 
-
-	
 	int currentOffset = (fcbArray[fd].chunkNumber * B_CHUNK_SIZE) + fcbArray[fd].chunkOffset;
 	printf("currentOffset: %d\n", currentOffset);
 	int bytesRemaining = fcbArray[fd].fi->fileSize - currentOffset;
@@ -340,7 +343,9 @@ int b_read (b_io_fd fd, char * buffer, int count) {
 	if (count > B_CHUNK_SIZE){
 		
 		if (fcbArray[fd].chunkOffset > 0){
-			memcpy(buffer, fcbArray[fd].localBuff + fcbArray[fd].chunkOffset, B_CHUNK_SIZE-fcbArray[fd].chunkOffset);
+/*--------------------------------------------100-------------------------------------------------*/
+			memcpy(buffer, fcbArray[fd].localBuff + fcbArray[fd].chunkOffset,
+				B_CHUNK_SIZE-fcbArray[fd].chunkOffset);
 			bytesTransferred += (B_CHUNK_SIZE - fcbArray[fd].chunkOffset);
 			
 			fcbArray[fd].chunkNumber++;
@@ -375,8 +380,9 @@ int b_read (b_io_fd fd, char * buffer, int count) {
 	//Case 1: Count less than remaining space in local buffer
 	//Next call will resume current block
 	if (B_CHUNK_SIZE - fcbArray[fd].chunkOffset > count){
-		
-		memcpy(buffer + bytesTransferred, fcbArray[fd].localBuff + fcbArray[fd].chunkOffset, count);
+/*--------------------------------------------100-------------------------------------------------*/
+		memcpy(buffer + bytesTransferred, fcbArray[fd].localBuff +
+			fcbArray[fd].chunkOffset, count);
 		bytesTransferred += count;
 		fcbArray[fd].chunkOffset += count;
 		bytesRemaining -= bytesTransferred;
@@ -385,8 +391,9 @@ int b_read (b_io_fd fd, char * buffer, int count) {
 	//Case 2: Count equals remaining space in local buffer
 	//Must allow new block to read from LBA in next call
 	else if (B_CHUNK_SIZE - fcbArray[fd].chunkOffset == count){
-		
-		memcpy(buffer + bytesTransferred, fcbArray[fd].localBuff + fcbArray[fd].chunkOffset, count);
+/*--------------------------------------------100-------------------------------------------------*/
+		memcpy(buffer + bytesTransferred, fcbArray[fd].localBuff +
+			fcbArray[fd].chunkOffset, count);
 		bytesTransferred += count;
 		fcbArray[fd].chunkOffset = 0; //Reset block position to trigger LBAread on next call
 		fcbArray[fd].chunkNumber += 1;
@@ -396,8 +403,9 @@ int b_read (b_io_fd fd, char * buffer, int count) {
 	//Case 3: Not enough space in local buffer for requested count
 	//Must fill block, transfer, request new block from LBA, then transfer again
 	else if (B_CHUNK_SIZE - fcbArray[fd].chunkOffset < count){
-		
-		memcpy(buffer + bytesTransferred, fcbArray[fd].localBuff + fcbArray[fd].chunkOffset, B_CHUNK_SIZE-fcbArray[fd].chunkOffset);
+/*--------------------------------------------100-------------------------------------------------*/
+		memcpy(buffer + bytesTransferred, fcbArray[fd].localBuff +
+			fcbArray[fd].chunkOffset, B_CHUNK_SIZE-fcbArray[fd].chunkOffset);
 		bytesTransferred += (B_CHUNK_SIZE - fcbArray[fd].chunkOffset);
 		count -= (B_CHUNK_SIZE - fcbArray[fd].chunkOffset);
 		fcbArray[fd].chunkOffset = 0; //Reset for upcoming new block
@@ -406,7 +414,9 @@ int b_read (b_io_fd fd, char * buffer, int count) {
 		fileChunk = getBlockN(fcbArray[fd].chunkNumber, fcbArray[fd].fi);
 		LBAread(fcbArray[fd].localBuff, 1, fileChunk);
 
-		memcpy(buffer + bytesTransferred, fcbArray[fd].localBuff + fcbArray[fd].chunkOffset, count); 				
+/*--------------------------------------------100-------------------------------------------------*/
+		memcpy(buffer + bytesTransferred, fcbArray[fd].localBuff +
+			fcbArray[fd].chunkOffset, count); 				
 		bytesTransferred += count;
 		fcbArray[fd].chunkOffset += count;
 		bytesRemaining -= bytesTransferred;

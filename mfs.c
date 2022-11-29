@@ -61,7 +61,9 @@ int fs_rmdir(const char *pathname)
 
     // Mark blocks as free
     LBAread(freeSpaceMap, 5, vcb->locOfFreespace);
-    for (int i = parentDir[path.index].location; i < parentDir[path.index].location + dirBlocks; i++)
+/*--------------------------------------------100-------------------------------------------------*/
+    for (int i = parentDir[path.index].location; i < parentDir[path.index].location +
+    dirBlocks; i++)
     {
         setBitZero(freeSpaceMap, i);
     }
@@ -132,7 +134,9 @@ int fs_delete(char *filename)
     // int fileBlocks = (parentDir[path.index].size + (vcb->blockSize - 1)) / vcb->blockSize;
 
     // // Mark blocks as free
-    // for (int i = parentDir[path.index].location; i < parentDir[path.index].location + fileBlocks; i++)
+/*--------------------------------------------100-------------------------------------------------*/
+    // for (int i = parentDir[path.index].location; i < parentDir[path.index].location +
+    // fileBlocks; i++)
     // {
     //     setBitZero(freeSpaceMap, i);
     // }
@@ -326,7 +330,9 @@ struct fdPathResult parsedPath(const char *path)
                     printf("no directory with the name: %s\n", tokenArray[i]);
                     if (i > 0)
                     {
-                       // printf("setting dirPtr to tempBuffer[0].location: %d\n",tempBuffer[0].location);
+/*--------------------------------------------100-------------------------------------------------*/
+                       // printf("setting dirPtr to tempBuffer[0].location: %d\n",
+                       // tempBuffer[0].location);
                         globalTemp.dirPtr = tempBuffer[0].location;
                     }
                     else{
@@ -692,7 +698,9 @@ int fs_setcwd(char *pathname)
 //     // mark blocks as used
 //     uint8_t* freeSpaceMap = malloc(getFreespaceSize(vcb->numBlocks, vcb->blockSize));
 //     LBAread(freeSpaceMap, 5, vcb->locOfFreespace);
-//     for (int i = parentDir[path.index].location; i < parentDir[path.index].location + dirBlocks; i++){
+/*--------------------------------------------100-------------------------------------------------*/
+//     for (int i = parentDir[path.index].location; i < parentDir[path.index].location +
+//     dirBlocks; i++){
 //         setBitOne(freeSpaceMap, i);
 //     }
 

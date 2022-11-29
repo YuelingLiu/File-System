@@ -113,7 +113,9 @@ int displayFiles (fdDir * dirp, int flall, int fllong)
 			if (fllong)
 				{
 				fs_stat (di->d_name, &statbuf);
-				printf ("%s    %9ld   %s\n", fs_isDir(di->d_name)?"D":"-", statbuf.st_size, di->d_name);
+/*--------------------------------------------100-------------------------------------------------*/
+				printf ("%s    %9ld   %s\n", fs_isDir(di->d_name)?"D":"-",
+					statbuf.st_size, di->d_name);
 				}
 			else
 				{
@@ -740,7 +742,9 @@ int main (int argc, char * argv[])
 		}
 		
 	retVal = startPartitionSystem (filename, &volumeSize, &blockSize);	
-	printf("Opened %s, Volume Size: %llu;  BlockSize: %llu; Return %d\n", filename, (ull_t)volumeSize, (ull_t)blockSize, retVal);
+/*--------------------------------------------100-------------------------------------------------*/
+	printf("Opened %s, Volume Size: %llu;  BlockSize: %llu; Return %d\n",
+		filename, (ull_t)volumeSize, (ull_t)blockSize, retVal);
 
 	if (retVal != PART_NOERROR)
 		{
