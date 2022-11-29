@@ -40,9 +40,9 @@ fileInfo * GetFileInfo (char * fname){
 //Writes a new index block to disk and returns its disk location
 int createIndexBlock(){
     //Index block is exactly 512 bytes in size, enough to hold 64 location integers
-    int* indexBlock = calloc(1, INDEXBLOCKSIZE);
+    int* indexBlock = calloc(1, vcb->blockSize);
     int blockLocation = allocSingleBlock(freeSpaceMap, getFreespaceSize(vcb->numBlocks, vcb->blockSize));
-    for (int i = 0; i < 128; i++){
+    for (int i = 0; i < (vcb->blockSize/sizeof(int)); i++){
         indexBlock[i] = -1;
     }
     LBAwrite(indexBlock, 1, blockLocation);
@@ -85,6 +85,8 @@ int makeNewFile(const char* pathname){
             directory[i].fileType = FT_REGFILE;
             directory[i].numOfDE = 0;
             directory[i].location = locOfIndexBlock;
+            // this location isnt updated 
+            printf("********directory[i].location:********** %ld\n", directory[i].location);
 
             //Write directory containing new file back to disk
             LBAwrite(directory, blocksNeededForDir(50), path.dirPtr);
@@ -103,7 +105,7 @@ int makeNewFile(const char* pathname){
 //also returns the location of the new chunk
 int makeFileChunk(int indexBlockLoc, int index){
     
-    int* indexBlock = calloc(1, INDEXBLOCKSIZE);
+    int* indexBlock = calloc(1, vcb->blockSize);
     LBAread(indexBlock, 1, indexBlockLoc);
 
     int locOfNewChunk = allocSingleBlock(freeSpaceMap, getFreespaceSize(vcb->numBlocks, vcb->blockSize));
@@ -111,6 +113,7 @@ int makeFileChunk(int indexBlockLoc, int index){
     indexBlock[index] = locOfNewChunk;
     LBAwrite(indexBlock, 1, indexBlockLoc);
 
+    free(indexBlock);
     return locOfNewChunk;
 
 }
@@ -127,7 +130,7 @@ int initializeWritableChunks(int indexBlockLoc, int count){
     }
     
     //Load given index block
-    int* indexBlock = calloc(1, INDEXBLOCKSIZE);
+    int* indexBlock = calloc(1, vcb->blockSize);
     LBAread(indexBlock, 1, indexBlockLoc);
 
     //Prepare variables needed to track progress through index blocks
@@ -141,7 +144,8 @@ int initializeWritableChunks(int indexBlockLoc, int count){
     //Until no more chunks left to be written, alloc free block/chunk and assign to index block
     while (numChunks > 0){
         //If tracker is at last index of Index Block, then we need to create a new Index Block
-        if (IBIndex == 127){
+        int lastIndex = (vcb->blockSize/sizeof(int)) - 1;
+        if (IBIndex == lastIndex){
             indexBlock[IBIndex] = createIndexBlock();
             LBAwrite(indexBlock, 1, currentBlockLoc);
             
@@ -167,14 +171,15 @@ int initializeWritableChunks(int indexBlockLoc, int count){
 //represented by fileInfo* fi
 int getBlockN(int n, fileInfo* fi){
     
-    int blockNumber = n / ((INDEXBLOCKSIZE-INTSIZE)/INTSIZE);
-    int indexInBlock = n % ((INDEXBLOCKSIZE-INTSIZE)/INTSIZE);
-    int* temp = calloc(1, INDEXBLOCKSIZE);
+    int blockNumber = n / ((vcb->blockSize-sizeof(int))/sizeof(int));
+    int indexInBlock = n % ((vcb->blockSize-sizeof(int))/sizeof(int));
+    int* temp = calloc(1, vcb->blockSize);
     LBAread(temp, 1, fi->location);
     int i = 0;
     int next;
-    while (i < blockNumber){
-        next = temp[127];
+    int lastIndex = (vcb->blockSize/sizeof(int)) - 1;
+    while (i < blockNumber){        
+        next = temp[lastIndex];
         if (next == -1){
             printf("Index block for chunk n doesn't exist!\n");
             return 0;
@@ -182,8 +187,31 @@ int getBlockN(int n, fileInfo* fi){
         LBAread(temp, 1, next);
     }
     int locN = temp[indexInBlock];
+    free(temp);
     return locN;
 
+}
+
+//Given n-th chunk of a file (from 0), return the location of the index block
+//that contains the pointer to that chunk.
+int getIndexBlockLoc(int chunkNumber, fileInfo* fi){
+    int blockNumber = chunkNumber / ((vcb->blockSize-sizeof(int))/sizeof(int));
+    int* temp = calloc(1, vcb->blockSize);
+    LBAread(temp, 1, fi->location);
+    int i = 0;
+    int next;
+    int lastIndex = (vcb->blockSize/sizeof(int)) - 1;
+    while (i < (blockNumber - 1)){
+        next = temp[lastIndex];
+        if (next == -1){
+            printf("Index block for chunk n doesn't exist!\n");
+            return 0;
+        }
+        LBAread(temp, 1, next);
+    }
+    int loc = temp[lastIndex];
+    free(temp);
+    return loc;
 }
 
 

@@ -9,7 +9,7 @@
 * File: DE.h
 *
 * Description: This is the header file for our directory entry.
-* 
+*
 **************************************************************/
 
 #ifndef DE_H
@@ -26,15 +26,11 @@ typedef struct DirectoryEntry {
     // Dictate the total number of directory entries we want for a directory.
     int numOfDE;
 
-    // Dictate the bytes we need multiply the size of your directory entry
-    // by the number of entries
+    // Dictate the number of bytes we need.
+    // (multiply the size of directory entry by the number of entries)
     int bytesNeeded;
 
-    // Dictate the current time
-    //time_t timeStamp;
-
-    // SUBJECT TO CHANGE: for now, going forward using a file allocation method
-    // that requires a “pointer” to the starting block of the file.
+    // the location that we want to keep
     long location;
 
     // including a filetype for directories and files

@@ -42,12 +42,12 @@
 
 /****   SET THESE TO 1 WHEN READY TO TEST THAT COMMAND ****/
 #define CMDLS_ON	1
-#define CMDCP_ON	0
-#define CMDMV_ON	0
+#define CMDCP_ON	1
+#define CMDMV_ON	1
 #define CMDMD_ON	1
 #define CMDRM_ON	1
-#define CMDCP2L_ON	0
-#define CMDCP2FS_ON	0
+#define CMDCP2L_ON	1
+#define CMDCP2FS_ON	1
 #define CMDCD_ON	1
 #define CMDPWD_ON	1
 #define CMDTOUCH_ON	1
@@ -245,9 +245,6 @@ int cmd_touch (int argcnt, char *argvec[])
         {
 #if (CMDTOUCH_ON == 1)     
         int testfs_src_fd;
-		int delete_int;
-		int delete2;
-		int delete3;
         char * src;
 
         switch (argcnt)
@@ -263,6 +260,9 @@ int cmd_touch (int argcnt, char *argvec[])
 
         testfs_src_fd = b_open (src, O_WRONLY | O_CREAT);
 		
+        testfs_src_fd = b_open (src, O_RDWR | O_CREAT);
+		
+
         if (testfs_src_fd < 0)
 	    return (testfs_src_fd);	//return with error
 
@@ -273,7 +273,6 @@ int cmd_touch (int argcnt, char *argvec[])
 
 
 /***************************************************
-* Cat Command
 ***************************************************/
 
 int cmd_cat (int argcnt, char *argvec[])
@@ -501,7 +500,15 @@ int cmd_cp2fs (int argcnt, char *argvec[])
 	
 	
 	testfs_fd = b_open (dest, O_WRONLY | O_CREAT | O_TRUNC);
+	/* test code */
+	//printf(" INSIDE OF CP2FStestfs_fd: %d\n", testfs_fd);
+	/* test code */
+
 	linux_fd = open (src, O_RDONLY);
+	/* test code */
+
+	//printf(" INSIDE OF CP2FSlinux_fd: %d\n", linux_fd);
+	/* test code */
 	do 
 		{
 		readcnt = read (linux_fd, buf, BUFFERLEN);
