@@ -85,6 +85,8 @@ int makeNewFile(const char* pathname){
             directory[i].fileType = FT_REGFILE;
             directory[i].numOfDE = 0;
             directory[i].location = locOfIndexBlock;
+            // this location isnt updated 
+            printf("********directory[i].location:********** %ld\n", directory[i].location);
 
             //Write directory containing new file back to disk
             LBAwrite(directory, blocksNeededForDir(50), path.dirPtr);
