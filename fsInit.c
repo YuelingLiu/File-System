@@ -178,8 +178,13 @@ int initFileSystem (uint64_t numberOfBlocks, uint64_t blockSize) {
 
 void exitFileSystem () {
 	printf ("System exiting\n");
+
     free(vcb);
+    printf ("System exiting1\n");
     vcb = NULL;
+    printf ("System exiting1.5\n");
+    printf ("freespaceMap%p\n",freeSpaceMap);
     free(freeSpaceMap);
+    printf ("System exiting2\n");
     freeSpaceMap = NULL;
 }

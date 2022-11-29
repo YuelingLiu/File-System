@@ -598,7 +598,7 @@ int fs_mkdir(const char *pathname, mode_t mode)
             // Prepare freespace
             size_t fssize = getFreespaceSize(vcb->numBlocks, vcb->blockSize);
             // uint8_t *freeSpaceMap = malloc(fssize);
-            //LBAread(freeSpaceMap, 5, vcb->locOfFreespace);
+            LBAread(freeSpaceMap, 5, vcb->locOfFreespace);
             int locOfNewDir = allocContBlocks(freeSpaceMap, fssize, blocksNeededForDir(MAXDE));
             //printf("locOfNewDir: %d\n", locOfNewDir);
 
@@ -666,7 +666,8 @@ fdDir *fs_opendir(const char *pathname)
     //      b: no -> fail return null it is not a directory
     if (tempBuffer[tempPath.index].fileType != FT_DIRECTORY)
     {
-        printf("return NULL from opendir\n");
+      
+      
         return NULL;
     }
 

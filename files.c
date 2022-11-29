@@ -47,16 +47,16 @@ int createIndexBlock(){
     }
     LBAwrite(indexBlock, 1, blockLocation);
     free(indexBlock);
-    printf("*createIndexBlock* new index block at: %d\n", blockLocation);
+    //printf("*createIndexBlock* new index block at: %d\n", blockLocation);
     return blockLocation;
 }
 
 //Given a path/filename of a new file, this function creates 
 //a directory entry and index block for the new file
 int makeNewFile(const char* pathname){
-    printf("inside makeNewFile before parsed path\n");
+   // printf("inside makeNewFile before parsed path\n");
     struct fdPathResult path = parsedPath(pathname);
-    printf("inside makeNewFile after parsed path\n");
+    //printf("inside makeNewFile after parsed path\n");
 
 
     // if the file already exists we dont need to make another
@@ -68,13 +68,13 @@ int makeNewFile(const char* pathname){
     DirectoryEntry* directory = calloc(blocksNeededForDir(50), vcb->blockSize);
     LBAread(directory, blocksNeededForDir(50), path.dirPtr);
 
-    printf("inside makeNewfile after LBAread\n");
+    //printf("inside makeNewfile after LBAread\n");
     int i = 2; // starting dir index of NOT "." or ".."
     while (i < 50){
-        printf("inside makenewfile after while loop\n");
+        //printf("inside makenewfile after while loop\n");
         if (strcmp(directory[i].name, "") == 0){ // Upon finding first available DE slot
             
-            printf("inside makenewfile inside loop\n");
+            //printf("inside makenewfile inside loop\n");
 
             //Prepare index block of new file
             int locOfIndexBlock = createIndexBlock();
@@ -86,7 +86,7 @@ int makeNewFile(const char* pathname){
             directory[i].numOfDE = 0;
             directory[i].location = locOfIndexBlock;
             // this location isnt updated 
-            printf("********directory[i].location:********** %ld\n", directory[i].location);
+            //printf("********directory[i].location:********** %ld\n", directory[i].location);
 
             //Write directory containing new file back to disk
             LBAwrite(directory, blocksNeededForDir(50), path.dirPtr);
@@ -156,7 +156,7 @@ int initializeWritableChunks(int indexBlockLoc, int count){
         }
         
         indexBlock[IBIndex] = allocSingleBlock(freeSpaceMap, getFreespaceSize(vcb->numBlocks, vcb->blockSize));
-        printf("*initWritChunks* allocing new file chunk at: %d\n", indexBlock[IBIndex]);
+        //printf("*initWritChunks* allocing new file chunk at: %d\n", indexBlock[IBIndex]);
         IBIndex++;
         numChunks--;
     }

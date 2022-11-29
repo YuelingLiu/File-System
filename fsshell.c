@@ -371,6 +371,7 @@ int cmd_mv (int argcnt, char *argvec[])
 #if (CMDMV_ON == 1)				
 	return -99;
 	// **** TODO ****  For you to implement	
+	
 #endif
 	return 0;
 	}
@@ -778,7 +779,7 @@ int main (int argc, char * argv[])
 		free (cmdin);
 		cmdin = NULL;
 		
-		if (strcmp (cmd, "exit") == 0)
+		if (strcmp (cmd, "exit") == 0 || strcmp (cmd, "exit ") == 0 )
 			{
 			free (cmd);
 			cmd = NULL;
