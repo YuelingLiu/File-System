@@ -42,12 +42,12 @@
 
 /****   SET THESE TO 1 WHEN READY TO TEST THAT COMMAND ****/
 #define CMDLS_ON	1
-#define CMDCP_ON	0
-#define CMDMV_ON	0
+#define CMDCP_ON	1
+#define CMDMV_ON	1
 #define CMDMD_ON	1
 #define CMDRM_ON	1
-#define CMDCP2L_ON	0
-#define CMDCP2FS_ON	0
+#define CMDCP2L_ON	1
+#define CMDCP2FS_ON	1
 #define CMDCD_ON	1
 #define CMDPWD_ON	1
 #define CMDTOUCH_ON	1
@@ -245,13 +245,7 @@ int cmd_touch (int argcnt, char *argvec[])
         {
 #if (CMDTOUCH_ON == 1)     
         int testfs_src_fd;
-		int delete_int;
-		int delete2;
-		int delete3;
-		int readDelete;
-		int openDelete;
         char * src;
-		char readBuffer[5000];
 
         switch (argcnt)
                 {
@@ -265,37 +259,7 @@ int cmd_touch (int argcnt, char *argvec[])
                 }
 
         testfs_src_fd = b_open (src, O_RDWR | O_CREAT);
-		/* test code */
-
 		
-
-		// test buffer string
-		char buffer123[3000] = "It was in July, 1805, and the speaker was the well-known Anna Pávlovna Schérer, maid of honor and favorite of the Empress Márya Fëdorovna. With these words she greeted Prince Vasíli Kurágin, a man of high rank and importance, who was the first to arrive at her reception. Anna Pávlovna had had a cough for some days. She was, as she said, suffering from la grippe; grippe being then a new word in St. Petersburg, used only by the elite. All her invitations without exception, written in French, and delivered by a scarlet-liveried footman that morning, ran as follows: Prince Vasíli always spoke languidly, like an actor repeating a stale part. Anna Pávlovna Schérer on the contrary, despite her forty years, overflowed with animation and impulsiveness. To be an enthusiast had become her social vocation and, sometimes even when she did not feel like it, she became enthusiastic in order not to disappoint the expectations of those who knew her. The subdued smile which, though it did not suit her faded features, always played round her lips expressed, as in a spoiled child, a continual consciousness of her charming defect, which she neither wished, nor could, nor considered it necessary, to correct."; 
-
-
-		// write to jeep file strlen amount
-		delete_int = b_write(testfs_src_fd, buffer123, strlen(buffer123));
-		printf("delete_int************: %d\n", delete_int);
-
-
-		//After write, seek back to beginning for reading
-		b_seek(testfs_src_fd, 0, SEEK_SET);
-		
-		// tests for read
-		// readDelete = b_read(delete2, readBuffer, 30);
-		b_read(testfs_src_fd, readBuffer, 60);
-		b_read(testfs_src_fd, readBuffer+60, 120);
-		b_read(testfs_src_fd, readBuffer+180, 240);
-		b_read(testfs_src_fd, readBuffer+420, 555);
-		b_read(testfs_src_fd, readBuffer+975, 240);
-
-		// ** 
-		// localbuff stores bytes from write but location of new openDelete stores previous location
-		printf("readBuffer: %s\n", readBuffer);
-
-		
-		/* test code */
-
 
         if (testfs_src_fd < 0)
 	    return (testfs_src_fd);	//return with error
@@ -535,7 +499,15 @@ int cmd_cp2fs (int argcnt, char *argvec[])
 	
 	
 	testfs_fd = b_open (dest, O_WRONLY | O_CREAT | O_TRUNC);
+	/* test code */
+	printf(" INSIDE OF CP2FStestfs_fd: %d\n", testfs_fd);
+	/* test code */
+
 	linux_fd = open (src, O_RDONLY);
+	/* test code */
+
+	printf(" INSIDE OF CP2FSlinux_fd: %d\n", linux_fd);
+	/* test code */
 	do 
 		{
 		readcnt = read (linux_fd, buf, BUFFERLEN);

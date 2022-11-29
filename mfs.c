@@ -593,7 +593,12 @@ int fs_setcwd(char *pathname)
 {   
     struct fdPathResult path = parsedPath(pathname);
     printf("globalPath******(): %s\n", globalPath);
-    //fs_pathReconstruction(pathname);
+
+    // check if isfile
+    int isFile = fs_isFile(pathname);
+    if (isFile == 1 ){
+        return -1;
+    }
 
     if (path.index == -1)
     {

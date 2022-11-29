@@ -158,7 +158,7 @@ int initFileSystem (uint64_t numberOfBlocks, uint64_t blockSize) {
     // in your structure and see if it matches.
 
     // temp to get the code to work MAKE SURE TO DELETE
-    vcb->signature = 12;
+    //vcb->signature = 12;
 
     if (vcb->signature != MAGICNUM) {
         vcb->signature = MAGICNUM;
