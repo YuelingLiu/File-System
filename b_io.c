@@ -77,6 +77,9 @@ int b_open (char * filename, int flags) {
 	}
 
 	fcbArray[returnFd].fi = GetFileInfo(filename);
+	if (fcbArray[returnFd].fi == NULL){
+		return (-1);
+	}
 	fcbArray[returnFd].localBuff = calloc(1, B_CHUNK_SIZE);
 	fcbArray[returnFd].chunkOffset = 0;
 	fcbArray[returnFd].chunkNumber = 0;
