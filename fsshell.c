@@ -779,7 +779,7 @@ int main (int argc, char * argv[])
 		free (cmdin);
 		cmdin = NULL;
 		
-		if (strcmp (cmd, "exit") == 0 || strcmp (cmd, "exit ") == 0 )
+		if (strcmp (cmd, "exit") == 0 )
 			{
 			free (cmd);
 			cmd = NULL;
