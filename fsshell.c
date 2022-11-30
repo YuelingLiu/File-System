@@ -359,7 +359,7 @@ int cmd_mv(int argcnt, char *argvec[])
 #if (CMDMV_ON == 1)
 	// return -99;
 	// **** TODO ****  For you to implement
-	printf("Inside mv command\n");
+	//printf("Inside mv command\n");
 	int testfs_src_fd;
 	int testfs_dest_fd;
 	char *src;

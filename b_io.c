@@ -44,7 +44,7 @@ b_io_fd b_getFCB () {
 // Modification of interface for this assignment, flags match the Linux flags for open
 // O_RDONLY, O_WRONLY, or O_RDWR
 int b_open (char * filename, int flags) {
-	printf("printing inside of b_open\n");
+	//printf("printing inside of b_open\n");
 	int returnFd;
 
 	//*** TODO ***:  Modify to save or set any information needed
@@ -59,15 +59,15 @@ int b_open (char * filename, int flags) {
 	// Set to read mode, write mode, or read/write mode
 
 	if ((flags & O_RDONLY) == O_RDONLY) {
-		printf("setting read only\n");
+		//printf("setting read only\n");
 		fcbArray[returnFd].mode = O_RDONLY;
 	}
 	else if ((flags & O_WRONLY) == O_WRONLY) {
-		printf("setting write only\n");
+		//printf("setting write only\n");
 		fcbArray[returnFd].mode = O_WRONLY;
 	}
 	else if ((flags & O_RDWR) == O_RDWR) {
-		printf("setting read write\n");
+		//printf("setting read write\n");
 		fcbArray[returnFd].mode = O_RDWR;
 	}
 
@@ -168,18 +168,18 @@ to the file referred to by the file descriptor fd.
 On success, the number of bytes written is returned.
 */
 int b_write (b_io_fd fd, char * buffer, int count) {
-	printf("*****************************************\n");
-	printf("Start of b_write\n");
+	//printf("*****************************************\n");
+	//printf("Start of b_write\n");
 	if (startup == 0) b_init();  //Initialize our system
 
-	printf("after first if\n");
+	//printf("after first if\n");
 
 	// check that fd is between 0 and (MAXFCBS-1)
 	if ((fd < 0) || (fd >= MAXFCBS)) {
 		return (-1); // invalid file descriptor
 	}
 
-	printf("after second if\n");
+	//printf("after second if\n");
 	//fcbArray[fd].mode = O_WRONLY;
 	// where is fcbArray[fd].mode changed? *************
 
@@ -265,13 +265,13 @@ int b_write (b_io_fd fd, char * buffer, int count) {
 	LBAread(fcbArray[fd].localBuff, 1, fileChunk);
 	fcbArray[fd].chunkOffset += tempCount;
 
-	printf("after LBAread\n");
-	printf("tempCount: %d\n", tempCount);
-	printf("writecount: %d\n", writeCount);
+	//printf("after LBAread\n");
+	//printf("tempCount: %d\n", tempCount);
+	//printf("writecount: %d\n", writeCount);
 	memcpy(fcbArray[fd].localBuff, buffer + writeCount, tempCount);
-	printf("base case writing to location: %d\n", fileChunk);
+	//printf("base case writing to location: %d\n", fileChunk);
 	LBAwrite(fcbArray[fd].localBuff, 1, fileChunk);
-	printf("fcbArray->localBuff: %s\n", fcbArray[fd].localBuff);
+	//printf("fcbArray->localBuff: %s\n", fcbArray[fd].localBuff);
 
 	writeCount += tempCount;
 
@@ -282,8 +282,8 @@ int b_write (b_io_fd fd, char * buffer, int count) {
 		fcbArray[fd].chunkOffset);
 	}
 
-	printf("new file size is: %d\n", fcbArray[fd].fi->fileSize);
-	printf("end of Write\n");
+	//printf("new file size is: %d\n", fcbArray[fd].fi->fileSize);
+	//printf("end of Write\n");
 	return (returnCount);
 }
 
@@ -320,13 +320,13 @@ int b_read (b_io_fd fd, char * buffer, int count) {
 	// 	return (-1); // Invalid mode: cannot read from writeonly file
 	// }
 	
-	printf("************************************\n");
-	printf("STARTING THE READ FUNCTION\n");
+	//printf("************************************\n");
+	//printf("STARTING THE READ FUNCTION\n");
 
 	int currentOffset = (fcbArray[fd].chunkNumber * B_CHUNK_SIZE) + fcbArray[fd].chunkOffset;
-	printf("currentOffset: %d\n", currentOffset);
+	//printf("currentOffset: %d\n", currentOffset);
 	int bytesRemaining = fcbArray[fd].fi->fileSize - currentOffset;
-	printf("bytesRemaining: %d\n", bytesRemaining);
+	//printf("bytesRemaining: %d\n", bytesRemaining);
 	
 	if (bytesRemaining < count){
 		count = bytesRemaining;
