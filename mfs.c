@@ -539,6 +539,8 @@ void fs_pathReconstruction (){
     {
         printf("tokenArray[i]***********: %s\n", tokenArray[i]);
         if ( (strcmp(tokenArray[i],".") == 0)  || (strcmp(tokenArray[i],"..") == 0)){
+/*--------------------------------------------100-------------------------------------------------*/
+
             tokenFlag = 1;
         }
        

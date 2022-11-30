@@ -41,7 +41,10 @@ fileInfo * GetFileInfo (char * fname){
 int createIndexBlock(){
     //Index block is exactly 512 bytes in size, enough to hold 64 location integers
     int* indexBlock = calloc(1, vcb->blockSize);
-    int blockLocation = allocSingleBlock(freeSpaceMap, getFreespaceSize(vcb->numBlocks, vcb->blockSize));
+/*--------------------------------------------100-------------------------------------------------*/
+
+    int blockLocation = allocSingleBlock(freeSpaceMap, getFreespaceSize(vcb->numBlocks,
+     vcb->blockSize));
     for (int i = 0; i < (vcb->blockSize/sizeof(int)); i++){
         indexBlock[i] = -1;
     }
@@ -86,7 +89,6 @@ int makeNewFile(const char* pathname){
             directory[i].numOfDE = 0;
             directory[i].location = locOfIndexBlock;
             // this location isnt updated 
-            printf("********directory[i].location:********** %ld\n", directory[i].location);
 
             //Write directory containing new file back to disk
             LBAwrite(directory, blocksNeededForDir(50), path.dirPtr);
@@ -108,7 +110,10 @@ int makeFileChunk(int indexBlockLoc, int index){
     int* indexBlock = calloc(1, vcb->blockSize);
     LBAread(indexBlock, 1, indexBlockLoc);
 
-    int locOfNewChunk = allocSingleBlock(freeSpaceMap, getFreespaceSize(vcb->numBlocks, vcb->blockSize));
+    int locOfNewChunk = allocSingleBlock(freeSpaceMap, getFreespaceSize(vcb->numBlocks,
+     vcb->blockSize));
+/*--------------------------------------------100-------------------------------------------------*/
+
     
     indexBlock[index] = locOfNewChunk;
     LBAwrite(indexBlock, 1, indexBlockLoc);
@@ -141,6 +146,8 @@ int initializeWritableChunks(int indexBlockLoc, int count){
     while (indexBlock[IBIndex] != (-1) && IBIndex < 63){
         IBIndex++;
     }
+/*--------------------------------------------100-------------------------------------------------*/
+
     //Until no more chunks left to be written, alloc free block/chunk and assign to index block
     while (numChunks > 0){
         //If tracker is at last index of Index Block, then we need to create a new Index Block
@@ -154,8 +161,10 @@ int initializeWritableChunks(int indexBlockLoc, int count){
             LBAread(indexBlock, 1, currentBlockLoc);
             IBIndex = 0;
         }
+/*--------------------------------------------100-------------------------------------------------*/
         
-        indexBlock[IBIndex] = allocSingleBlock(freeSpaceMap, getFreespaceSize(vcb->numBlocks, vcb->blockSize));
+        indexBlock[IBIndex] = allocSingleBlock(freeSpaceMap, getFreespaceSize(vcb->numBlocks,
+         vcb->blockSize));
         printf("*initWritChunks* allocing new file chunk at: %d\n", indexBlock[IBIndex]);
         IBIndex++;
         numChunks--;

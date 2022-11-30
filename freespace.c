@@ -35,6 +35,8 @@ int getFreespaceSize(int numberOfBlocks, int blockSize){
 
 // allocate contiguous blocks of free space for directories/files
 int allocContBlocks(uint8_t *freeSpaceMap, size_t fssize, int num){
+/*--------------------------------------------100-------------------------------------------------*/
+
     // count how many contiguous free blocks there are starting from the first free one
     int freeBlockCounter = 0;
     // amount of used blocks inside the byte before the first free one
