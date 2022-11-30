@@ -41,22 +41,25 @@ fileInfo * GetFileInfo (char * fname){
 int createIndexBlock(){
     //Index block is exactly 512 bytes in size, enough to hold 64 location integers
     int* indexBlock = calloc(1, vcb->blockSize);
-    int blockLocation = allocSingleBlock(freeSpaceMap, getFreespaceSize(vcb->numBlocks, vcb->blockSize));
+/*--------------------------------------------100-------------------------------------------------*/
+
+    int blockLocation = allocSingleBlock(freeSpaceMap, getFreespaceSize(vcb->numBlocks,
+     vcb->blockSize));
     for (int i = 0; i < (vcb->blockSize/sizeof(int)); i++){
         indexBlock[i] = -1;
     }
     LBAwrite(indexBlock, 1, blockLocation);
     free(indexBlock);
-    printf("*createIndexBlock* new index block at: %d\n", blockLocation);
+    //printf("*createIndexBlock* new index block at: %d\n", blockLocation);
     return blockLocation;
 }
 
 //Given a path/filename of a new file, this function creates 
 //a directory entry and index block for the new file
 int makeNewFile(const char* pathname){
-    printf("inside makeNewFile before parsed path\n");
+   // printf("inside makeNewFile before parsed path\n");
     struct fdPathResult path = parsedPath(pathname);
-    printf("inside makeNewFile after parsed path\n");
+    //printf("inside makeNewFile after parsed path\n");
 
 
     // if the file already exists we dont need to make another
@@ -68,13 +71,13 @@ int makeNewFile(const char* pathname){
     DirectoryEntry* directory = calloc(blocksNeededForDir(50), vcb->blockSize);
     LBAread(directory, blocksNeededForDir(50), path.dirPtr);
 
-    printf("inside makeNewfile after LBAread\n");
+    //printf("inside makeNewfile after LBAread\n");
     int i = 2; // starting dir index of NOT "." or ".."
     while (i < 50){
-        printf("inside makenewfile after while loop\n");
+        //printf("inside makenewfile after while loop\n");
         if (strcmp(directory[i].name, "") == 0){ // Upon finding first available DE slot
             
-            printf("inside makenewfile inside loop\n");
+            //printf("inside makenewfile inside loop\n");
 
             //Prepare index block of new file
             int locOfIndexBlock = createIndexBlock();
@@ -86,7 +89,6 @@ int makeNewFile(const char* pathname){
             directory[i].numOfDE = 0;
             directory[i].location = locOfIndexBlock;
             // this location isnt updated 
-            printf("********directory[i].location:********** %ld\n", directory[i].location);
 
             //Write directory containing new file back to disk
             LBAwrite(directory, blocksNeededForDir(50), path.dirPtr);
@@ -108,7 +110,10 @@ int makeFileChunk(int indexBlockLoc, int index){
     int* indexBlock = calloc(1, vcb->blockSize);
     LBAread(indexBlock, 1, indexBlockLoc);
 
-    int locOfNewChunk = allocSingleBlock(freeSpaceMap, getFreespaceSize(vcb->numBlocks, vcb->blockSize));
+    int locOfNewChunk = allocSingleBlock(freeSpaceMap, getFreespaceSize(vcb->numBlocks,
+     vcb->blockSize));
+/*--------------------------------------------100-------------------------------------------------*/
+
     
     indexBlock[index] = locOfNewChunk;
     LBAwrite(indexBlock, 1, indexBlockLoc);
@@ -141,6 +146,8 @@ int initializeWritableChunks(int indexBlockLoc, int count){
     while (indexBlock[IBIndex] != (-1) && IBIndex < 63){
         IBIndex++;
     }
+/*--------------------------------------------100-------------------------------------------------*/
+
     //Until no more chunks left to be written, alloc free block/chunk and assign to index block
     while (numChunks > 0){
         //If tracker is at last index of Index Block, then we need to create a new Index Block
@@ -154,9 +161,11 @@ int initializeWritableChunks(int indexBlockLoc, int count){
             LBAread(indexBlock, 1, currentBlockLoc);
             IBIndex = 0;
         }
+/*--------------------------------------------100-------------------------------------------------*/
         
-        indexBlock[IBIndex] = allocSingleBlock(freeSpaceMap, getFreespaceSize(vcb->numBlocks, vcb->blockSize));
-        printf("*initWritChunks* allocing new file chunk at: %d\n", indexBlock[IBIndex]);
+        indexBlock[IBIndex] = allocSingleBlock(freeSpaceMap, getFreespaceSize(vcb->numBlocks,
+         vcb->blockSize));
+        //printf("*initWritChunks* allocing new file chunk at: %d\n", indexBlock[IBIndex]);
         IBIndex++;
         numChunks--;
     }

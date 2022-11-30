@@ -113,7 +113,9 @@ int displayFiles (fdDir * dirp, int flall, int fllong)
 			if (fllong)
 				{
 				fs_stat (di->d_name, &statbuf);
-				printf ("%s    %9ld   %s\n", fs_isDir(di->d_name)?"D":"-", statbuf.st_size, di->d_name);
+/*--------------------------------------------100-------------------------------------------------*/
+				printf ("%s    %9ld   %s\n", fs_isDir(di->d_name)?"D":"-",
+					statbuf.st_size, di->d_name);
 				}
 			else
 				{
@@ -258,6 +260,8 @@ int cmd_touch (int argcnt, char *argvec[])
                         return (-1);
                 }
 
+        testfs_src_fd = b_open (src, O_WRONLY | O_CREAT);
+		
         testfs_src_fd = b_open (src, O_RDWR | O_CREAT);
 		
 
@@ -271,7 +275,6 @@ int cmd_touch (int argcnt, char *argvec[])
 
 
 /***************************************************
-* Cat Command
 ***************************************************/
 
 int cmd_cat (int argcnt, char *argvec[])
@@ -368,8 +371,35 @@ int cmd_cp (int argcnt, char *argvec[])
 int cmd_mv (int argcnt, char *argvec[])
 	{
 #if (CMDMV_ON == 1)				
-	return -99;
+	//return -99;
 	// **** TODO ****  For you to implement	
+	int testfs_src_fd;
+	int testfs_dest_fd;
+	char * src;
+	char * dest;
+	int readcnt;
+	char buf[BUFFERLEN];
+	
+	switch (argcnt)
+		{
+		case 2:	//only one name provided
+			printf("Invalid number\n");
+			return -1;
+			
+		case 3:
+			src = argvec[1];
+			dest = argvec[2];
+			break;
+		
+		default:
+			printf("Usage: cp srcfile [destfile]\n");
+			return (-1);
+		}
+	
+	printf("src: %s\n",src);
+	printf("des: %s\n",dest);
+	
+	
 #endif
 	return 0;
 	}
@@ -500,13 +530,13 @@ int cmd_cp2fs (int argcnt, char *argvec[])
 	
 	testfs_fd = b_open (dest, O_WRONLY | O_CREAT | O_TRUNC);
 	/* test code */
-	printf(" INSIDE OF CP2FStestfs_fd: %d\n", testfs_fd);
+	//printf(" INSIDE OF CP2FStestfs_fd: %d\n", testfs_fd);
 	/* test code */
 
 	linux_fd = open (src, O_RDONLY);
 	/* test code */
 
-	printf(" INSIDE OF CP2FSlinux_fd: %d\n", linux_fd);
+	//printf(" INSIDE OF CP2FSlinux_fd: %d\n", linux_fd);
 	/* test code */
 	do 
 		{
@@ -740,7 +770,9 @@ int main (int argc, char * argv[])
 		}
 		
 	retVal = startPartitionSystem (filename, &volumeSize, &blockSize);	
-	printf("Opened %s, Volume Size: %llu;  BlockSize: %llu; Return %d\n", filename, (ull_t)volumeSize, (ull_t)blockSize, retVal);
+/*--------------------------------------------100-------------------------------------------------*/
+	printf("Opened %s, Volume Size: %llu;  BlockSize: %llu; Return %d\n",
+		filename, (ull_t)volumeSize, (ull_t)blockSize, retVal);
 
 	if (retVal != PART_NOERROR)
 		{
@@ -777,7 +809,7 @@ int main (int argc, char * argv[])
 		free (cmdin);
 		cmdin = NULL;
 		
-		if (strcmp (cmd, "exit") == 0)
+		if (strcmp (cmd, "exit") == 0 )
 			{
 			free (cmd);
 			cmd = NULL;

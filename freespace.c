@@ -35,6 +35,8 @@ int getFreespaceSize(int numberOfBlocks, int blockSize){
 
 // allocate contiguous blocks of free space for directories/files
 int allocContBlocks(uint8_t *freeSpaceMap, size_t fssize, int num){
+/*--------------------------------------------100-------------------------------------------------*/
+
     // count how many contiguous free blocks there are starting from the first free one
     int freeBlockCounter = 0;
     // amount of used blocks inside the byte before the first free one
@@ -52,13 +54,17 @@ int allocContBlocks(uint8_t *freeSpaceMap, size_t fssize, int num){
             }
             // after we found the first zero, traverse until we reach amount requested
             // or encounter a 1
-            while(getBit(freeSpaceMap, (byteIndex * 8) + firstBitOffset + freeBlockCounter) == 0){
+/*--------------------------------------------100-------------------------------------------------*/
+            while(getBit(freeSpaceMap, (byteIndex * 8) + firstBitOffset +
+            freeBlockCounter) == 0) {
                 freeBlockCounter++;
 
                 // once freeBlockCounter is equal to userInput, we have found the space
                 // starting at (byteIndex * 8) + firstBitOffset;
                 if (freeBlockCounter == num){
-                    for (int i = (byteIndex * 8)+firstBitOffset; i < (byteIndex * 8)+firstBitOffset + freeBlockCounter; i++){
+/*--------------------------------------------100-------------------------------------------------*/
+                    for (int i = (byteIndex * 8) + firstBitOffset;
+                    i < (byteIndex * 8) + firstBitOffset + freeBlockCounter; i++){
                         setBitOne(freeSpaceMap, i); // mark the bits as used
                     }
                     
