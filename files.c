@@ -30,6 +30,12 @@ fileInfo * GetFileInfo (char * fname){
     LBAread(tempDir, dirBlocks, path.dirPtr);
 
     fileInfo* fi = malloc(sizeof(fileInfo));
+    
+    if (tempDir[path.index].fileType == FT_DIRECTORY){
+        printf("Cannot get file info for a directory!\n");
+        return NULL;
+    }
+    
     strncpy(fi->fileName, tempDir[path.index].name, 64);
     fi->fileSize = tempDir[path.index].size;
     fi->location = tempDir[path.index].location;

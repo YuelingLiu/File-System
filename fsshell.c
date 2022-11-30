@@ -354,6 +354,10 @@ int cmd_cp (int argcnt, char *argvec[])
 	
 	testfs_src_fd = b_open (src, O_RDONLY);
 	testfs_dest_fd = b_open (dest, O_WRONLY | O_CREAT | O_TRUNC);
+	if (testfs_src_fd == -1 || testfs_dest_fd == -1){
+		printf("Cannot open a directory\n");
+		return -1;
+	}
 	do 
 		{
 		readcnt = b_read (testfs_src_fd, buf, BUFFERLEN);
@@ -371,8 +375,75 @@ int cmd_cp (int argcnt, char *argvec[])
 int cmd_mv (int argcnt, char *argvec[])
 	{
 #if (CMDMV_ON == 1)				
-	return -99;
 	// **** TODO ****  For you to implement	
+	printf("Inside mv command\n");
+	int testfs_src_fd;
+	int testfs_dest_fd;
+	char * src;
+	char * dest;
+	int readcnt;
+	char buf[BUFFERLEN];
+	
+	switch (argcnt)
+		{
+		case 2:	//only one name provided
+			printf("Invalid number of arguments for mv\n");
+			printf("Usage: mv srcfile [destdir]\n");
+			return (-1);
+			
+		case 3:
+			src = argvec[1];
+			dest = argvec[2];
+			break;
+		
+		default:
+			printf("Usage: mv srcfile [destdir]\n");
+			return (-1);
+		}
+	
+	//The challenge is that src could be just a name like "hello" or it could
+	//also be a path like "banana/hello"
+	//which makes simply concat-ing on to dest (which is a path to a dir) not an option
+
+	//Create file in dest dir with same name as src
+	//Tokenize src, grab last name/token
+
+	char *tokenArray[50];     // array of names to be tokenized
+        
+        const char s[2] = "/";    // delimiter
+        int tokenIndex = 0;       // counter for number of tokens
+        char str[strlen(src)];   // declare a string, str to be read of size strlen(path)
+        strcpy(str, src);        // copy path into str
+
+        // loop to tokenize values
+        char *token = strtok(str, s);
+
+        // tokenizes the values and inserts into tokenArray
+        while (token != NULL)
+        {
+            tokenArray[tokenIndex++] = token;
+            token = strtok(NULL, s);
+        }
+
+		//Concatinating final name in src path to dest path
+		strcat(dest, "/");
+		strcat(dest, tokenArray[tokenIndex - 1]);
+		
+	
+	
+	testfs_src_fd = b_open (src, O_RDONLY);
+	testfs_dest_fd = b_open (dest, O_WRONLY | O_CREAT | O_TRUNC);
+	
+	do 
+		{
+		readcnt = b_read (testfs_src_fd, buf, BUFFERLEN);
+		b_write (testfs_dest_fd, buf, readcnt);
+		} while (readcnt == BUFFERLEN);
+	
+	b_close (testfs_src_fd);
+	b_close (testfs_dest_fd);
+	//Removing the original file
+	fs_delete(src);
 	
 #endif
 	return 0;
