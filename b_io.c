@@ -436,7 +436,7 @@ int b_close (b_io_fd fd) {
     struct fdPathResult path = parsedPath(fcbArray[fd].fi->fileName);
     if (path.index == -1)
     {
-        return NULL;
+        return (-1);
     }
     int dirBlocks = blocksNeededForDir(MAXDE);
     DirectoryEntry* tempDir = calloc (dirBlocks, vcb->blockSize);
