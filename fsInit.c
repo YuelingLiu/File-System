@@ -74,9 +74,10 @@ int initRootDE(int blockSize, int FSSize){
     freeSpaceMap = malloc(FSSize);
     LBAread(freeSpaceMap, 5, 1);
 
+    // Call allocContBlocks allocate contiguous blocks function
     int locOfRoot = allocContBlocks(freeSpaceMap, FSSize, blocksNeeded);
 
-    // set the dot
+    // set the dot 
     strcpy(directoryEntries[0].name, ".");
     directoryEntries[0].size = MAXDE * sizeof(DirectoryEntry);
     directoryEntries[0].location = locOfRoot;
@@ -91,23 +92,10 @@ int initRootDE(int blockSize, int FSSize){
     directoryEntries[1].fileType = FT_DIRECTORY;
     directoryEntries[1].numOfDE = MAXDE;
 
-    // // DELETE THIS LATER
-    // strcpy(directoryEntries[2].name, "banana");
-    // directoryEntries[2].size = MAXDE * sizeof(DirectoryEntry);
-    // directoryEntries[2].location = 60;
-    // directoryEntries[2].fileType = FT_DIRECTORY;
-    // directoryEntries[2].numOfDE = MAXDE;
 
-    // // DELETE THIS TOO
-    // strcpy(directoryEntries[3].name, "banana2");
-    // directoryEntries[3].size = MAXDE * sizeof(DirectoryEntry);
-    // directoryEntries[3].location = 2000;
-    // directoryEntries[3].fileType = FT_DIRECTORY;
-    // directoryEntries[3].numOfDE = MAXDE;
-
-
+    // Call LBAwrite function to write directoryEntires ,the number of blocksNeeded 
+    // and start from the location of the root 
     LBAwrite(directoryEntries, blocksNeeded, locOfRoot);
-
 
     LBAwrite(freeSpaceMap, 5, 1);
 
@@ -167,10 +155,6 @@ int initFileSystem (uint64_t numberOfBlocks, uint64_t blockSize) {
         vcb->locOfFreespace = initFreespace(FSSize); // function to be implemented
         vcb->locOfRoot = initRootDE(blockSize, FSSize); // function to be implemented
 
-        /* TEST CODE */
-        
-
-        /* TEST CODE */
 
 		// after the values are populated into the VCB, write to storage.
         int writeReturn;
@@ -184,15 +168,24 @@ int initFileSystem (uint64_t numberOfBlocks, uint64_t blockSize) {
 		// volume has already been formatted so no changes to the vcb
         freeSpaceMap = calloc(5, 512);
         LBAread(freeSpaceMap, 5, 1);
+        printf("*****freeSPaceMapCalloc %p\n",freeSpaceMap);
         return 0;
     }
 
 }
 
+
+
+
 void exitFileSystem () {
 	printf ("System exiting\n");
+
     free(vcb);
+    printf ("System exiting1\n");
     vcb = NULL;
+    printf ("System exiting1.5\n");
+    printf ("freespaceMap%p\n",freeSpaceMap);
     free(freeSpaceMap);
+    printf ("System exiting2\n");
     freeSpaceMap = NULL;
 }

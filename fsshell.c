@@ -260,6 +260,8 @@ int cmd_touch (int argcnt, char *argvec[])
                         return (-1);
                 }
 
+        testfs_src_fd = b_open (src, O_WRONLY | O_CREAT);
+		
         testfs_src_fd = b_open (src, O_RDWR | O_CREAT);
 		
 
@@ -273,7 +275,6 @@ int cmd_touch (int argcnt, char *argvec[])
 
 
 /***************************************************
-* Cat Command
 ***************************************************/
 
 int cmd_cat (int argcnt, char *argvec[])
@@ -372,6 +373,7 @@ int cmd_mv (int argcnt, char *argvec[])
 #if (CMDMV_ON == 1)				
 	return -99;
 	// **** TODO ****  For you to implement	
+	
 #endif
 	return 0;
 	}
@@ -502,13 +504,13 @@ int cmd_cp2fs (int argcnt, char *argvec[])
 	
 	testfs_fd = b_open (dest, O_WRONLY | O_CREAT | O_TRUNC);
 	/* test code */
-	printf(" INSIDE OF CP2FStestfs_fd: %d\n", testfs_fd);
+	//printf(" INSIDE OF CP2FStestfs_fd: %d\n", testfs_fd);
 	/* test code */
 
 	linux_fd = open (src, O_RDONLY);
 	/* test code */
 
-	printf(" INSIDE OF CP2FSlinux_fd: %d\n", linux_fd);
+	//printf(" INSIDE OF CP2FSlinux_fd: %d\n", linux_fd);
 	/* test code */
 	do 
 		{
@@ -781,7 +783,7 @@ int main (int argc, char * argv[])
 		free (cmdin);
 		cmdin = NULL;
 		
-		if (strcmp (cmd, "exit") == 0)
+		if (strcmp (cmd, "exit") == 0 )
 			{
 			free (cmd);
 			cmd = NULL;
