@@ -48,7 +48,7 @@ int createIndexBlock(){
     //Index block is exactly 512 bytes in size, enough to hold 64 location integers
     int* indexBlock = calloc(1, vcb->blockSize);
 /*--------------------------------------------100-------------------------------------------------*/
-
+    printf("*createIndexBlock: freeSpaceMap: %p\n", freeSpaceMap);
     int blockLocation = allocSingleBlock(freeSpaceMap, getFreespaceSize(vcb->numBlocks,
      vcb->blockSize));
     for (int i = 0; i < (vcb->blockSize/sizeof(int)); i++){
@@ -56,7 +56,7 @@ int createIndexBlock(){
     }
     LBAwrite(indexBlock, 1, blockLocation);
     free(indexBlock);
-    //printf("*createIndexBlock* new index block at: %d\n", blockLocation);
+    printf("*createIndexBlock* new index block at: %d\n", blockLocation);
     return blockLocation;
 }
 
@@ -83,7 +83,7 @@ int makeNewFile(const char* pathname){
         //printf("inside makenewfile after while loop\n");
         if (strcmp(directory[i].name, "") == 0){ // Upon finding first available DE slot
             
-            //printf("inside makenewfile inside loop\n");
+            printf("inside makenewfile inside loop\n");
 
             //Prepare index block of new file
             int locOfIndexBlock = createIndexBlock();
@@ -98,6 +98,8 @@ int makeNewFile(const char* pathname){
 
             //Write directory containing new file back to disk
             LBAwrite(directory, blocksNeededForDir(50), path.dirPtr);
+            LBAwrite(freeSpaceMap, 5, vcb->locOfFreespace);
+            printFS(freeSpaceMap);
             free(directory);
             return locOfIndexBlock;
         }

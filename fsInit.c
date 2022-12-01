@@ -71,7 +71,7 @@ int initRootDE(int blockSize, int FSSize){
 
 	// 6. Ask the free space for 6 blocks, and it should return
 	// a starting block number for those 6 blocks
-    freeSpaceMap = malloc(FSSize);
+    //freeSpaceMap = malloc(FSSize);
     LBAread(freeSpaceMap, 5, 1);
 
     // Call allocContBlocks allocate contiguous blocks function
@@ -98,6 +98,7 @@ int initRootDE(int blockSize, int FSSize){
     LBAwrite(directoryEntries, blocksNeeded, locOfRoot);
 
     LBAwrite(freeSpaceMap, 5, 1);
+    printFS(freeSpaceMap);
 
     free(directoryEntries);
     return locOfRoot;
@@ -114,6 +115,7 @@ int initFreespace(size_t fssize) {
 
     // block 1 is where freespace will be written
     LBAwrite(freeSpaceMap, 5, 1);
+    printFS(freeSpaceMap);
 
 
     return 1; // returning location of freespace to VCB

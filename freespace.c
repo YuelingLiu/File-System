@@ -14,6 +14,18 @@
 
 #include "freespace.h"
 
+void printFS(uint8_t *freeSpaceMap){
+    char bitstring[150];
+    int bit;
+    for (size_t i = 0; i < 150; i++)
+    {
+        bit = getBit(freeSpaceMap, i);
+        bitstring[i] = bit + '0';
+    }
+    printf("Freespace: %s\n", bitstring);
+    
+}
+
 void setBitOne(uint8_t *freeSpaceMap, int i){
     freeSpaceMap[i >> 3] |= (1 << (i & 0x7));
 }
@@ -36,7 +48,7 @@ int getFreespaceSize(int numberOfBlocks, int blockSize){
 // allocate contiguous blocks of free space for directories/files
 int allocContBlocks(uint8_t *freeSpaceMap, size_t fssize, int num){
 /*--------------------------------------------100-------------------------------------------------*/
-
+    printf("freeSpaceMap in alloc: %p\n", freeSpaceMap);
     // count how many contiguous free blocks there are starting from the first free one
     int freeBlockCounter = 0;
     // amount of used blocks inside the byte before the first free one
@@ -80,6 +92,7 @@ int allocContBlocks(uint8_t *freeSpaceMap, size_t fssize, int num){
 }
 
 int allocSingleBlock(uint8_t *freeSpaceMap, size_t fssize){
+    printf("freeSpaceMap in allocSingle: %p\n", freeSpaceMap);
     // amount of used blocks inside the byte before the first free one
     int firstBitOffset = 0;
     // read in one byte at a time (8 bits, 1 byte block)

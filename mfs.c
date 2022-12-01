@@ -78,6 +78,7 @@ int fs_rmdir(const char *pathname)
 
     // Write freespace and parentDir back to disk, free malloc
     LBAwrite(freeSpaceMap, 5, vcb->locOfFreespace);
+    printFS(freeSpaceMap);
     LBAwrite(parentDir, dirBlocks, path.dirPtr);
 
     free(parentDir);
@@ -91,6 +92,7 @@ int fs_rmdir(const char *pathname)
 //for each file chunk and index block as free.
 void markChunksFree(int indexBlockLoc){
     setBitZero(freeSpaceMap, indexBlockLoc);
+    printf("Setting bit %d of freepspacemap to 0\n", indexBlockLoc);
     
     int* temp = calloc(1, vcb->blockSize);
     LBAread(temp, 1, indexBlockLoc);
@@ -104,6 +106,7 @@ void markChunksFree(int indexBlockLoc){
             //If chunk is allocated, free it
             if (temp[i] != -1){
                 setBitZero(freeSpaceMap, temp[i]);
+                printf("Setting bit %d of freepspacemap to 0\n", temp[i]);
             }
             
         }
@@ -153,6 +156,7 @@ int fs_delete(char *filename)
     //Write freespace and parentDir back to disk
 
     LBAwrite(freeSpaceMap, 5, vcb->locOfFreespace);
+    printFS(freeSpaceMap);
     LBAwrite(parentDir, dirBlocks, path.dirPtr);
 
     free(parentDir);
@@ -647,6 +651,7 @@ int fs_mkdir(const char *pathname, mode_t mode)
                 printf("Error Writing with LBAwrite, exiting program\n");
                 exit(-1);
             }
+            printFS(freeSpaceMap);
             free(newDir);
             return locOfNewDir;
         }

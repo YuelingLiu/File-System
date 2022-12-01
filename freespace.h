@@ -20,6 +20,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+void printFS(uint8_t *freeSpaceMap);
+
 void setBitOne(uint8_t *freeSpaceMap, int i);
 
 void setBitZero(uint8_t *freeSpaceMap, int i);
