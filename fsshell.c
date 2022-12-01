@@ -106,7 +106,6 @@ int displayFiles(fdDir *dirp, int flall, int fllong)
 			if (fllong)
 			{
 				fs_stat(di->d_name, &statbuf);
-				/*--------------------------------------------100-------------------------------------------------*/
 				printf("%s    %9ld   %s\n", fs_isDir(di->d_name) ? "D" : "-",
 					   statbuf.st_size, di->d_name);
 			}
@@ -359,7 +358,6 @@ int cmd_mv(int argcnt, char *argvec[])
 #if (CMDMV_ON == 1)
 	// return -99;
 	// **** TODO ****  For you to implement
-	//printf("Inside mv command\n");
 	int testfs_src_fd;
 	int testfs_dest_fd;
 	char *src;
@@ -790,7 +788,6 @@ int main(int argc, char *argv[])
 	}
 
 	retVal = startPartitionSystem(filename, &volumeSize, &blockSize);
-	/*--------------------------------------------100-------------------------------------------------*/
 	printf("Opened %s, Volume Size: %llu;  BlockSize: %llu; Return %d\n",
 		   filename, (ull_t)volumeSize, (ull_t)blockSize, retVal);
 
