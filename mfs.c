@@ -600,7 +600,6 @@ int fs_mkdir(const char *pathname, mode_t mode)
 //
 fdDir *fs_opendir(const char *pathname)
 {
-    //printf("Entering opendir\n");
     // 1. parse the pathname, make sure path is valid and find the last element
     struct fdPathResult tempPath = parsedPath(pathname);
 
@@ -611,8 +610,6 @@ fdDir *fs_opendir(const char *pathname)
     //      b: no -> fail return null it is not a directory
     if (tempBuffer[tempPath.index].fileType != FT_DIRECTORY)
     {
-      
-      
         return NULL;
     }
 
