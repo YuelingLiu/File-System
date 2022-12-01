@@ -19,6 +19,7 @@
 //Duplicate of asmt5 get file info
 //This function should find file by calling parsepath
 fileInfo * GetFileInfo (char * fname){
+    
 //Copy info from file's DE into fileInfo struct, return ptr to struct
     struct fdPathResult path = parsedPath(fname);
     if (path.index == -1)
@@ -36,8 +37,12 @@ fileInfo * GetFileInfo (char * fname){
         return NULL;
     }
     
-    strncpy(fi->fileName, tempDir[path.index].name, 64);
+    //strncpy(fi->fileName, tempDir[path.index].name, 64);
+    // we removed this and changed it to fname so that we save the full path.
+    strncpy(fi->fileName, fname, 64);
+  
     fi->fileSize = tempDir[path.index].size;
+
     fi->location = tempDir[path.index].location;
     free(tempDir);
     return fi;

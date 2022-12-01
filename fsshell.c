@@ -332,6 +332,7 @@ int cmd_cp(int argcnt, char *argvec[])
 		return (-1);
 	}
 
+
 	testfs_src_fd = b_open(src, O_RDONLY);
 	testfs_dest_fd = b_open(dest, O_WRONLY | O_CREAT | O_TRUNC);
 	if (testfs_src_fd == -1 || testfs_dest_fd == -1)

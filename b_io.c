@@ -47,6 +47,9 @@ int b_open (char * filename, int flags) {
 	//printf("start b_open\n");
 	int returnFd;
 
+
+
+	
 	//*** TODO ***:  Modify to save or set any information needed
 	//
 	//
@@ -55,7 +58,7 @@ int b_open (char * filename, int flags) {
 
 	returnFd = b_getFCB();	// get our own file descriptor
 							// check for error - all used FCB's
-
+	
 	// Set to read mode, write mode, or read/write mode
 
 	if ((flags & O_RDONLY) == O_RDONLY) {
@@ -86,11 +89,12 @@ int b_open (char * filename, int flags) {
 	fcbArray[returnFd].currentIndexBlockLoc = fcbArray[returnFd].fi->location;
 	fcbArray[returnFd].buflen = 0;
 
+
 	// Case O_APPEND: TODO
 	if ((flags & O_APPEND) == O_CREAT) {
 		//set index, chunkNumber, etc. to end of file
 	}
-
+	
 	return (returnFd); // all set
 }
 
@@ -166,10 +170,11 @@ to the file referred to by the file descriptor fd.
 On success, the number of bytes written is returned.
 */
 int b_write (b_io_fd fd, char * buffer, int count) {
-	//printf("start bwrite\n");
+	
+
 	if (startup == 0) b_init();  //Initialize our system
 
-	//printf("after first if\n");
+	
 
 	// check that fd is between 0 and (MAXFCBS-1)
 	if ((fd < 0) || (fd >= MAXFCBS)) {
@@ -199,7 +204,6 @@ int b_write (b_io_fd fd, char * buffer, int count) {
 		initializeWritableChunks(fcbArray[fd].currentIndexBlockLoc, count);
 		fileChunk = getBlockN(fcbArray[fd].chunkNumber, fcbArray[fd].fi);
 	}
-	//printf("after getblockn\n");
 	// If starting part-way through starting file chunk, we finish filling that chunk first
 	if (count > (B_CHUNK_SIZE - fcbArray[fd].chunkOffset) && fcbArray[fd].chunkOffset > 0) {
 		LBAread(fcbArray[fd].localBuff, 1, fileChunk);
@@ -233,6 +237,7 @@ int b_write (b_io_fd fd, char * buffer, int count) {
 		LBAread(fcbArray[fd].localBuff, 1, fileChunk);
 
 		// copy from user buffer to process buffer
+		
 		memcpy(fcbArray[fd].localBuff, buffer + writeCount, B_CHUNK_SIZE);
 
 		// write localBuff to storage
@@ -253,7 +258,6 @@ int b_write (b_io_fd fd, char * buffer, int count) {
 	LBAread(fcbArray[fd].localBuff, 1, fileChunk);
 	
 
-	
 	memcpy(fcbArray[fd].localBuff + fcbArray[fd].chunkOffset, buffer + writeCount, tempCount);
 
 	fcbArray[fd].chunkOffset += tempCount;
@@ -293,9 +297,10 @@ int b_write (b_io_fd fd, char * buffer, int count) {
 //  +-------------+------------------------------------------------+--------+
 // When we LBA read, use getBlockN() function
 int b_read (b_io_fd fd, char * buffer, int count) {
-
+	
+	
 	if (startup == 0) b_init(); // Initialize our system
-
+	
 	// check that fd is between 0 and (MAXFCBS-1)
 	if ((fd < 0) || (fd >= MAXFCBS)) {
 		return (-1); // invalid file descriptor
@@ -304,7 +309,7 @@ int b_read (b_io_fd fd, char * buffer, int count) {
 	// if (fcbArray[fd].mode == O_WRONLY) {
 	// 	return (-1); // Invalid mode: cannot read from writeonly file
 	// }
-	
+
 
 	int currentOffset = (fcbArray[fd].chunkNumber * B_CHUNK_SIZE) + fcbArray[fd].chunkOffset;
 	int bytesRemaining = fcbArray[fd].fi->fileSize - currentOffset;
@@ -352,7 +357,7 @@ int b_read (b_io_fd fd, char * buffer, int count) {
 		
 		count = count - bytesTransferred; //Count should now be less than a block
 	}
-
+	
 	//Proceed from here assuming less than block of bytes to copy
 	//Local buffer empty? Grab new block from LBA
 	if (fcbArray[fd].chunkOffset == 0){
@@ -368,6 +373,7 @@ int b_read (b_io_fd fd, char * buffer, int count) {
 		bytesTransferred += count;
 		fcbArray[fd].chunkOffset += count;
 		bytesRemaining -= bytesTransferred;
+		
 		return bytesTransferred;
 	}
 	//Case 2: Count equals remaining space in local buffer
@@ -379,6 +385,7 @@ int b_read (b_io_fd fd, char * buffer, int count) {
 		fcbArray[fd].chunkOffset = 0; //Reset block position to trigger LBAread on next call
 		fcbArray[fd].chunkNumber += 1;
 		bytesRemaining -= bytesTransferred;
+		
 		return bytesTransferred;
 	}
 	//Case 3: Not enough space in local buffer for requested count
@@ -399,15 +406,19 @@ int b_read (b_io_fd fd, char * buffer, int count) {
 		bytesTransferred += count;
 		fcbArray[fd].chunkOffset += count;
 		bytesRemaining -= bytesTransferred;
+		
 		return bytesTransferred;
 
 	}
+
+	
 	
 }
 
 // Interface to close the file
 int b_close (b_io_fd fd) {
 	// we need to populate the final count 
+	
 	
     struct fdPathResult path = parsedPath(fcbArray[fd].fi->fileName);
     if (path.index == -1)
