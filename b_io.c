@@ -211,7 +211,8 @@ int b_write (b_io_fd fd, char * buffer, int count) {
 		tempCount -= (B_CHUNK_SIZE - fcbArray[fd].chunkOffset);
 		fcbArray[fd].chunkOffset = 0;
 		fcbArray[fd].chunkNumber += 1;
-
+		fcbArray[fd].currentIndexBlockLoc = getIndexBlockLoc(fcbArray[fd].chunkNumber, 
+			fcbArray[fd].fi);
 		// After iterating chunk number, check for existence again?
 		fileChunk = getBlockN(fcbArray[fd].chunkNumber, fcbArray[fd].fi);
 
@@ -239,6 +240,8 @@ int b_write (b_io_fd fd, char * buffer, int count) {
 
 		// iterate through the ArrayBlock and load in the next location
 		fcbArray[fd].chunkNumber++;
+		fcbArray[fd].currentIndexBlockLoc = getIndexBlockLoc(fcbArray[fd].chunkNumber, 
+			fcbArray[fd].fi);
 
 		// grab the next fileChunk
 		fileChunk = getBlockN(fcbArray[fd].chunkNumber, fcbArray[fd].fi);
@@ -248,10 +251,13 @@ int b_write (b_io_fd fd, char * buffer, int count) {
 
 	// *base case in the case that the other previous if statements dont run
 	LBAread(fcbArray[fd].localBuff, 1, fileChunk);
-	fcbArray[fd].chunkOffset += tempCount;
+	
 
 	
-	memcpy(fcbArray[fd].localBuff, buffer + writeCount, tempCount);
+	memcpy(fcbArray[fd].localBuff + fcbArray[fd].chunkOffset, buffer + writeCount, tempCount);
+
+	fcbArray[fd].chunkOffset += tempCount;
+
 	LBAwrite(fcbArray[fd].localBuff, 1, fileChunk);
 
 	writeCount += tempCount;

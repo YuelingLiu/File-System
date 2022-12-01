@@ -27,21 +27,21 @@ void printFS(uint8_t *freeSpaceMap){
 }
 
 void setBitOne(uint8_t *freeSpaceMap, int i){
-    printf("bit to set 1: %d\n", i);
-    printf("before ");
-    printFS(freeSpaceMap);
+    //printf("bit to set 1: %d\n", i);
+    //printf("before ");
+    //printFS(freeSpaceMap);
     freeSpaceMap[i >> 3] |= (1 << (i & 0x7));
-    printf("after  ");
-    printFS(freeSpaceMap);
+    //printf("after  ");
+    //printFS(freeSpaceMap);
 }
 
 void setBitZero(uint8_t *freeSpaceMap, int i){
-    printf("bit to set 0: %d\n", i);
-    printf("before ");
-    printFS(freeSpaceMap);
+    //printf("bit to set 0: %d\n", i);
+    //printf("before ");
+    //printFS(freeSpaceMap);
     freeSpaceMap[i >> 3] &= ~(1 << (i & 0x7));
-    printf("after  ");
-    printFS(freeSpaceMap);
+    //printf("after  ");
+    //printFS(freeSpaceMap);
 }
 
 bool getBit(uint8_t *freeSpaceMap, int i){

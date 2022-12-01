@@ -211,6 +211,9 @@ int getBlockN(int n, fileInfo* fi){
 //that contains the pointer to that chunk.
 int getIndexBlockLoc(int chunkNumber, fileInfo* fi){
     int blockNumber = chunkNumber / ((vcb->blockSize-sizeof(int))/sizeof(int));
+    if (blockNumber == 0){
+        return fi->location;
+    }
     int* temp = calloc(1, vcb->blockSize);
     LBAread(temp, 1, fi->location);
     int i = 0;
