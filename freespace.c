@@ -99,7 +99,6 @@ int allocContBlocks(uint8_t *freeSpaceMap, size_t fssize, int num){
 }
 
 int allocSingleBlock(uint8_t *freeSpaceMap, size_t fssize){
-    printf("freeSpaceMap in allocSingle: %p\n", freeSpaceMap);
     // amount of used blocks inside the byte before the first free one
     int firstBitOffset = 0;
     // read in one byte at a time (8 bits, 1 byte block)
