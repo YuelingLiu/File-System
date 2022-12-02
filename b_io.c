@@ -174,8 +174,6 @@ int b_write (b_io_fd fd, char * buffer, int count) {
 
 	if (startup == 0) b_init();  //Initialize our system
 
-	
-
 	// check that fd is between 0 and (MAXFCBS-1)
 	if ((fd < 0) || (fd >= MAXFCBS)) {
 		return (-1); // invalid file descriptor
@@ -257,7 +255,6 @@ int b_write (b_io_fd fd, char * buffer, int count) {
 	// *base case in the case that the other previous if statements dont run
 	LBAread(fcbArray[fd].localBuff, 1, fileChunk);
 	
-
 	memcpy(fcbArray[fd].localBuff + fcbArray[fd].chunkOffset, buffer + writeCount, tempCount);
 
 	fcbArray[fd].chunkOffset += tempCount;
@@ -419,10 +416,10 @@ int b_read (b_io_fd fd, char * buffer, int count) {
 int b_close (b_io_fd fd) {
 	// we need to populate the final count 
 	
-	
     struct fdPathResult path = parsedPath(fcbArray[fd].fi->fileName);
     if (path.index == -1)
     {
+		printf("does this work\n");
         return (-1);
     }
     int dirBlocks = blocksNeededForDir(MAXDE);
